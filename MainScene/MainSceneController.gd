@@ -4,9 +4,6 @@ extends Node
 @onready var fuseki_dumper = $ControlLayer/SettingsBackground/Settings/%FusekiDumperController
 @onready var fuseki_data : FusekiData = $FusekiData
 @onready var dt_container : BoxContainer = $DTContainer
-#audio ressources
-@onready var audio_player = $AudioStreamPlayer
-@onready var drop_sound = preload("res://Audio/drop_001.ogg")
 
 func _ready():
 	fuseki_caller.set_fuseki_data_manager(fuseki_data)
@@ -46,8 +43,6 @@ func _check_for_data():
 		get_tree().create_timer(0.5).timeout.connect(_check_for_data)
 
 func _update_fuseki_data():
-	audio_player.stream = drop_sound
-	audio_player.play()
 	dt_container.feed_fuseki_data(fuseki_data)
 
 func load_yaml_from_dump():

@@ -179,8 +179,6 @@ anchor_right = 0.5
 anchor_bottom = 0.5
 IS_IN_GAME_MENU = false
 
-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
-
 [node name="FusekiData" parent="." instance=ExtResource("5_4e51a")]
 
 [node name="CICDServer" type="Node" parent="." node_paths=PackedStringArray("container", "to_hide")]
