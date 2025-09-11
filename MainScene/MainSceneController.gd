@@ -44,21 +44,3 @@ func _check_for_data():
 
 func _update_fuseki_data():
 	dt_container.feed_fuseki_data(fuseki_data)
-
-func load_yaml_from_dump():
-	var http = HTTPRequest.new()
-	add_child(http)
-	http.request_completed.connect(self._on_HTTPRequest_yaml_completed)
-	# TODO: Fix this hardcoded URL
-	var error = http.request("https://oakeslab-polymtl.github.io/DTDF/data_dump.yaml")
-	#var error = http.request("http://localhost:1313/DTDF/data_dump.yaml")
-	if error != OK:
-		push_error("An error occurred in the HTTP request for YAML data.")
-
-func _on_HTTPRequest_yaml_completed(result, response_code, headers, body):
-	if response_code == 200:
-		var yaml_content = body.get_string_from_utf8()
-		fuseki_dumper.load_from_dump(fuseki_data, yaml_content)
-		print("YAML data loaded successfully from HTTP request")
-	else:
-		push_error("Failed to load YAML data. Response code: " + str(response_code))
