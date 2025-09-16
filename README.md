@@ -4,6 +4,10 @@ The purpose of this project is to provide users with a graphical and interactive
 
 <img width="1075" alt="image" src="https://github.com/user-attachments/assets/6841f934-bf88-4eb5-9e41-3e4e1e57c05b">
 
+## YouTube Overview
+
+[![DTInsight video](https://img.youtube.com/vi/CD0pdK-eGXY/0.jpg)](https://www.youtube.com/watch?v=CD0pdK-eGXY)
+
 # About this project
 
 This tool was built with the aim of being cross compatible with any digital twin ontology built with the Ontology Modeling Lanuage (OML) vocabulary available at "https://github.com/oakeslabmtl/DTDF". To build such ontologies we recommend tools such as openCAESAR Rosetta available at "https://github.com/opencaesar/oml-rosetta".
