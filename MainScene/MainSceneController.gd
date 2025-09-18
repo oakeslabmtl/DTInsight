@@ -12,7 +12,9 @@ func _ready():
 	
 	if OS.has_feature("web"):
 		print("Detected running on the web")
-		$ControlLayer.hide()
+		#$ControlLayer.hide()
+		$ControlLayer/ControlPanel.hide()
+		$ControlLayer/SettingsButton.hide()
 		# Start checking for data after a short delay
 		get_tree().create_timer(1.0).timeout.connect(_check_for_data)
 	else:
