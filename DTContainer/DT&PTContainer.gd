@@ -26,6 +26,10 @@ var highlighted_element = null
 var all_highlighted_element = []
 var highlighted_with_click = false
 
+# Border and background views
+var bg_view = 0
+var border_view = 0
+
 #initialization
 func _ready():
 	GenericDisplaySignals.generic_display_over.connect(_on_element_over)
@@ -42,23 +46,44 @@ class NamedNode:
 var displayed_node_list: Array[NamedNode]
 
 #Attributes
-const border_attribute : String = "hasTimeScale"
+const timescale_key : String = "hasTimeScale"
+const implementation_key : String = "hasImplementation"
 const type_attribute : String = "type"
 
 #Operator/machine
-const opperator_type : String = "Insight"
+const operator_type : String = "Insight"
 
 #Set the starting start of a node when loaded
 func set_starting_node_style(namedNode : NamedNode, attributes : Dictionary):
-	namedNode.node.set_dimmed_style()
-	if (border_attribute in attributes.keys()):
-		match attributes[border_attribute]:
+	# Structural style
+	if (PythonConfig.LOCATION_KEY in attributes.keys()):
+		namedNode.node.set_python_script_location(attributes[PythonConfig.LOCATION_KEY][0])
+	if ("HasVisualization" in attributes.keys() and attributes["HasVisualization"][0] == "true"):
+		namedNode.node.set_visualization()
+	if ("desc" in attributes.keys() and attributes["desc"][0] != ""):
+		namedNode.node.set_description(attributes["desc"][0])
+	# Visual style
+	namedNode.node.set_default_style()
+	if (implementation_key in attributes.keys()):
+		var is_border = border_view == 2
+		var is_bg = bg_view == 2
+		match attributes[implementation_key]:
+			["planned"]:
+				namedNode.node.set_node_style(StyleConfig.Implementation.PLANNED, is_bg, is_border)
+			["active"]:
+				namedNode.node.set_node_style(StyleConfig.Implementation.ACTIVE, is_bg, is_border)
+			["implemented"]:
+				namedNode.node.set_node_style(StyleConfig.Implementation.IMPLEMENTED, is_bg, is_border)
+	if (timescale_key in attributes.keys()):
+		var is_border = border_view == 3
+		var is_bg = bg_view == 3
+		match attributes[timescale_key]:
 			["slower_trt"]:
-				namedNode.node.set_slower_style()
+				namedNode.node.set_node_style(StyleConfig.Timescale.SLOWER_THAN_REALTIME, is_bg, is_border)
 			["rt"]:
-				namedNode.node.set_rt_style()
+				namedNode.node.set_node_style(StyleConfig.Timescale.REALTIME, is_bg, is_border)
 			["faster_trt"]:
-				namedNode.node.set_faster_style()
+				namedNode.node.set_node_style(StyleConfig.Timescale.FASTER_THAN_REALTIME, is_bg, is_border)
 
 #Set highlighted element on signal
 func _on_element_over(element_name, click: bool):
@@ -204,7 +229,7 @@ func update_provided_things(operator_container : HBoxContainer, machine_containe
 	var machine_data : Dictionary = {}
 	for entry_name in provided_data.keys():
 		if (type_attribute in provided_data[entry_name].keys()):
-			if (opperator_type in provided_data[entry_name][type_attribute]):
+			if (operator_type in provided_data[entry_name][type_attribute]):
 				operator_data[entry_name] = provided_data[entry_name]
 			else:
 				machine_data[entry_name] = provided_data[entry_name]
@@ -217,14 +242,6 @@ func update_node_with(visual_container : HBoxContainer, fuseki_node_data : Dicti
 	for key in fuseki_node_data.keys():
 		var new_node = GenericDisplay.instantiate()
 		new_node.set_text(key)
-		if (PythonConfig.LOCATION_KEY in fuseki_node_data[key].keys()):
-			new_node.set_python_script_location(fuseki_node_data[key][PythonConfig.LOCATION_KEY][0])
-		if ("HasVisualization" in fuseki_node_data[key].keys() and fuseki_node_data[key]["HasVisualization"][0] == "true"):
-			new_node.set_visualization()
-		if ("IsPlanned" in fuseki_node_data[key].keys() and fuseki_node_data[key]["IsPlanned"][0] == "true"):
-			new_node.set_is_planned()
-		if ("desc" in fuseki_node_data[key].keys() and fuseki_node_data[key]["desc"][0] != ""):
-			new_node.set_description(fuseki_node_data[key]["desc"][0])
 		visual_container.add_child(new_node)
 		var displayed_element = NamedNode.new()
 		displayed_element.name = key
@@ -343,6 +360,8 @@ func feed_fuseki_data(feed):
 
 #Update all displayed information on data update from a signal from FusekiCallerButton
 func on_fuseki_data_updated():
+	if fuseki_data == null:
+		return
 	displayed_node_list.clear()
 	update_node_with(service_container, fuseki_data.service)
 	update_node_with(enabler_container, fuseki_data.enabler)
@@ -386,3 +405,12 @@ func _on_rabbit_data_updated(container_name: String, data : Array[String]):
 	var last_data = data[data.size() - 1]
 	var is_bool : bool = last_data == "true" or last_data == "false"
 	container.set_info(data, is_bool)
+
+
+func _on_node_border_option_item_selected(index: int) -> void:
+	border_view = index
+	on_fuseki_data_updated()
+
+func _on_node_bg_option_item_selected(index: int) -> void:
+	bg_view = index
+	on_fuseki_data_updated()

@@ -5,7 +5,6 @@
 [ext_resource type="Script" uid="uid://chsxi3pvlcut1" path="res://Camera/CameraControl.gd" id="3_5mxu4"]
 [ext_resource type="Script" uid="uid://cwl13x3trg1o3" path="res://ControlPanel/ControlPanelSuperviser.gd" id="4_xqnle"]
 [ext_resource type="PackedScene" uid="uid://bx42q4hl46td1" path="res://Fuseki/Data/FusekiData.tscn" id="5_4e51a"]
-[ext_resource type="PackedScene" uid="uid://cwd5j8qr66eh3" path="res://Legends/Legends.tscn" id="5_8cnmr"]
 [ext_resource type="Theme" uid="uid://xukk6lvgcpaa" path="res://main_theme.tres" id="5_77ryg"]
 [ext_resource type="Script" uid="uid://wfoj63h06hpx" path="res://MainScene/help_button.gd" id="6_tgjmw"]
 [ext_resource type="Script" uid="uid://b0mon1bk14hp6" path="res://MainScene/settings_button.gd" id="7_gs64f"]
@@ -13,6 +12,7 @@
 [ext_resource type="PackedScene" uid="uid://cowug1mbtod0e" path="res://Fuseki/Caller/FusekiCallerBtton.tscn" id="8_ped26"]
 [ext_resource type="Script" uid="uid://cfkgtkfhl06v5" path="res://RabbitMQ/Control/RabbitButton.gd" id="9_qda1k"]
 [ext_resource type="Texture2D" uid="uid://doyxcp824t4vw" path="res://gear.png" id="12_77ryg"]
+[ext_resource type="PackedScene" uid="uid://cf7nrorpbpbjb" path="res://Legends/Legends.tscn" id="12_80vrr"]
 [ext_resource type="Script" uid="uid://0b3cap3tphwi" path="res://MainScene/CICDServer.gd" id="15_gmiik"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ffs3u"]
@@ -82,8 +82,6 @@ layout_mode = 2
 disabled = true
 text = "Record data form RabbitMQ :"
 script = ExtResource("9_qda1k")
-
-[node name="Legends" parent="ControlLayer" instance=ExtResource("5_8cnmr")]
 
 [node name="HelpButton" type="Button" parent="ControlLayer"]
 anchors_preset = 2
@@ -179,6 +177,89 @@ anchor_right = 0.5
 anchor_bottom = 0.5
 IS_IN_GAME_MENU = false
 
+[node name="ViewPanel" type="PanelContainer" parent="ControlLayer"]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -373.0
+offset_top = -125.0
+offset_right = -18.0
+offset_bottom = -18.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="ControlLayer/ViewPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ControlLayer/ViewPanel/MarginContainer"]
+layout_mode = 2
+
+[node name="ViewLabel" type="Label" parent="ControlLayer/ViewPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "dt component views"
+horizontal_alignment = 1
+uppercase = true
+
+[node name="HSeparator" type="HSeparator" parent="ControlLayer/ViewPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ControlLayer/ViewPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="NodeBGLabel" type="Label" parent="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "Background Color"
+
+[node name="NodeBGOption" type="OptionButton" parent="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+selected = 0
+allow_reselect = true
+item_count = 4
+popup/item_0/text = "None"
+popup/item_0/id = 0
+popup/item_1/text = "Deployment"
+popup/item_1/id = 1
+popup/item_2/text = "Implementation"
+popup/item_2/id = 2
+popup/item_3/text = "Timescale"
+popup/item_3/id = 3
+
+[node name="Legends" parent="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer" instance=ExtResource("12_80vrr")]
+layout_mode = 2
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="NodeBorderLabel" type="Label" parent="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2"]
+layout_mode = 2
+text = "Border Color"
+
+[node name="NodeBorderOption" type="OptionButton" parent="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2"]
+layout_mode = 2
+selected = 0
+allow_reselect = true
+item_count = 4
+popup/item_0/text = "None"
+popup/item_0/id = 0
+popup/item_1/text = "Deployment"
+popup/item_1/id = 1
+popup/item_2/text = "Implementation"
+popup/item_2/id = 2
+popup/item_3/text = "Timescale"
+popup/item_3/id = 3
+
+[node name="Legends" parent="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2" instance=ExtResource("12_80vrr")]
+layout_mode = 2
+
 [node name="FusekiData" parent="." instance=ExtResource("5_4e51a")]
 
 [node name="CICDServer" type="Node" parent="." node_paths=PackedStringArray("container", "to_hide")]
@@ -190,3 +271,7 @@ to_hide = [NodePath("../ControlLayer")]
 [connection signal="pressed" from="ControlLayer/HelpButton" to="ControlLayer/HelpButton" method="_on_help_button_pressed"]
 [connection signal="pressed" from="ControlLayer/SettingsButton" to="ControlLayer/SettingsButton" method="_on_pressed"]
 [connection signal="settings_menu_closed" from="ControlLayer/SettingsBackground/Settings" to="ControlLayer/SettingsButton" method="_on_settings_settings_menu_closed"]
+[connection signal="item_selected" from="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/NodeBGOption" to="DTContainer" method="_on_node_bg_option_item_selected"]
+[connection signal="item_selected" from="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/NodeBGOption" to="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/Legends" method="_on_node_style_option_item_selected"]
+[connection signal="item_selected" from="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/NodeBorderOption" to="DTContainer" method="_on_node_border_option_item_selected"]
+[connection signal="item_selected" from="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/NodeBorderOption" to="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/Legends" method="_on_node_style_option_item_selected"]

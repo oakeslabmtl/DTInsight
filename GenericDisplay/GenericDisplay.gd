@@ -18,6 +18,8 @@ var script_file_path : String = ""
 var absolute_path : String = ""
 var data : Array = []
 var highlightable : bool = true
+var bg_color : Color = StyleConfig.DTElement.DIMMED_COLOR
+var border_color : Color = StyleConfig.DTElement.BORDER_COLOR
 
 var last_loaded_pck_path: String = ""
 
@@ -32,7 +34,7 @@ func _on_display_highlight(highlighted_elements_names : Array):
 	if (element.text in highlighted_elements_names):
 		set_highlight_style()
 	else:
-		set_dimmed_style()
+		set_default_style()
 
 func _on_mouse_entered():
 	GenericDisplaySignals.generic_display_over.emit(element.text, false)
@@ -135,10 +137,6 @@ func set_description(description):
 	$PopupDescription.title = $GenericDisplay/PresentationBox/GenericElementName.text + " description"
 	$PopupDescription/DescriptionControl/DescriptionContainer/Description.text = description
 
-# Changes the style of the node when the DTComponent is planned
-func set_is_planned():
-	self_modulate = StyleConfig.DTElement.PLANNED_COLOR
-
 func set_info(new_data : Array[String], is_bool = false) -> void:
 	data = to_float_array(new_data, is_bool)
 	var node : Label = get_node("GenericDisplay/RealTimeContainer/GenericElementAttributes")
@@ -149,7 +147,6 @@ func set_info(new_data : Array[String], is_bool = false) -> void:
 			info = "on"
 		else:
 			info = "off"
-	
 	else:
 		info = format_float(last_data, 4)
 	node.text = "Real time info : \n" + info
@@ -181,7 +178,6 @@ func format_float(f: float, sig_digits: int = 4) -> String:
 	
 	return result
 
-
 func update_chart(last_data) -> void:
 	if pop_up_chart.visible == false :
 		return
@@ -190,36 +186,38 @@ func update_chart(last_data) -> void:
 	else :
 		chart.add_value(last_data)
 
-#Background style --------------------------------------------------------------
-func set_dimmed_style():
-	set_bg_color(StyleConfig.DTElement.DIMMED_COLOR)
-	set_text_color(Color.BLACK)
+# Style --------------------------------------------------------------
+## Highlights
+func set_default_style():
+	change_bg_color(bg_color)
+	change_border_color(border_color)
+	change_text_color(Color.BLACK)
 
 func set_highlight_style():
-	set_bg_color(StyleConfig.DTElement.HIGHLIGHT_COLOR)
-	set_text_color(StyleConfig.DTElement.TEXT_HIGHLIGHT_COLOR)
+	change_bg_color(StyleConfig.DTElement.HIGHLIGHT_COLOR)
+	change_text_color(StyleConfig.DTElement.TEXT_HIGHLIGHT_COLOR)
 
-func set_bg_color(color : Color):
+## Changing styles
+func change_bg_color(color : Color):
 	var styleBox : StyleBoxFlat = get_theme_stylebox("panel").duplicate()
 	styleBox.bg_color = color
 	add_theme_stylebox_override("panel", styleBox)
 	
-func set_text_color(color: Color):
+func change_border_color(color : Color):
+	var styleBox : StyleBoxFlat = get_theme_stylebox("panel").duplicate()
+	styleBox.border_color = color
+	styleBox.set_border_width_all(StyleConfig.DTElement.BORDER_WIDTH)
+	add_theme_stylebox_override("panel", styleBox)
+	
+func change_text_color(color: Color):
 	element.set("theme_override_colors/font_color", color)
 	realtime_element.set("theme_override_colors/font_color", color)
 
-#Border style ------------------------------------------------------------------
-func set_slower_style():
-	set_border_color(StyleConfig.RTBorder.SLOWER_THAN_RT_COLOR)
-
-func set_rt_style():
-	set_border_color(StyleConfig.RTBorder.RT_COLOR)
-
-func set_faster_style():
-	set_border_color(StyleConfig.RTBorder.FASTER_THAN_RT_COLOR)
-
-func set_border_color(color : Color):
-	var styleBox : StyleBoxFlat = get_theme_stylebox("panel").duplicate()
-	styleBox.border_color = color
-	styleBox.set_border_width_all(StyleConfig.RTBorder.BORDER_WIDTH)
-	add_theme_stylebox_override("panel", styleBox)
+## Style definitions
+func set_node_style(_color: Color, is_bg: bool, is_border: bool):
+	if  is_bg:
+		bg_color = _color
+		change_bg_color(bg_color)
+	if is_border:
+		border_color = _color
+		change_border_color(border_color)

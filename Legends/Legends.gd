@@ -7,15 +7,7 @@ extends Container
 const LegendElement = preload("res://Legends/LegendElement.tscn")
 
 func _ready() -> void:
-	set_retract_button_color(StyleConfig.Legends.RETRACT_BUTTON_COLOR)
 	set_panel_color(StyleConfig.Legends.PANEL_COLOR)
-	build_legends(LegendsConfig.LEGENDS)
-	retract_button.text = StyleConfig.Legends.GO_AWAY_TEXT
-
-func set_retract_button_color(color : Color):
-	var buttonStylebox : StyleBoxFlat = retract_button.get_theme_stylebox("normal").duplicate()
-	buttonStylebox.bg_color = color
-	retract_button.add_theme_stylebox_override("normal", buttonStylebox)
 
 func set_panel_color(color : Color):
 	var panelStylebox : StyleBoxFlat = legends_panel.get_theme_stylebox("panel").duplicate()
@@ -56,3 +48,24 @@ func hide_legends():
 		retract_button.text = StyleConfig.Legends.COME_IN_TEXT
 	legends_hidden = !legends_hidden
 	position += Vector2(0, translate_distance)
+
+
+func _on_node_style_option_item_selected(index: int) -> void:
+	for child in legends_container.get_children():
+		child.queue_free()
+	match index:
+		1:
+			var deployment = StyleConfig.Deployment.new()
+			var deployment_map = deployment.get_script().get_script_constant_map()
+			for key in deployment_map:
+				instanciate_legend_element(key, deployment_map[key])
+		2:
+			var implementation = StyleConfig.Implementation.new()
+			var implementation_map = implementation.get_script().get_script_constant_map()
+			for key in implementation_map:
+				instanciate_legend_element(key, implementation_map[key])
+		3:
+			var timescale = StyleConfig.Timescale.new()
+			var timescale_map = timescale.get_script().get_script_constant_map()
+			for key in timescale_map:
+				instanciate_legend_element(key, timescale_map[key])

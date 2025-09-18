@@ -6,9 +6,9 @@ const LEGENDS : Dictionary = {
 }
 
 const RT_LEGENDS : Dictionary = {
-	"Slower than realtime" : StyleConfig.RTBorder.SLOWER_THAN_RT_COLOR,
-	"Realtime" : StyleConfig.RTBorder.RT_COLOR,
-	"Faster than realtime" : StyleConfig.RTBorder.FASTER_THAN_RT_COLOR,
+	"Slower than realtime" : StyleConfig.Timescale.SLOWER_THAN_REALTIME,
+	"Realtime" : StyleConfig.Timescale.REALTIME,
+	"Faster than realtime" : StyleConfig.Timescale.FASTER_THAN_REALTIME,
 }
 
 const BG_LEGENDS : Dictionary = {
