@@ -122,19 +122,15 @@ static func parse_fuseki_json(json, is_link = false):
 				new_json_value.json_value = parse_fuseki_value(result[head]["value"])
 				tuple_aggregator.append(new_json_value)
 		result_aggregator.append(tuple_aggregator)
-	var formated_result = format_result(result_aggregator, is_link)
-	return formated_result
+	#Transform the result agregator in an array of GenericLinkedNodes or
+	#in a dictionary depending on the data type
+	return parse_link_result(result_aggregator) if (is_link) else parse_element_result(result_aggregator)
 
 #Remove oml link data from values
 static func parse_fuseki_value(value) -> String:
 	if(value.contains("#")):
 		return value.split("#")[1]
 	return value
-
-#Transform the result agregator in an array of GenericLinkedNodes or
-#in a dictionary depending on the data type
-static func format_result(result_aggregator, is_link = false):
-	return parse_link_result(result_aggregator) if (is_link) else parse_element_result(result_aggregator)
 
 #Transform the result agregator in an Array of GenericLinkedNodes
 static func parse_link_result(result_agregator) -> Array[GenericLinkedNodes]:
