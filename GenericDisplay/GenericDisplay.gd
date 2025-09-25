@@ -79,7 +79,13 @@ func _on_file_selected(pck_path: String) -> void:
 		$GenericDisplay/VisualizationContainer/HBoxContainer/VizPopUpButton.disabled = false
 
 func _on_description_button_pressed() -> void:
+	CameraSignals.disable_camera_movement.emit()
+	CameraSignals.disable_camera_zoom.emit()
 	$PopupDescription.popup()
+	
+func _on_popup_description_popup_hide() -> void:
+	CameraSignals.enable_camera_movement.emit()
+	CameraSignals.enable_camera_zoom.emit()
 
 func _on_viz_pop_up_button_pressed():
 	var pop_up_panel = $GenericDisplay/VisualizationContainer/HBoxContainer/VizPopUpButton/PopupPanel
