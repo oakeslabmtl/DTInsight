@@ -434,14 +434,14 @@ func _on_add_component_button_pressed_system() -> void:
 	on_fuseki_data_updated()
 
 func _on_add_component_button_pressed_operator() -> void:
-	var new_fuseki_node_data_insight = new_fuseki_node_data
+	var new_fuseki_node_data_insight = new_fuseki_node_data.duplicate_deep()
 	new_fuseki_node_data_insight["type"].append("Insight")
 	fuseki_data.provided_thing["new_node_" + str(new_node_index)] = new_fuseki_node_data_insight
 	new_node_index += 1
 	on_fuseki_data_updated()
 
 func _on_add_component_button_pressed_machine() -> void:
-	var new_fuseki_node_data_action = new_fuseki_node_data
+	var new_fuseki_node_data_action = new_fuseki_node_data.duplicate_deep()
 	new_fuseki_node_data_action["type"].append("Action")
 	fuseki_data.provided_thing["new_node_" + str(new_node_index)] = new_fuseki_node_data_action
 	new_node_index += 1
