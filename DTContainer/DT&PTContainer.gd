@@ -35,6 +35,9 @@ func _ready():
 	GenericDisplaySignals.generic_display_over.connect(_on_element_over)
 	RabbitSignals.updated_data.connect(_on_rabbit_data_updated)
 
+func set_fuseki_data(_fuseki_data: FusekiData) -> void:
+	fuseki_data = _fuseki_data
+
 #Node and element manipulation functions -----------------------------------------------------------
 
 #Displays node referenced by its name
@@ -413,4 +416,63 @@ func _on_node_border_option_item_selected(index: int) -> void:
 
 func _on_node_bg_option_item_selected(index: int) -> void:
 	bg_view = index
+	on_fuseki_data_updated()
+
+## Adding nodes to containers
+
+var new_node_index = 1
+var new_fuseki_node_data : Dictionary = { "type": ["NamedIndividual", "Component", "ContainedElement", "Thing", "DescribedThing", "ImplementationThing", "ConnectionComponent", "TimeScaleThing", "ConceptInstance"], "desc": ["New description here"] }
+
+func _on_add_component_button_pressed_env() -> void:
+	fuseki_data.env["new_node_" + str(new_node_index)] = new_fuseki_node_data
+	new_node_index += 1
+	on_fuseki_data_updated()
+
+func _on_add_component_button_pressed_system() -> void:
+	fuseki_data.sys_component["new_node_" + str(new_node_index)] = new_fuseki_node_data
+	new_node_index += 1
+	on_fuseki_data_updated()
+
+func _on_add_component_button_pressed_operator() -> void:
+	var new_fuseki_node_data_insight = new_fuseki_node_data
+	new_fuseki_node_data_insight["type"].append("Insight")
+	fuseki_data.provided_thing["new_node_" + str(new_node_index)] = new_fuseki_node_data_insight
+	new_node_index += 1
+	on_fuseki_data_updated()
+
+func _on_add_component_button_pressed_machine() -> void:
+	var new_fuseki_node_data_action = new_fuseki_node_data
+	new_fuseki_node_data_action["type"].append("Action")
+	fuseki_data.provided_thing["new_node_" + str(new_node_index)] = new_fuseki_node_data_action
+	new_node_index += 1
+	on_fuseki_data_updated()
+
+func _on_add_component_button_pressed_sensors() -> void:
+	fuseki_data.sensing_component["new_node_" + str(new_node_index)] = new_fuseki_node_data
+	new_node_index += 1
+	on_fuseki_data_updated()
+
+func _on_add_component_button_pressed_data_trans() -> void:
+	fuseki_data.data_transmitted["new_node_" + str(new_node_index)] = new_fuseki_node_data
+	new_node_index += 1
+	on_fuseki_data_updated()
+
+func _on_add_component_button_pressed_services() -> void:
+	fuseki_data.service["new_node_" + str(new_node_index)] = new_fuseki_node_data
+	new_node_index += 1
+	on_fuseki_data_updated()
+
+func _on_add_component_button_pressed_enablers() -> void:
+	fuseki_data.enabler["new_node_" + str(new_node_index)] = new_fuseki_node_data
+	new_node_index += 1
+	on_fuseki_data_updated()
+
+func _on_add_component_button_pressed_models() -> void:
+	fuseki_data.model["new_node_" + str(new_node_index)] = new_fuseki_node_data
+	new_node_index += 1
+	on_fuseki_data_updated()
+
+func _on_add_component_button_pressed_data() -> void:
+	fuseki_data.data["new_node_" + str(new_node_index)] = new_fuseki_node_data
+	new_node_index += 1
 	on_fuseki_data_updated()
