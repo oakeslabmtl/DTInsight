@@ -8,18 +8,22 @@ extends Node
 func _ready():
 	fuseki_caller.set_fuseki_data_manager(fuseki_data)
 	fuseki_dumper.set_fuseki_data_manager(fuseki_data)
+	dt_container.set_fuseki_data(fuseki_data)
 	FusekiSignals.fuseki_data_updated.connect(_update_fuseki_data)
 	
 	if OS.has_feature("web"):
 		print("Detected running on the web")
-		#$ControlLayer.hide()
+		# Hide UI
 		$ControlLayer/ControlPanel.hide()
 		$ControlLayer/SettingsButton.hide()
+		
 		# Start checking for data after a short delay
 		get_tree().create_timer(1.0).timeout.connect(_check_for_data)
 	else:
+		# Use RabbitMQ if not on the web
 		RabbitMq.set_fuseki_data_manager(fuseki_data)
 
+# Checks for YAML data from the web page it is embedded in
 func _check_for_data():
 	print("🔍 Checking for YAML data...")
 	
@@ -41,7 +45,6 @@ func _check_for_data():
 		fuseki_dumper.load_from_dump(fuseki_data, result)
 	else:
 		print("⏳ No data yet, will try again...")
-		# Try again in 0.5 seconds
 		get_tree().create_timer(0.5).timeout.connect(_check_for_data)
 
 func _update_fuseki_data():
