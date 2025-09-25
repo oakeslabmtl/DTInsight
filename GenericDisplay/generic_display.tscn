@@ -220,8 +220,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 4.0
 offset_top = 4.0
-offset_right = -4.0
-offset_bottom = -4.0
+offset_right = 396.0
+offset_bottom = 221.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -306,3 +306,4 @@ text = "Select the DT script folder in the settings first"
 [connection signal="pressed" from="GenericDisplay/VisualizationContainer/HBoxContainer/VizPopUpButton" to="." method="_on_viz_pop_up_button_pressed"]
 [connection signal="popup_hide" from="PopupDescription" to="." method="_on_popup_description_popup_hide"]
 [connection signal="text_changed" from="PopupDescription/DescriptionControl/DescriptionContainer/ComponentNameContainer/ComponentNameEdit" to="." method="_on_component_name_edit_text_changed"]
+[connection signal="text_changed" from="PopupDescription/DescriptionControl/DescriptionContainer/Description" to="." method="_on_description_text_changed"]

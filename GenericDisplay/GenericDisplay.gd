@@ -139,6 +139,7 @@ func set_visualization():
 
 # Enables a button showing DTComponent information
 func set_description(description):
+	tooltip_text = description
 	$GenericDisplay/PresentationBox/DescriptionButton.show()
 	$PopupDescription/DescriptionControl/DescriptionContainer/ComponentNameContainer/ComponentNameEdit.text = $GenericDisplay/PresentationBox/GenericElementName.text
 	$PopupDescription/DescriptionControl/DescriptionContainer/Description.text = description
@@ -148,6 +149,10 @@ func set_description(description):
 func _on_component_name_edit_text_changed() -> void:
 	$GenericDisplay/PresentationBox/GenericElementName.text = $PopupDescription/DescriptionControl/DescriptionContainer/ComponentNameContainer/ComponentNameEdit.text
 	# TODO: Keep link information when name changes
+
+# Editable component description
+func _on_description_text_changed() -> void:
+	tooltip_text = $PopupDescription/DescriptionControl/DescriptionContainer/Description.text
 
 func set_info(new_data : Array[String], is_bool = false) -> void:
 	data = to_float_array(new_data, is_bool)
