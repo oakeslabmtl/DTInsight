@@ -137,11 +137,17 @@ func set_visualization():
 		if last_loaded_pck_path.is_empty():
 			$GenericDisplay/VisualizationContainer/HBoxContainer/VizPopUpButton.disabled = true
 
-# Enables a button showing DTComponent's description
+# Enables a button showing DTComponent information
 func set_description(description):
 	$GenericDisplay/PresentationBox/DescriptionButton.show()
-	$PopupDescription.title = $GenericDisplay/PresentationBox/GenericElementName.text + " description"
+	$PopupDescription/DescriptionControl/DescriptionContainer/ComponentNameContainer/ComponentNameEdit.text = $GenericDisplay/PresentationBox/GenericElementName.text
 	$PopupDescription/DescriptionControl/DescriptionContainer/Description.text = description
+	$PopupDescription/DescriptionControl/DescriptionContainer/ComponentNameContainer/ComponentNameEdit.grab_focus()
+
+# Editable component name
+func _on_component_name_edit_text_changed() -> void:
+	$GenericDisplay/PresentationBox/GenericElementName.text = $PopupDescription/DescriptionControl/DescriptionContainer/ComponentNameContainer/ComponentNameEdit.text
+	# TODO: Keep link information when name changes
 
 func set_info(new_data : Array[String], is_bool = false) -> void:
 	data = to_float_array(new_data, is_bool)

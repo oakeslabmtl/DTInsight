@@ -204,9 +204,9 @@ layout_mode = 2
 [node name="PopupDescription" type="PopupPanel" parent="."]
 disable_3d = true
 oversampling_override = 1.0
-title = "Description"
+title = "Component Information"
 initial_position = 4
-size = Vector2i(400, 200)
+size = Vector2i(400, 225)
 unresizable = false
 borderless = false
 always_on_top = true
@@ -218,8 +218,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 4.0
 offset_top = 4.0
-offset_right = 396.0
-offset_bottom = 196.0
+offset_right = -4.0
+offset_bottom = -4.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -231,10 +231,31 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="ComponentNameContainer" type="HBoxContainer" parent="PopupDescription/DescriptionControl/DescriptionContainer"]
+custom_minimum_size = Vector2(0, 35)
+layout_mode = 2
+
+[node name="ComponentNameLabel" type="Label" parent="PopupDescription/DescriptionControl/DescriptionContainer/ComponentNameContainer"]
+layout_mode = 2
+text = "Name:"
+
+[node name="ComponentNameEdit" type="TextEdit" parent="PopupDescription/DescriptionControl/DescriptionContainer/ComponentNameContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+focus_next = NodePath("../../Description")
+placeholder_text = "Placeholder component name"
+
+[node name="HSeparator" type="HSeparator" parent="PopupDescription/DescriptionControl/DescriptionContainer"]
+layout_mode = 2
+
+[node name="DescriptionLabel" type="Label" parent="PopupDescription/DescriptionControl/DescriptionContainer"]
+layout_mode = 2
+text = "Description:"
+
 [node name="Description" type="TextEdit" parent="PopupDescription/DescriptionControl/DescriptionContainer"]
 layout_mode = 2
 size_flags_vertical = 3
-text = "No description"
+placeholder_text = "No description"
 wrap_mode = 1
 
 [node name="PopupScript" type="PopupPanel" parent="."]
@@ -254,8 +275,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 4.0
 offset_top = 4.0
-offset_right = 516.0
-offset_bottom = 516.0
+offset_right = -4.0
+offset_bottom = -4.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("3_ipcor")
@@ -282,3 +303,4 @@ text = "Select the DT script folder in the settings first"
 [connection signal="pressed" from="GenericDisplay/VisualizationContainer/HBoxContainer/VizPickerButton" to="." method="_on_viz_picker_button_pressed"]
 [connection signal="pressed" from="GenericDisplay/VisualizationContainer/HBoxContainer/VizPopUpButton" to="." method="_on_viz_pop_up_button_pressed"]
 [connection signal="popup_hide" from="PopupDescription" to="." method="_on_popup_description_popup_hide"]
+[connection signal="text_changed" from="PopupDescription/DescriptionControl/DescriptionContainer/ComponentNameContainer/ComponentNameEdit" to="." method="_on_component_name_edit_text_changed"]
