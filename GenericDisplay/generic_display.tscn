@@ -218,8 +218,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 4.0
 offset_top = 4.0
-offset_right = 396.0
-offset_bottom = 196.0
+offset_right = -4.0
+offset_bottom = -4.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -231,10 +231,11 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Description" type="RichTextLabel" parent="PopupDescription/DescriptionControl/DescriptionContainer"]
+[node name="Description" type="TextEdit" parent="PopupDescription/DescriptionControl/DescriptionContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 text = "No description"
+wrap_mode = 1
 
 [node name="PopupScript" type="PopupPanel" parent="."]
 disable_3d = true
