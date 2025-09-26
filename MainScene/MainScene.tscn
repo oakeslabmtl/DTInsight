@@ -172,7 +172,7 @@ popup/item_3/id = 3
 [node name="Legends" parent="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2" instance=ExtResource("12_80vrr")]
 layout_mode = 2
 
-[node name="PanelContainer" type="PanelContainer" parent="ControlLayer"]
+[node name="VisualEditingPanelContainer" type="PanelContainer" parent="ControlLayer"]
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
@@ -184,7 +184,7 @@ grow_vertical = 0
 size_flags_horizontal = 0
 size_flags_vertical = 0
 
-[node name="EditButton" type="CheckButton" parent="ControlLayer/PanelContainer"]
+[node name="VisualEditingButton" type="CheckButton" parent="ControlLayer/VisualEditingPanelContainer"]
 layout_mode = 2
 tooltip_text = "Enables the visual editing of the DT constellation"
 text = "Visual editing"
@@ -295,6 +295,8 @@ to_hide = [NodePath("../ControlLayer")]
 [connection signal="item_selected" from="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/NodeBGOption" to="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/Legends" method="_on_node_style_option_item_selected"]
 [connection signal="item_selected" from="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/NodeBorderOption" to="DTContainer" method="_on_node_border_option_item_selected"]
 [connection signal="item_selected" from="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/NodeBorderOption" to="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/Legends" method="_on_node_style_option_item_selected"]
+[connection signal="ready" from="ControlLayer/VisualEditingPanelContainer/VisualEditingButton" to="DTContainer" method="_on_visual_editing_button_ready" flags=18]
+[connection signal="toggled" from="ControlLayer/VisualEditingPanelContainer/VisualEditingButton" to="DTContainer" method="_on_visual_editing_button_toggled"]
 [connection signal="pressed" from="ControlLayer/HelpButton" to="ControlLayer/HelpButton" method="_on_help_button_pressed"]
 [connection signal="pressed" from="ControlLayer/SettingsButton" to="ControlLayer/SettingsButton" method="_on_pressed"]
 [connection signal="settings_menu_closed" from="ControlLayer/SettingsBackground/Settings" to="ControlLayer/SettingsButton" method="_on_settings_settings_menu_closed"]

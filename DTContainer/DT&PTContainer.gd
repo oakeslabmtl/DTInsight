@@ -426,53 +426,92 @@ var new_fuseki_node_data : Dictionary = { "type": ["NamedIndividual", "Component
 func _on_add_component_button_pressed_env() -> void:
 	fuseki_data.env["new_node_" + str(new_node_index)] = new_fuseki_node_data
 	new_node_index += 1
-	on_fuseki_data_updated()
+	update_node_with(env_container, fuseki_data.env)
 
 func _on_add_component_button_pressed_system() -> void:
 	fuseki_data.sys_component["new_node_" + str(new_node_index)] = new_fuseki_node_data
 	new_node_index += 1
-	on_fuseki_data_updated()
+	update_node_with(sys_container, fuseki_data.sys_component)
 
 func _on_add_component_button_pressed_operator() -> void:
 	var new_fuseki_node_data_insight = new_fuseki_node_data.duplicate_deep()
 	new_fuseki_node_data_insight["type"].append("Insight")
 	fuseki_data.provided_thing["new_node_" + str(new_node_index)] = new_fuseki_node_data_insight
 	new_node_index += 1
-	on_fuseki_data_updated()
+	update_provided_things(operator_container, machine_container, fuseki_data.provided_thing)
 
 func _on_add_component_button_pressed_machine() -> void:
 	var new_fuseki_node_data_action = new_fuseki_node_data.duplicate_deep()
 	new_fuseki_node_data_action["type"].append("Action")
 	fuseki_data.provided_thing["new_node_" + str(new_node_index)] = new_fuseki_node_data_action
 	new_node_index += 1
-	on_fuseki_data_updated()
+	update_provided_things(operator_container, machine_container, fuseki_data.provided_thing)
 
 func _on_add_component_button_pressed_sensors() -> void:
 	fuseki_data.sensing_component["new_node_" + str(new_node_index)] = new_fuseki_node_data
 	new_node_index += 1
-	on_fuseki_data_updated()
+	update_node_with(sensor_container, fuseki_data.sensing_component)
 
 func _on_add_component_button_pressed_data_trans() -> void:
 	fuseki_data.data_transmitted["new_node_" + str(new_node_index)] = new_fuseki_node_data
 	new_node_index += 1
-	on_fuseki_data_updated()
+	update_node_with(data_transmitted_container, fuseki_data.data_transmitted)
 
 func _on_add_component_button_pressed_services() -> void:
 	fuseki_data.service["new_node_" + str(new_node_index)] = new_fuseki_node_data
 	new_node_index += 1
-	on_fuseki_data_updated()
+	update_node_with(service_container, fuseki_data.service)
 
 func _on_add_component_button_pressed_enablers() -> void:
 	fuseki_data.enabler["new_node_" + str(new_node_index)] = new_fuseki_node_data
 	new_node_index += 1
-	on_fuseki_data_updated()
+	update_node_with(enabler_container, fuseki_data.enabler)
 
 func _on_add_component_button_pressed_models() -> void:
 	fuseki_data.model["new_node_" + str(new_node_index)] = new_fuseki_node_data
 	new_node_index += 1
-	on_fuseki_data_updated()
+	update_node_with(model_container, fuseki_data.model)
 
 func _on_add_component_button_pressed_data() -> void:
 	fuseki_data.data["new_node_" + str(new_node_index)] = new_fuseki_node_data
 	new_node_index += 1
-	on_fuseki_data_updated()
+	update_node_with(data_container, fuseki_data.data)
+
+## Visual editing
+
+func _on_visual_editing_button_toggled(toggled_on: bool) -> void:
+	if toggled_on:
+		enable_visual_editing()
+	else:
+		disable_visual_editing()
+
+func enable_visual_editing():
+	$DTContainer/EnablersPanel/AddComponentButton.show()
+	$DTContainer/ServicesPanel/AddComponentButton.show()
+	$DTContainer/ModelsDataPanel/AddComponentButton.show()
+	$PTContainer/DataTravelContainer/DataOutPanel/AddComponentButton.show()
+	$PTContainer/DataTravelContainer/MachinePanel/AddComponentButton.show()
+	$"PTContainer/Operator&EnvContainer/OperatorPanel/AddComponentButton".show()
+	$"PTContainer/Operator&EnvContainer/ExperimentContainer/EnvPanel/AddComponentButton".show()
+	$"PTContainer/Operator&EnvContainer/ExperimentContainer/SystemPanel/AddComponentButton".show()
+	$DTContainer/ModelsDataPanel/ModelsDataContainer/ModelsPanelContainer/AddComponentButton.show()
+	$PTContainer/DataTravelContainer/DataOutPanel/DataOutContainer/HBoxContainer/AddComponentButton.show()
+
+func disable_visual_editing():
+	$DTContainer/EnablersPanel/AddComponentButton.hide()
+	$DTContainer/ServicesPanel/AddComponentButton.hide()
+	$DTContainer/ModelsDataPanel/AddComponentButton.hide()
+	$PTContainer/DataTravelContainer/DataOutPanel/AddComponentButton.hide()
+	$PTContainer/DataTravelContainer/MachinePanel/AddComponentButton.hide()
+	$"PTContainer/Operator&EnvContainer/OperatorPanel/AddComponentButton".hide()
+	$"PTContainer/Operator&EnvContainer/ExperimentContainer/EnvPanel/AddComponentButton".hide()
+	$"PTContainer/Operator&EnvContainer/ExperimentContainer/SystemPanel/AddComponentButton".hide()
+	$DTContainer/ModelsDataPanel/ModelsDataContainer/ModelsPanelContainer/AddComponentButton.hide()
+	$PTContainer/DataTravelContainer/DataOutPanel/DataOutContainer/HBoxContainer/AddComponentButton.hide()
+
+
+func _on_visual_editing_button_ready(source: Node) -> void:
+	if source.button_pressed:
+		enable_visual_editing()
+	else:
+		disable_visual_editing()
