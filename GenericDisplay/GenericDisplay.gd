@@ -53,11 +53,15 @@ func _on_mouse_exited():
 	GenericDisplaySignals.generic_display_over.emit("", false)
 	
 func _gui_input(event: InputEvent) -> void:
-	if event.button_mask == MOUSE_BUTTON_LEFT and highlightable:
-		highlightable = false
-		GenericDisplaySignals.generic_display_over.emit(element.text, true)
-		await get_tree().create_timer(0.2).timeout
-		highlightable = true
+	if event is InputEventMouseButton:
+		if event.button_mask == MOUSE_BUTTON_LEFT and highlightable:
+			highlightable = false
+			GenericDisplaySignals.generic_display_over.emit(element.text, true)
+			await get_tree().create_timer(0.2).timeout
+			highlightable = true
+		if event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
+			if $GenericDisplay/PresentationBox/EditButton.visible:
+				$PopupDescription.popup()
 
 func _on_pop_up_button_pressed() -> void:
 	chart.feed_historic(data)
