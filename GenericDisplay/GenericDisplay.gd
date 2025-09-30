@@ -5,6 +5,7 @@ class_name GenericDisplay
 @onready var element : Label = $GenericDisplay/PresentationBox/GenericElementName
 @onready var realtime_element : Label = $GenericDisplay/RealTimeContainer/GenericElementAttributes
 @onready var script_button = $GenericDisplay/PresentationBox/ScriptButton
+@onready var edit_button = $GenericDisplay/PresentationBox/EditButton
 @onready var real_time_container = $GenericDisplay/RealTimeContainer
 @onready var attributes : Label = $GenericDisplay/RealTimeContainer/GenericElementAttributes
 @onready var visualization_container = $GenericDisplay/VisualizationContainer
@@ -21,6 +22,9 @@ var highlightable : bool = true
 var bg_color : Color = StyleConfig.DTElement.DIMMED_COLOR
 var border_color : Color = StyleConfig.DTElement.BORDER_COLOR
 
+var node_name_before_edit: String
+var node_desc_before_edit: String
+
 var last_loaded_pck_path: String = ""
 
 func _ready():
@@ -28,6 +32,12 @@ func _ready():
 	ChartSignals.hide.connect(_on_hide_chart_pop_up_signal)
 	ScriptSignals.hide.connect(_on_hide_script_pop_up_signal)
 	ScriptSignals.scripts_folder_selected.connect(_on_script_folder_updated)
+	
+	var buttons = get_tree().get_nodes_in_group("main_buttons")
+	for btn in buttons:
+		if btn.name == "VisualEditingButton":
+			btn.toggled.connect(_on_visual_editing_toggled)
+			_on_visual_editing_toggled(btn.button_pressed)
 
 #Signal handling ---------------------------------------------------------------
 func _on_display_highlight(highlighted_elements_names : Array):
@@ -67,6 +77,12 @@ func _on_script_folder_updated(dir : String) -> void:
 	script_software_directory = dir
 	set_python_script()
 
+func _on_visual_editing_toggled(enabled: bool):
+	if enabled:
+		edit_button.show()
+	else:
+		edit_button.hide()
+
  #Trigger the file dialog when the button is pressed
 func _on_viz_picker_button_pressed() -> void:
 	var file_picker = $GenericDisplay/FilePicker
@@ -78,14 +94,25 @@ func _on_file_selected(pck_path: String) -> void:
 	if not last_loaded_pck_path.is_empty():
 		$GenericDisplay/VisualizationContainer/HBoxContainer/VizPopUpButton.disabled = false
 
-func _on_description_button_pressed() -> void:
+func _on_edit_button_pressed() -> void:
+	$PopupDescription.popup()
+
+func _on_popup_description_about_to_popup() -> void:
 	CameraSignals.disable_camera_movement.emit()
 	CameraSignals.disable_camera_zoom.emit()
-	$PopupDescription.popup()
+	# Save current variables
+	node_name_before_edit = $GenericDisplay/PresentationBox/GenericElementName.text
 	
 func _on_popup_description_popup_hide() -> void:
 	CameraSignals.enable_camera_movement.emit()
 	CameraSignals.enable_camera_zoom.emit()
+	
+	# Emit signal to edit the node's FusekiData
+	var node_name = $GenericDisplay/PresentationBox/GenericElementName.text
+	var node_desc = $PopupDescription/DescriptionControl/DescriptionContainer/Description.text
+	var parent_container = get_parent()
+	# Edit the descirption
+	GenericDisplaySignals.generic_display_edit.emit(node_name_before_edit, parent_container, false, node_name, node_desc)
 
 func _on_viz_pop_up_button_pressed():
 	var pop_up_panel = $GenericDisplay/VisualizationContainer/HBoxContainer/VizPopUpButton/PopupPanel
@@ -140,7 +167,6 @@ func set_visualization():
 # Enables a button showing DTComponent information
 func set_description(description):
 	tooltip_text = description
-	$GenericDisplay/PresentationBox/DescriptionButton.show()
 	$PopupDescription/DescriptionControl/DescriptionContainer/ComponentNameContainer/ComponentNameEdit.text = $GenericDisplay/PresentationBox/GenericElementName.text
 	$PopupDescription/DescriptionControl/DescriptionContainer/Description.text = description
 	$PopupDescription/DescriptionControl/DescriptionContainer/ComponentNameContainer/ComponentNameEdit.grab_focus()
@@ -148,7 +174,6 @@ func set_description(description):
 # Editable component name
 func _on_component_name_edit_text_changed() -> void:
 	$GenericDisplay/PresentationBox/GenericElementName.text = $PopupDescription/DescriptionControl/DescriptionContainer/ComponentNameContainer/ComponentNameEdit.text
-	# TODO: Keep link information when name changes
 
 # Editable component description
 func _on_description_text_changed() -> void:
@@ -238,3 +263,11 @@ func set_node_style(_color: Color, is_bg: bool, is_border: bool):
 	if is_border:
 		border_color = _color
 		change_border_color(border_color)
+
+func _on_delete_button_pressed() -> void:
+	var node_name = $GenericDisplay/PresentationBox/GenericElementName.text
+	var parent_container = get_parent()
+	GenericDisplaySignals.generic_display_edit.emit(node_name, parent_container, true, "", "")
+	CameraSignals.enable_camera_movement.emit()
+	CameraSignals.enable_camera_zoom.emit()
+	queue_free()

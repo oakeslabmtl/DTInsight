@@ -33,7 +33,14 @@ var border_view = 0
 #initialization
 func _ready():
 	GenericDisplaySignals.generic_display_over.connect(_on_element_over)
+	GenericDisplaySignals.generic_display_edit.connect(edit_node)
 	RabbitSignals.updated_data.connect(_on_rabbit_data_updated)
+	
+	var buttons = get_tree().get_nodes_in_group("main_buttons")
+	for btn in buttons:
+		if btn.name == "VisualEditingButton":
+			btn.toggled.connect(_on_visual_editing_toggled)
+			_on_visual_editing_toggled(btn.button_pressed)
 
 func set_fuseki_data(_fuseki_data: FusekiData) -> void:
 	fuseki_data = _fuseki_data
@@ -389,7 +396,7 @@ func _process(_delta):
 static func free_all_child(node : Node):
 	for child in node.get_children():
 		if (child.get_class() == "PanelContainer"):
-			child.free()
+			child.queue_free()
 
 #Draw all links
 func _draw():
@@ -421,65 +428,73 @@ func _on_node_bg_option_item_selected(index: int) -> void:
 ## Adding nodes to containers
 
 var new_node_index = 1
-var new_fuseki_node_data : Dictionary = { "type": ["NamedIndividual", "Component", "ContainedElement", "Thing", "DescribedThing", "ImplementationThing", "ConnectionComponent", "TimeScaleThing", "ConceptInstance"], "desc": ["New description here"] }
+var default_fuseki_node_data : Dictionary = { "type": ["NamedIndividual", "Component", "ContainedElement", "Thing", "DescribedThing", "ImplementationThing", "ConnectionComponent", "TimeScaleThing", "ConceptInstance"], "desc": ["New description here"] }
 
 func _on_add_component_button_pressed_env() -> void:
+	var new_fuseki_node_data = default_fuseki_node_data.duplicate_deep()
 	fuseki_data.env["new_node_" + str(new_node_index)] = new_fuseki_node_data
 	new_node_index += 1
 	update_node_with(env_container, fuseki_data.env)
 
 func _on_add_component_button_pressed_system() -> void:
+	var new_fuseki_node_data = default_fuseki_node_data.duplicate_deep()
 	fuseki_data.sys_component["new_node_" + str(new_node_index)] = new_fuseki_node_data
 	new_node_index += 1
 	update_node_with(sys_container, fuseki_data.sys_component)
 
 func _on_add_component_button_pressed_operator() -> void:
-	var new_fuseki_node_data_insight = new_fuseki_node_data.duplicate_deep()
-	new_fuseki_node_data_insight["type"].append("Insight")
-	fuseki_data.provided_thing["new_node_" + str(new_node_index)] = new_fuseki_node_data_insight
+	var new_fuseki_node_data = default_fuseki_node_data.duplicate_deep()
+	new_fuseki_node_data["type"].append("Insight")
+	fuseki_data.provided_thing["new_node_" + str(new_node_index)] = new_fuseki_node_data
 	new_node_index += 1
 	update_provided_things(operator_container, machine_container, fuseki_data.provided_thing)
 
 func _on_add_component_button_pressed_machine() -> void:
-	var new_fuseki_node_data_action = new_fuseki_node_data.duplicate_deep()
-	new_fuseki_node_data_action["type"].append("Action")
-	fuseki_data.provided_thing["new_node_" + str(new_node_index)] = new_fuseki_node_data_action
+	var new_fuseki_node_data = default_fuseki_node_data.duplicate_deep()
+	new_fuseki_node_data["type"].append("Action")
+	fuseki_data.provided_thing["new_node_" + str(new_node_index)] = new_fuseki_node_data
 	new_node_index += 1
 	update_provided_things(operator_container, machine_container, fuseki_data.provided_thing)
 
 func _on_add_component_button_pressed_sensors() -> void:
+	var new_fuseki_node_data = default_fuseki_node_data.duplicate_deep()
 	fuseki_data.sensing_component["new_node_" + str(new_node_index)] = new_fuseki_node_data
 	new_node_index += 1
 	update_node_with(sensor_container, fuseki_data.sensing_component)
 
 func _on_add_component_button_pressed_data_trans() -> void:
+	var new_fuseki_node_data = default_fuseki_node_data.duplicate_deep()
 	fuseki_data.data_transmitted["new_node_" + str(new_node_index)] = new_fuseki_node_data
 	new_node_index += 1
 	update_node_with(data_transmitted_container, fuseki_data.data_transmitted)
 
 func _on_add_component_button_pressed_services() -> void:
+	var new_fuseki_node_data = default_fuseki_node_data.duplicate_deep()
 	fuseki_data.service["new_node_" + str(new_node_index)] = new_fuseki_node_data
 	new_node_index += 1
 	update_node_with(service_container, fuseki_data.service)
 
 func _on_add_component_button_pressed_enablers() -> void:
+	var new_fuseki_node_data = default_fuseki_node_data.duplicate_deep()
 	fuseki_data.enabler["new_node_" + str(new_node_index)] = new_fuseki_node_data
 	new_node_index += 1
 	update_node_with(enabler_container, fuseki_data.enabler)
 
 func _on_add_component_button_pressed_models() -> void:
+	var new_fuseki_node_data = default_fuseki_node_data.duplicate_deep()
 	fuseki_data.model["new_node_" + str(new_node_index)] = new_fuseki_node_data
 	new_node_index += 1
 	update_node_with(model_container, fuseki_data.model)
 
 func _on_add_component_button_pressed_data() -> void:
+	var new_fuseki_node_data = default_fuseki_node_data.duplicate_deep()
 	fuseki_data.data["new_node_" + str(new_node_index)] = new_fuseki_node_data
 	new_node_index += 1
 	update_node_with(data_container, fuseki_data.data)
 
 ## Visual editing
 
-func _on_visual_editing_button_toggled(toggled_on: bool) -> void:
+func _on_visual_editing_toggled(toggled_on: bool) -> void:
 	if toggled_on:
 		enable_visual_editing()
 	else:
@@ -509,9 +524,128 @@ func disable_visual_editing():
 	$DTContainer/ModelsDataPanel/ModelsDataContainer/ModelsPanelContainer/AddComponentButton.hide()
 	$PTContainer/DataTravelContainer/DataOutPanel/DataOutContainer/HBoxContainer/AddComponentButton.hide()
 
+func rename_dict_key(dict: Dictionary, old_key, new_key) -> void:
+	if old_key == new_key or not dict.has(old_key):
+		return  # nothing to do
+	var keys = dict.keys()
+	var values = dict.values()
+	for i in range(keys.size()):
+		if keys[i] == old_key:
+			keys[i] = new_key
+			break
+	dict.clear()
+	for i in range(keys.size()):
+		dict[keys[i]] = values[i]
 
-func _on_visual_editing_button_ready(source: Node) -> void:
-	if source.button_pressed:
-		enable_visual_editing()
-	else:
-		disable_visual_editing()
+# Edit the FusekiData of a specific node
+func edit_node(node_name: String, parent_container: Node, delete: bool, new_node_name: String, new_node_description: String):
+	match parent_container:
+		service_container:
+			if delete:
+				fuseki_data.service.erase(node_name)
+			else:
+				if node_name != new_node_name:
+					rename_dict_key(fuseki_data.service, node_name, new_node_name)
+					node_name = new_node_name
+				if new_node_description:
+					fuseki_data.service[node_name]["desc"] = [new_node_description]
+			update_node_with(service_container, fuseki_data.service)
+
+		enabler_container:
+			if delete:
+				fuseki_data.enabler.erase(node_name)
+			else:
+				if node_name != new_node_name:
+					rename_dict_key(fuseki_data.enabler, node_name, new_node_name)
+					node_name = new_node_name
+				if new_node_description:
+					fuseki_data.enabler[node_name]["desc"] = [new_node_description]
+			update_node_with(enabler_container, fuseki_data.enabler)
+
+		model_container:
+			if delete:
+				fuseki_data.model.erase(node_name)
+			else:
+				if node_name != new_node_name:
+					rename_dict_key(fuseki_data.model, node_name, new_node_name)
+					node_name = new_node_name
+				if new_node_description:
+					fuseki_data.model[node_name]["desc"] = [new_node_description]
+			update_node_with(model_container, fuseki_data.model)
+
+		data_container:
+			if delete:
+				fuseki_data.data.erase(node_name)
+			else:
+				if node_name != new_node_name:
+					rename_dict_key(fuseki_data.data, node_name, new_node_name)
+					node_name = new_node_name
+				if new_node_description:
+					fuseki_data.data[node_name]["desc"] = [new_node_description]
+			update_node_with(data_container, fuseki_data.data)
+
+		operator_container:
+			if delete:
+				fuseki_data.provided_thing.erase(node_name)
+			else:
+				if node_name != new_node_name:
+					rename_dict_key(fuseki_data.provided_thing, node_name, new_node_name)
+					node_name = new_node_name
+				if new_node_description:
+					fuseki_data.provided_thing[node_name]["desc"] = [new_node_description]
+			update_provided_things(operator_container, machine_container, fuseki_data.provided_thing)
+
+		machine_container:
+			if delete:
+				fuseki_data.provided_thing.erase(node_name)
+			else:
+				if node_name != new_node_name:
+					rename_dict_key(fuseki_data.provided_thing, node_name, new_node_name)
+					node_name = new_node_name
+				if new_node_description:
+					fuseki_data.provided_thing[node_name]["desc"] = [new_node_description]
+			update_provided_things(operator_container, machine_container, fuseki_data.provided_thing)
+
+		data_transmitted_container:
+			if delete:
+				fuseki_data.data_transmitted.erase(node_name)
+			else:
+				if node_name != new_node_name:
+					rename_dict_key(fuseki_data.data_transmitted, node_name, new_node_name)
+					node_name = new_node_name
+				if new_node_description:
+					fuseki_data.data_transmitted[node_name]["desc"] = [new_node_description]
+			update_node_with(data_transmitted_container, fuseki_data.data_transmitted)
+
+		sensor_container:
+			if delete:
+				fuseki_data.sensing_component.erase(node_name)
+			else:
+				if node_name != new_node_name:
+					rename_dict_key(fuseki_data.sensing_component, node_name, new_node_name)
+					node_name = new_node_name
+				if new_node_description:
+					fuseki_data.sensing_component[node_name]["desc"] = [new_node_description]
+			update_node_with(sensor_container, fuseki_data.sensing_component)
+
+		env_container:
+			if delete:
+				fuseki_data.env.erase(node_name)
+			else:
+				if node_name != new_node_name:
+					rename_dict_key(fuseki_data.env, node_name, new_node_name)
+					node_name = new_node_name
+				if new_node_description:
+					fuseki_data.env[node_name]["desc"] = [new_node_description]
+			update_node_with(env_container, fuseki_data.env)
+
+		sys_container:
+			if delete:
+				fuseki_data.sys_component.erase(node_name)
+			else:
+				if node_name != new_node_name:
+					rename_dict_key(fuseki_data.sys_component, node_name, new_node_name)
+					node_name = new_node_name
+				if new_node_description:
+					fuseki_data.sys_component[node_name]["desc"] = [new_node_description]
+			update_node_with(sys_container, fuseki_data.sys_component)

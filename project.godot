@@ -46,6 +46,10 @@ project/assembly_name="DigitalTwinVisualisationProject"
 
 enabled=PackedStringArray("res://addons/easy_charts/plugin.cfg", "res://addons/modular-settings-menu/plugin.cfg")
 
+[global_group]
+
+main_buttons=""
+
 [input]
 
 cam_zoom_in={
