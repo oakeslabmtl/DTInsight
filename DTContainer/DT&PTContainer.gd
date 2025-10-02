@@ -76,6 +76,8 @@ func set_starting_node_style(generic_node : GenericDisplay, attributes : Diction
 		generic_node.set_visualization()
 	if ("desc" in attributes.keys() and attributes["desc"][0] != ""):
 		generic_node.set_description(attributes["desc"][0])
+	else:
+		generic_node.set_description("")
 	# Visual style
 	generic_node.set_default_style()
 	generic_node.set_node_style(StyleConfig.DTElement.DIMMED_COLOR, true, false)
