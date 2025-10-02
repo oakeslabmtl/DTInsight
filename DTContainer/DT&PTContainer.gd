@@ -18,6 +18,14 @@ class_name DT_PT
 #Access to fuseki data
 var fuseki_data : FusekiData = null
 
+var links_as_dict_enabler_to_service : Dictionary = {}
+var links_as_dict_model_to_enabler : Dictionary = {}
+var links_as_dict_service_to_provided_thing : Dictionary = {}
+var links_as_dict_sensor_to_data_transmitted : Dictionary = {}
+var links_as_dict_data_to_enabler : Dictionary = {}
+var links_as_dict_data_transmitted_to_data : Dictionary = {}
+
+
 #Load the generic display scene
 const GenericDisplay = preload("res://GenericDisplay/generic_display.tscn")
 
@@ -47,13 +55,9 @@ func set_fuseki_data(_fuseki_data: FusekiData) -> void:
 
 #Node and element manipulation functions -----------------------------------------------------------
 
-#Displays node referenced by its name
-class NamedNode:
-	var name : String
-	var node : GenericDisplay
-
 #Array of displayes nodes
-var displayed_node_list: Array[NamedNode]
+var displayed_node_list: Array[Node]
+var link_dict: Dictionary
 
 #Attributes
 const timescale_key : String = "hasTimeScale"
@@ -64,36 +68,38 @@ const type_attribute : String = "type"
 const operator_type : String = "Insight"
 
 #Set the starting start of a node when loaded
-func set_starting_node_style(namedNode : NamedNode, attributes : Dictionary):
+func set_starting_node_style(generic_node : GenericDisplay, attributes : Dictionary):
 	# Structural style
 	if (PythonConfig.LOCATION_KEY in attributes.keys()):
-		namedNode.node.set_python_script_location(attributes[PythonConfig.LOCATION_KEY][0])
+		generic_node.set_python_script_location(attributes[PythonConfig.LOCATION_KEY][0])
 	if ("HasVisualization" in attributes.keys() and attributes["HasVisualization"][0] == "true"):
-		namedNode.node.set_visualization()
+		generic_node.set_visualization()
 	if ("desc" in attributes.keys() and attributes["desc"][0] != ""):
-		namedNode.node.set_description(attributes["desc"][0])
+		generic_node.set_description(attributes["desc"][0])
 	# Visual style
-	namedNode.node.set_default_style()
+	generic_node.set_default_style()
+	generic_node.set_node_style(StyleConfig.DTElement.DIMMED_COLOR, true, false)
+	generic_node.set_node_style(StyleConfig.DTElement.BORDER_COLOR, false, true)
 	if (implementation_key in attributes.keys()):
 		var is_border = border_view == 2
 		var is_bg = bg_view == 2
 		match attributes[implementation_key]:
 			["planned"]:
-				namedNode.node.set_node_style(StyleConfig.Implementation.PLANNED, is_bg, is_border)
+				generic_node.set_node_style(StyleConfig.Implementation.PLANNED, is_bg, is_border)
 			["active"]:
-				namedNode.node.set_node_style(StyleConfig.Implementation.ACTIVE, is_bg, is_border)
+				generic_node.set_node_style(StyleConfig.Implementation.ACTIVE, is_bg, is_border)
 			["implemented"]:
-				namedNode.node.set_node_style(StyleConfig.Implementation.IMPLEMENTED, is_bg, is_border)
-	if (timescale_key in attributes.keys()):
+				generic_node.set_node_style(StyleConfig.Implementation.IMPLEMENTED, is_bg, is_border)
+	elif (timescale_key in attributes.keys()):
 		var is_border = border_view == 3
 		var is_bg = bg_view == 3
 		match attributes[timescale_key]:
 			["slower_trt"]:
-				namedNode.node.set_node_style(StyleConfig.Timescale.SLOWER_THAN_REALTIME, is_bg, is_border)
+				generic_node.set_node_style(StyleConfig.Timescale.SLOWER_THAN_REALTIME, is_bg, is_border)
 			["rt"]:
-				namedNode.node.set_node_style(StyleConfig.Timescale.REALTIME, is_bg, is_border)
+				generic_node.set_node_style(StyleConfig.Timescale.REALTIME, is_bg, is_border)
 			["faster_trt"]:
-				namedNode.node.set_node_style(StyleConfig.Timescale.FASTER_THAN_REALTIME, is_bg, is_border)
+				generic_node.set_node_style(StyleConfig.Timescale.FASTER_THAN_REALTIME, is_bg, is_border)
 
 #Set highlighted element on signal
 func _on_element_over(element_name, click: bool):
@@ -129,12 +135,10 @@ func _on_element_over(element_name, click: bool):
 #Return a node by its name in the displayes_node_list
 func get_node_by_name(node_name : String) -> GenericDisplay:
 	for displayed_node in displayed_node_list:
-		if (displayed_node.name == node_name && displayed_node.node != null):
-			return displayed_node.node
-	var displayed_node_list_string = ""
-	for displayed_node in displayed_node_list:
-		displayed_node_list_string += displayed_node.name
-	print(node_name + " not found in " + displayed_node_list_string)
+		if (displayed_node.name == node_name && displayed_node != null):
+			return displayed_node
+	#print(node_name + " not found in :")
+	#print(displayed_node_list)
 	return null
 
 #Get a list of elements connected to inputed element
@@ -155,14 +159,14 @@ static func get_middle_x(node) -> int:
 	return node_position.x + node_size.x / 2 - StyleConfig.Link.WIDTH / 2
 
 #Return middle bottom position of a node
-func get_bottom_side(node) -> Vector2:
+func get_bottom_side(node: Node) -> Vector2:
 	var node_position = node.global_position
 	var node_size = node.size
 	var corrected_position = Vector2(DT_PT.get_middle_x(node), node_position.y + node_size.y)
 	return corrected_position
 
 #Return middle top position of a node
-func get_top_side(node) -> Vector2:
+func get_top_side(node: Node) -> Vector2:
 	var node_position = node.global_position
 	var corrected_position = Vector2(DT_PT.get_middle_x(node), node_position.y)
 	return corrected_position
@@ -248,22 +252,25 @@ func update_provided_things(operator_container : HBoxContainer, machine_containe
 
 #Update a node with Fuseki element data by creating a generic display node
 func update_node_with(visual_container : HBoxContainer, fuseki_node_data : Dictionary):
-	DT_PT.free_all_child(visual_container)
+	#DT_PT.free_all_child(visual_container)
 	for key in fuseki_node_data.keys():
-		var new_node = GenericDisplay.instantiate()
-		new_node.set_text(key)
-		visual_container.add_child(new_node)
-		var displayed_element = NamedNode.new()
-		displayed_element.name = key
-		displayed_element.node = new_node
-		displayed_node_list.append(displayed_element)
-		set_starting_node_style(displayed_element, fuseki_node_data[key])
+		var dt_component = get_node_by_name(key)
+		if dt_component == null:
+			var new_node : GenericDisplay = GenericDisplay.instantiate()
+			new_node.name = key
+			new_node.set_text(key)
+			visual_container.add_child(new_node)
+			displayed_node_list.append(new_node)
+			set_starting_node_style(new_node, fuseki_node_data[key])
+		else:
+			set_starting_node_style(dt_component, fuseki_node_data[key])
 
-#Transform fuseki link data (a list a link) to a dictionary
-func to_link_dictionary(fuseki_link_data) -> Dictionary:
-	var links : Dictionary = {} #desination as key -> list 
+#Transform fuseki link data to a dictionary (source node -> destination node)
+func to_link_dictionary(links, fuseki_link_data):
 	for link in fuseki_link_data:
 		var source_node = get_node_by_name(link.source)
+		if source_node == null:
+			return {}
 		if(not links.has(source_node)):
 			links[source_node] = []
 		links[source_node].append(get_node_by_name(link.destination))
@@ -278,7 +285,7 @@ func get_appropriate_link_color(is_in_critical_path : bool):
 	return StyleConfig.Link.HIGHLIGHT_COLOR if is_in_critical_path else StyleConfig.Link.DIMMED_COLOR
 
 #Draw from element node on y axis to linking lane on x axis, with an arrow if destination of link
-func draw_element_to_lane(node, drawable_y_position : int, color : Color, destination : bool = false) -> int:
+func draw_element_to_lane(node, drawable_y_position : int, color : Color, destination : bool = false):
 	var is_pointing_up : bool = node.global_position.y < drawable_y_position
 	var drawing_position_element : Vector2 = get_bottom_side(node) if (is_pointing_up) else get_top_side(node)
 	var adjusted_x : int = get_drawable_x_position(drawing_position_element.x)
@@ -307,22 +314,22 @@ func draw_link_lane(x_drawn : Array[int], x_highlight : Array[int], drawable_y_p
 		draw_line_differed(Vector2(most_left_highlight_x_position, drawable_y_position), Vector2(most_right_highlight_x_position, drawable_y_position), StyleConfig.Link.HIGHLIGHT_COLOR, StyleConfig.Link.WIDTH, true)
 
 #Get not already drawed y 
-func get_drawable_y_height(key, array_nodes: Array) -> int:
-	var potential_y_position = (key.global_position.y + key.size.y + array_nodes[0].global_position.y) / 2
+func get_drawable_y_height(key_node: Node, array_nodes: Array) -> int:
+	var potential_y_position = (key_node.global_position.y + key_node.size.y + array_nodes[0].global_position.y) / 2
 	return get_viable_position(potential_y_position, already_drawn_y, 1)
 
 #Get not already drawed x
 func get_drawable_x_position(potential_x : int) -> int:
 	return get_viable_position(potential_x, already_drawn_x, 1)
 
-func get_drawable_y_position_for_container_side(side : ContainerSide, key : Object, links : Array) -> int:
+func get_drawable_y_position_for_container_side(side : ContainerSide, key_node : Node, links : Array) -> int:
 	match side :
 		ContainerSide.ANY :
-			return get_drawable_y_height(key, links)
+			return get_drawable_y_height(key_node, links)
 		ContainerSide.TOP :
-			return get_viable_position(get_top_side(key).y - StyleConfig.Link.MEAN_OUTER_LINK_DISTANCE, already_drawn_y, 1)
+			return get_viable_position(get_top_side(key_node).y - StyleConfig.Link.MEAN_OUTER_LINK_DISTANCE, already_drawn_y, 1)
 		ContainerSide.BOTTOM :
-			return get_viable_position(get_bottom_side(key).y + StyleConfig.Link.MEAN_OUTER_LINK_DISTANCE, already_drawn_y, 1)
+			return get_viable_position(get_bottom_side(key_node).y + StyleConfig.Link.MEAN_OUTER_LINK_DISTANCE, already_drawn_y, 1)
 	return 0
 
 func get_viable_position(potential : int, concerned_list : Array[int], iteration : int) -> int:
@@ -336,22 +343,23 @@ func get_viable_position(potential : int, concerned_list : Array[int], iteration
 		return potential
 
 #With Fuseki link data draw those links
-func update_link_with(fuseki_link_data, force_side_source : ContainerSide = ContainerSide.ANY):
-	if(fuseki_link_data == null):
-		return
-	var links_as_dict : Dictionary = to_link_dictionary(fuseki_link_data)
-	for key in links_as_dict.keys():
-		var drawable_y_position : int = get_drawable_y_position_for_container_side(force_side_source, key, links_as_dict[key])
+func update_link_with(links_as_dict: Dictionary, force_side_source : ContainerSide = ContainerSide.ANY):
+	for key_node in links_as_dict.keys():
+		if key_node == null or links_as_dict[key_node][0] == null:
+			continue
+		var drawable_y_position : int = get_drawable_y_position_for_container_side(force_side_source, key_node, links_as_dict[key_node])
 		var x_drawn_list : Array[int] = []
 		var x_highlight_list : Array[int] = []
-		var source_in_critical_path : bool = in_critical_path(key, links_as_dict[key])
+		var source_in_critical_path : bool = in_critical_path(key_node, links_as_dict[key_node])
 		var source_color : Color = get_appropriate_link_color(source_in_critical_path)
-		var source_x = draw_element_to_lane(key, drawable_y_position, source_color)
+		var source_x = draw_element_to_lane(key_node, drawable_y_position, source_color)
 		x_drawn_list.append(source_x)
 		if(source_in_critical_path):
 			x_highlight_list.append(source_x)
-		for association_element in links_as_dict[key]:
-			var destination_in_critical_path : bool = in_critical_path(key, [association_element])
+		for association_element in links_as_dict[key_node]:
+			if association_element == null or links_as_dict[key_node][0] == null:
+				continue
+			var destination_in_critical_path : bool = in_critical_path(key_node, [association_element])
 			var arrow_color : Color = get_appropriate_link_color(destination_in_critical_path)
 			var drawn_x : int = draw_element_to_lane(association_element, drawable_y_position, arrow_color, true)
 			x_drawn_list.append(drawn_x)
@@ -364,6 +372,9 @@ func update_link_with(fuseki_link_data, force_side_source : ContainerSide = Cont
 #Feed fuseki data
 func feed_fuseki_data(feed):
 	fuseki_data = feed
+	for displayed_node in displayed_node_list:
+		displayed_node.get_parent().remove_child(displayed_node)
+	displayed_node_list.clear()
 	on_fuseki_data_updated()
 	await get_tree().create_timer(0.2).timeout
 	CameraSignals.zoom_to_fit.emit(get_rect())
@@ -372,7 +383,6 @@ func feed_fuseki_data(feed):
 func on_fuseki_data_updated():
 	if fuseki_data == null:
 		return
-	displayed_node_list.clear()
 	update_node_with(service_container, fuseki_data.service)
 	update_node_with(enabler_container, fuseki_data.enabler)
 	update_node_with(model_container, fuseki_data.model)
@@ -382,6 +392,22 @@ func on_fuseki_data_updated():
 	update_node_with(env_container, fuseki_data.env)
 	update_node_with(sys_container, fuseki_data.sys_component)
 	update_node_with(data_container, fuseki_data.data)
+	
+	update_link_dicts()
+
+func update_link_dicts():
+	links_as_dict_enabler_to_service.clear()
+	links_as_dict_model_to_enabler.clear()
+	links_as_dict_service_to_provided_thing.clear()
+	links_as_dict_sensor_to_data_transmitted.clear()
+	links_as_dict_data_to_enabler.clear()
+	links_as_dict_data_transmitted_to_data.clear()
+	to_link_dictionary(links_as_dict_enabler_to_service, fuseki_data.enabler_to_service)
+	to_link_dictionary(links_as_dict_model_to_enabler, fuseki_data.model_to_enabler)
+	to_link_dictionary(links_as_dict_service_to_provided_thing, fuseki_data.service_to_provided_thing)
+	to_link_dictionary(links_as_dict_sensor_to_data_transmitted, fuseki_data.sensor_to_data_transmitted)
+	to_link_dictionary(links_as_dict_data_to_enabler, fuseki_data.data_to_enabler)
+	to_link_dictionary(links_as_dict_data_transmitted_to_data, fuseki_data.data_transmitted_to_data)
 
 func _process(_delta):
 	already_drawn_x.clear()
@@ -400,13 +426,13 @@ static func free_all_child(node : Node):
 
 #Draw all links
 func _draw():
-	if (not fuseki_data == null):
-		update_link_with(fuseki_data.enabler_to_service)
-		update_link_with(fuseki_data.model_to_enabler)
-		update_link_with(fuseki_data.service_to_provided_thing, ContainerSide.TOP)
-		update_link_with(fuseki_data.sensor_to_data_transmitted)
-		update_link_with(fuseki_data.data_to_enabler)
-		update_link_with(fuseki_data.data_transmitted_to_data, ContainerSide.BOTTOM)
+	if (fuseki_data):
+		update_link_with(links_as_dict_enabler_to_service)
+		update_link_with(links_as_dict_model_to_enabler)
+		update_link_with(links_as_dict_service_to_provided_thing, ContainerSide.TOP)
+		update_link_with(links_as_dict_sensor_to_data_transmitted)
+		update_link_with(links_as_dict_data_to_enabler)
+		update_link_with(links_as_dict_data_transmitted_to_data, ContainerSide.BOTTOM)
 		draw_all_differed()
 
 # Rabbit MQ data integration ---------------------------------------------------
@@ -537,15 +563,24 @@ func rename_dict_key(dict: Dictionary, old_key, new_key) -> void:
 	for i in range(keys.size()):
 		dict[keys[i]] = values[i]
 
+func delete_component(node_name, fuseki_dict, parent_container: Node):
+	fuseki_dict.erase(node_name)
+	get_node_by_name(node_name).queue_free()
+	displayed_node_list.erase(get_node_by_name(node_name))
+
+func rename_component(fuseki_dict, node_name, new_node_name):
+	rename_dict_key(fuseki_dict, node_name, new_node_name)
+	get_node_by_name(node_name).name = new_node_name
+	
 # Edit the FusekiData of a specific node
 func edit_node(node_name: String, parent_container: Node, delete: bool, new_node_name: String, new_node_description: String):
 	match parent_container:
 		service_container:
 			if delete:
-				fuseki_data.service.erase(node_name)
+				delete_component(node_name, fuseki_data.service, parent_container)
 			else:
 				if node_name != new_node_name:
-					rename_dict_key(fuseki_data.service, node_name, new_node_name)
+					rename_component(fuseki_data.service, node_name, new_node_name)
 					node_name = new_node_name
 				if new_node_description:
 					fuseki_data.service[node_name]["desc"] = [new_node_description]
@@ -553,10 +588,10 @@ func edit_node(node_name: String, parent_container: Node, delete: bool, new_node
 
 		enabler_container:
 			if delete:
-				fuseki_data.enabler.erase(node_name)
+				delete_component(node_name, fuseki_data.enabler, parent_container)
 			else:
 				if node_name != new_node_name:
-					rename_dict_key(fuseki_data.enabler, node_name, new_node_name)
+					rename_component(fuseki_data.enabler, node_name, new_node_name)
 					node_name = new_node_name
 				if new_node_description:
 					fuseki_data.enabler[node_name]["desc"] = [new_node_description]
@@ -564,10 +599,10 @@ func edit_node(node_name: String, parent_container: Node, delete: bool, new_node
 
 		model_container:
 			if delete:
-				fuseki_data.model.erase(node_name)
+				delete_component(node_name, fuseki_data.model, parent_container)
 			else:
 				if node_name != new_node_name:
-					rename_dict_key(fuseki_data.model, node_name, new_node_name)
+					rename_component(fuseki_data.model, node_name, new_node_name)
 					node_name = new_node_name
 				if new_node_description:
 					fuseki_data.model[node_name]["desc"] = [new_node_description]
@@ -575,10 +610,10 @@ func edit_node(node_name: String, parent_container: Node, delete: bool, new_node
 
 		data_container:
 			if delete:
-				fuseki_data.data.erase(node_name)
+				delete_component(node_name, fuseki_data.data, parent_container)
 			else:
 				if node_name != new_node_name:
-					rename_dict_key(fuseki_data.data, node_name, new_node_name)
+					rename_component(fuseki_data.data, node_name, new_node_name)
 					node_name = new_node_name
 				if new_node_description:
 					fuseki_data.data[node_name]["desc"] = [new_node_description]
@@ -586,10 +621,10 @@ func edit_node(node_name: String, parent_container: Node, delete: bool, new_node
 
 		operator_container:
 			if delete:
-				fuseki_data.provided_thing.erase(node_name)
+				delete_component(node_name, fuseki_data.provided_thing, parent_container)
 			else:
 				if node_name != new_node_name:
-					rename_dict_key(fuseki_data.provided_thing, node_name, new_node_name)
+					rename_component(fuseki_data.provided_thing, node_name, new_node_name)
 					node_name = new_node_name
 				if new_node_description:
 					fuseki_data.provided_thing[node_name]["desc"] = [new_node_description]
@@ -597,10 +632,10 @@ func edit_node(node_name: String, parent_container: Node, delete: bool, new_node
 
 		machine_container:
 			if delete:
-				fuseki_data.provided_thing.erase(node_name)
+				delete_component(node_name, fuseki_data.provided_thing, parent_container)
 			else:
 				if node_name != new_node_name:
-					rename_dict_key(fuseki_data.provided_thing, node_name, new_node_name)
+					rename_component(fuseki_data.provided_thing, node_name, new_node_name)
 					node_name = new_node_name
 				if new_node_description:
 					fuseki_data.provided_thing[node_name]["desc"] = [new_node_description]
@@ -608,10 +643,10 @@ func edit_node(node_name: String, parent_container: Node, delete: bool, new_node
 
 		data_transmitted_container:
 			if delete:
-				fuseki_data.data_transmitted.erase(node_name)
+				delete_component(node_name, fuseki_data.data_transmitted, parent_container)
 			else:
 				if node_name != new_node_name:
-					rename_dict_key(fuseki_data.data_transmitted, node_name, new_node_name)
+					rename_component(fuseki_data.data_transmitted, node_name, new_node_name)
 					node_name = new_node_name
 				if new_node_description:
 					fuseki_data.data_transmitted[node_name]["desc"] = [new_node_description]
@@ -619,10 +654,10 @@ func edit_node(node_name: String, parent_container: Node, delete: bool, new_node
 
 		sensor_container:
 			if delete:
-				fuseki_data.sensing_component.erase(node_name)
+				delete_component(node_name, fuseki_data.sensing_component, parent_container)
 			else:
 				if node_name != new_node_name:
-					rename_dict_key(fuseki_data.sensing_component, node_name, new_node_name)
+					rename_component(fuseki_data.sensing_component, node_name, new_node_name)
 					node_name = new_node_name
 				if new_node_description:
 					fuseki_data.sensing_component[node_name]["desc"] = [new_node_description]
@@ -630,10 +665,10 @@ func edit_node(node_name: String, parent_container: Node, delete: bool, new_node
 
 		env_container:
 			if delete:
-				fuseki_data.env.erase(node_name)
+				delete_component(node_name, fuseki_data.env, parent_container)
 			else:
 				if node_name != new_node_name:
-					rename_dict_key(fuseki_data.env, node_name, new_node_name)
+					rename_component(fuseki_data.env, node_name, new_node_name)
 					node_name = new_node_name
 				if new_node_description:
 					fuseki_data.env[node_name]["desc"] = [new_node_description]
@@ -641,11 +676,12 @@ func edit_node(node_name: String, parent_container: Node, delete: bool, new_node
 
 		sys_container:
 			if delete:
-				fuseki_data.sys_component.erase(node_name)
+				delete_component(node_name, fuseki_data.sys_component, parent_container)
 			else:
 				if node_name != new_node_name:
-					rename_dict_key(fuseki_data.sys_component, node_name, new_node_name)
+					rename_component(fuseki_data.sys_component, node_name, new_node_name)
 					node_name = new_node_name
 				if new_node_description:
 					fuseki_data.sys_component[node_name]["desc"] = [new_node_description]
 			update_node_with(sys_container, fuseki_data.sys_component)
+	update_link_dicts()

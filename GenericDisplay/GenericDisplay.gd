@@ -235,6 +235,8 @@ func update_chart(last_data) -> void:
 # Style --------------------------------------------------------------
 ## Highlights
 func set_default_style():
+	set_node_style(bg_color, true, false)
+	set_node_style(border_color, false, true)
 	change_bg_color(bg_color)
 	change_border_color(border_color)
 	change_text_color(Color.BLACK)
@@ -261,7 +263,7 @@ func change_text_color(color: Color):
 
 ## Style definitions
 func set_node_style(_color: Color, is_bg: bool, is_border: bool):
-	if  is_bg:
+	if is_bg:
 		bg_color = _color
 		change_bg_color(bg_color)
 	if is_border:
@@ -274,4 +276,3 @@ func _on_delete_button_pressed() -> void:
 	GenericDisplaySignals.generic_display_edit.emit(node_name, parent_container, true, "", "")
 	CameraSignals.enable_camera_movement.emit()
 	CameraSignals.enable_camera_zoom.emit()
-	queue_free()
