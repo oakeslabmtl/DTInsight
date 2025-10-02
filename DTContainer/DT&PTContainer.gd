@@ -456,7 +456,7 @@ func _on_node_bg_option_item_selected(index: int) -> void:
 ## Adding nodes to containers
 
 var new_node_index = 1
-var default_fuseki_node_data : Dictionary = { "type": ["NamedIndividual", "Component", "ContainedElement", "Thing", "DescribedThing", "ImplementationThing", "ConnectionComponent", "TimeScaleThing", "ConceptInstance"], "desc": ["New description here"] }
+var default_fuseki_node_data : Dictionary = { "type": ["NamedIndividual", "Component", "ContainedElement", "Thing", "DescribedThing", "ImplementationThing", "ConnectionComponent", "TimeScaleThing", "ConceptInstance"], "desc": [""] }
 
 func _on_add_component_button_pressed_env() -> void:
 	var new_fuseki_node_data = default_fuseki_node_data.duplicate_deep()
