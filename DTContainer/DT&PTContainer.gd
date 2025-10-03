@@ -347,7 +347,11 @@ func get_viable_position(potential : int, concerned_list : Array[int], iteration
 #With Fuseki link data draw those links
 func update_link_with(links_as_dict: Dictionary, force_side_source : ContainerSide = ContainerSide.ANY):
 	for key_node in links_as_dict.keys():
-		if key_node == null or links_as_dict[key_node][0] == null:
+		if key_node == null:
+			continue
+		# Remove null values from the array
+		links_as_dict[key_node] = links_as_dict[key_node].filter(func(e): return e != null)
+		if links_as_dict[key_node].is_empty():
 			continue
 		var drawable_y_position : int = get_drawable_y_position_for_container_side(force_side_source, key_node, links_as_dict[key_node])
 		var x_drawn_list : Array[int] = []
@@ -359,8 +363,6 @@ func update_link_with(links_as_dict: Dictionary, force_side_source : ContainerSi
 		if(source_in_critical_path):
 			x_highlight_list.append(source_x)
 		for association_element in links_as_dict[key_node]:
-			if association_element == null or links_as_dict[key_node][0] == null:
-				continue
 			var destination_in_critical_path : bool = in_critical_path(key_node, [association_element])
 			var arrow_color : Color = get_appropriate_link_color(destination_in_critical_path)
 			var drawn_x : int = draw_element_to_lane(association_element, drawable_y_position, arrow_color, true)
