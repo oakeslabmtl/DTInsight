@@ -689,4 +689,3 @@ func edit_node(node_name: String, parent_container: Node, delete: bool, new_node
 					fuseki_data.sys_component[node_name]["desc"] = [new_node_description]
 			update_node_with(sys_container, fuseki_data.sys_component)
 	fuseki_data.build_relations()
-	update_link_dicts()
