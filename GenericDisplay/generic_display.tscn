@@ -1,9 +1,23 @@
-[gd_scene load_steps=10 format=3 uid="uid://tvcjlrt40n0q"]
+[gd_scene load_steps=12 format=3 uid="uid://tvcjlrt40n0q"]
 
 [ext_resource type="Script" uid="uid://ost4ju4q0ybe" path="res://GenericDisplay/GenericDisplay.gd" id="1_5lixw"]
 [ext_resource type="Script" uid="uid://jeh5r2brp2mt" path="res://GenericDisplay/PopUpChart/PopUpChartControl.gd" id="2_5nhr6"]
 [ext_resource type="PackedScene" uid="uid://dlwq4kmdb3bhs" path="res://addons/easy_charts/control_charts/chart.tscn" id="3_0c6qw"]
 [ext_resource type="Script" uid="uid://qe3n3obtygdn" path="res://GenericDisplay/PopUpScript/PopUpScriptControl.gd" id="3_ipcor"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6yx0x"]
+content_margin_left = 10.0
+content_margin_top = 5.0
+content_margin_right = 10.0
+content_margin_bottom = 5.0
+bg_color = Color(0, 0, 0, 0.7490196)
+corner_radius_top_left = 25
+corner_radius_top_right = 25
+corner_radius_bottom_right = 25
+corner_radius_bottom_left = 25
+
+[sub_resource type="Theme" id="Theme_5nhr6"]
+TooltipPanel/styles/panel = SubResource("StyleBoxFlat_6yx0x")
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2niug"]
 content_margin_left = 20.0
@@ -61,10 +75,11 @@ corner_detail = 5
 viewport_path = NodePath("GenericDisplay/VisualizationContainer/HBoxContainer/VizPopUpButton/PopupPanel/TextureRect/SubViewport")
 
 [node name="GenericDisplayContainer" type="PanelContainer"]
-offset_right = 97.0
+offset_right = 123.0
 offset_bottom = 43.0
 size_flags_vertical = 4
 mouse_default_cursor_shape = 2
+theme = SubResource("Theme_5nhr6")
 theme_override_styles/panel = SubResource("StyleBoxFlat_2niug")
 script = ExtResource("1_5lixw")
 
@@ -180,8 +195,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 4.0
 offset_top = 4.0
-offset_right = 516.0
-offset_bottom = 516.0
+offset_right = -4.0
+offset_bottom = -4.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("2_5nhr6")
@@ -220,8 +235,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 4.0
 offset_top = 4.0
-offset_right = 396.0
-offset_bottom = 221.0
+offset_right = -4.0
+offset_bottom = -4.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -291,8 +306,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 4.0
 offset_top = 4.0
-offset_right = 516.0
-offset_bottom = 516.0
+offset_right = -4.0
+offset_bottom = -4.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("3_ipcor")
