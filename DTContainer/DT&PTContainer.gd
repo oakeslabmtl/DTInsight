@@ -227,6 +227,41 @@ var highlighted_lines : Array[Dictionary] = []
 var dimmed_triangles : Array[Dictionary] = []
 var highlighted_triangles : Array[Dictionary] = []
 
+# 3 dictionary with (source node -> [destination node, ...])
+# Differencing the bot and top containers for formatting the arrows correctly
+var user_links : Dictionary = {}
+var user_links_bot2bot : Dictionary = {}
+var user_links_top2top : Dictionary = {}
+
+# 2 list for top and bottom containers, for formatting the arrows correctly
+var top_container := [
+	"ServicesContainer",
+	"MachineContainer",
+	"OperatorContainer"
+]
+var bot_container := [
+	"DataTransmittedContainer",
+	"ModelsContainer",
+	"DataContainer",
+	"SystemContainer",
+	"EnvContainer"
+]
+
+# Add link a user-drawn link
+func _add_user_link(src: GenericDisplay, dest: GenericDisplay):
+	if src.get_parent().name in bot_container and dest.get_parent().name in bot_container:
+		if not user_links_bot2bot.has(src):
+			user_links_bot2bot[src] = []
+		user_links_bot2bot[src].append(dest)
+	elif src.get_parent().name in top_container and dest.get_parent().name in top_container:
+		if not user_links_top2top.has(src):
+			user_links_top2top[src] = []
+		user_links_top2top[src].append(dest)
+	else:
+		if not user_links.has(src):
+			user_links[src] = []
+		user_links[src].append(dest)
+
 #Add lines to call list
 func draw_line_differed(start: Vector2, end: Vector2, color: Color, width : int, antialiased: bool):
 	if (color == StyleConfig.Link.DIMMED_COLOR):
@@ -472,6 +507,9 @@ func _draw():
 		update_link_with(links_as_dict_sensor_to_data_transmitted)
 		update_link_with(links_as_dict_data_to_enabler)
 		update_link_with(links_as_dict_data_transmitted_to_data, ContainerSide.BOTTOM)
+		update_link_with(user_links)
+		update_link_with(user_links_bot2bot, ContainerSide.BOTTOM)
+		update_link_with(user_links_top2top, ContainerSide.TOP)
 		draw_all_differed()
 
 # Rabbit MQ data integration ---------------------------------------------------
