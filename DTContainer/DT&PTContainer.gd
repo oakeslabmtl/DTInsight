@@ -43,6 +43,10 @@ func _ready():
 	GenericDisplaySignals.generic_display_over.connect(_on_element_over)
 	GenericDisplaySignals.generic_display_edit.connect(edit_node)
 	RabbitSignals.updated_data.connect(_on_rabbit_data_updated)
+
+	GenericDisplaySignals.start_drag.connect(_on_start_drag)
+	GenericDisplaySignals.dragging.connect(_on_dragging)
+	GenericDisplaySignals.stop_drag.connect(_on_stop_drag)
 	
 	var buttons = get_tree().get_nodes_in_group("main_buttons")
 	for btn in buttons:
@@ -54,6 +58,37 @@ func set_fuseki_data(_fuseki_data: FusekiData) -> void:
 	fuseki_data = _fuseki_data
 
 #Node and element manipulation functions -----------------------------------------------------------
+
+# Drag and drop functions
+var dragging_from : GenericDisplay = null
+var current_hover_target : GenericDisplay = null
+
+func get_node_under_mouse(pos : Vector2) -> GenericDisplay:
+	for node in displayed_node_list:
+		if node.get_global_rect().has_point(pos):
+			return node
+	return null
+
+func _on_start_drag(node):
+	dragging_from = node
+	current_hover_target = null
+
+func _on_dragging(node, mouse_pos):
+	if dragging_from == null:
+		return		
+	var hovered = get_node_under_mouse(mouse_pos)
+	if hovered != dragging_from:
+		current_hover_target = hovered
+
+func _on_stop_drag(node):
+	if dragging_from == null:
+		return	
+	if current_hover_target != null and current_hover_target != dragging_from:
+		_add_user_link(dragging_from, current_hover_target)
+
+	# reset
+	dragging_from = null
+	current_hover_target = null
 
 #Array of displayes nodes
 var displayed_node_list: Array[Node]

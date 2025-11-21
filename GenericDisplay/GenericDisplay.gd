@@ -51,7 +51,10 @@ func _on_mouse_entered():
 
 func _on_mouse_exited():
 	GenericDisplaySignals.generic_display_over.emit("", false)
-	
+
+var is_dragging = false
+var drag_start_position : Vector2
+
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		if event.button_mask == MOUSE_BUTTON_LEFT and highlightable:
@@ -62,6 +65,20 @@ func _gui_input(event: InputEvent) -> void:
 		if event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
 			if $GenericDisplay/PresentationBox/EditButton.visible:
 				$PopupDescription.popup()
+		if event.button_index == MOUSE_BUTTON_LEFT:
+			if event.pressed:
+				# Drag start
+				is_dragging = true
+				drag_start_position = get_global_mouse_position()
+				GenericDisplaySignals.start_drag.emit(self)
+			else:
+				# End drag
+				if is_dragging:
+					is_dragging = false
+					GenericDisplaySignals.stop_drag.emit(self)
+	if event is InputEventMouseMotion and is_dragging:
+		GenericDisplaySignals.dragging.emit(self, get_global_mouse_position())
+
 
 func _on_pop_up_button_pressed() -> void:
 	chart.feed_historic(data)
