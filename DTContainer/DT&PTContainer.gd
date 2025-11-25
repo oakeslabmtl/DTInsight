@@ -673,6 +673,23 @@ func _draw():
 		update_link_with(user_links_top2top, ContainerSide.TOP, "top2top")
 		draw_all_differed()
 
+	if deletion_mode and hovered_link != null and not hovered_link.is_empty():
+		var col = Color.RED
+		var width = StyleConfig.Link.WIDTH + 2
+		var ly = hovered_link["lane_y"]
+		var sx = hovered_link["source_x"]
+		var dx = hovered_link["dest_x"]
+		var src_node = hovered_link["source"]
+		var dest_node = hovered_link["destination"]
+		draw_line(Vector2(sx, ly), Vector2(dx, ly), col, width, true)
+		var src_y_edge = get_bottom_side(src_node).y if src_node.global_position.y < ly else get_top_side(src_node).y
+		draw_line(Vector2(sx, src_y_edge), Vector2(sx, ly), col, width, true)
+		var dest_y_edge = get_bottom_side(dest_node).y if dest_node.global_position.y < ly else get_top_side(dest_node).y
+		draw_line(Vector2(dx, ly), Vector2(dx, dest_y_edge), col, width, true)
+		var is_pointing_up = dest_node.global_position.y < ly
+		var vertical_shift = StyleConfig.Link.WIDTH if is_pointing_up else - StyleConfig.Link.WIDTH
+		draw_triangle(Vector2(dx, dest_y_edge), vertical_shift, col, is_pointing_up)
+
 # Rabbit MQ data integration ---------------------------------------------------
 func _on_rabbit_data_updated(container_name: String, data : Array[String]):
 	var container : GenericDisplay = get_node_by_name(container_name)
