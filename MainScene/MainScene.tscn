@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://cxj8tr6re2b4t"]
+[gd_scene load_steps=17 format=3 uid="uid://cxj8tr6re2b4t"]
 
 [ext_resource type="PackedScene" uid="uid://nqgolpvgp7yg" path="res://DTContainer/DT&PTContainer.tscn" id="1_lklxr"]
 [ext_resource type="Script" uid="uid://dfun6prbhxg7c" path="res://MainScene/MainSceneController.gd" id="1_r7thu"]
@@ -19,6 +19,8 @@
 border_color = Color(0.259294, 0.259294, 0.259294, 1)
 corner_radius_bottom_right = 20
 corner_radius_bottom_left = 20
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_80vrr"]
 
 [node name="MainScene" type="Node"]
 script = ExtResource("1_r7thu")
@@ -172,98 +174,6 @@ popup/item_3/id = 3
 [node name="Legends" parent="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2" instance=ExtResource("12_80vrr")]
 layout_mode = 2
 
-[node name="VisualEditingPanelContainer" type="PanelContainer" parent="ControlLayer"]
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_left = 50.0
-offset_top = -41.0
-offset_right = 202.0
-offset_bottom = -10.0
-grow_vertical = 0
-size_flags_horizontal = 0
-size_flags_vertical = 0
-
-[node name="VisualEditingButton" type="CheckButton" parent="ControlLayer/VisualEditingPanelContainer" groups=["main_buttons"]]
-layout_mode = 2
-tooltip_text = "Enables the visual editing of the DT constellation"
-text = "Visual editing"
-
-[node name="HelpButton" type="Button" parent="ControlLayer"]
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_left = 10.0
-offset_top = -41.0
-offset_right = 41.0
-offset_bottom = -10.0
-grow_vertical = 0
-tooltip_text = "Get help"
-text = "?"
-icon_alignment = 1
-script = ExtResource("6_tgjmw")
-
-[node name="HelpPopup" type="PopupPanel" parent="ControlLayer/HelpButton"]
-oversampling_override = 1.0
-title = "Help"
-position = Vector2i(18, 129)
-size = Vector2i(305, 455)
-unresizable = false
-borderless = false
-
-[node name="RichTextLabel" type="RichTextLabel" parent="ControlLayer/HelpButton/HelpPopup"]
-offset_left = 4.0
-offset_top = 4.0
-offset_right = 301.0
-offset_bottom = 451.0
-text = "DTInsight allows you to visualize the architecture of your Digital Twin. It does by gathering its ontological structure through a Fuseki server, and displaying the incoming RabbitMQ data.
-
-To get started, either:
-- Connect to Fuseki by clicking on the \"Call Fuseki\" button.
-- Load an existing dump by picking a dump file and selecting \"Load\"
-
-Once the graph is generated, hover on the nodes (clickable) to highlight connections."
-
-[node name="SettingsButton" type="Button" parent="ControlLayer"]
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_left = 10.0
-offset_top = -81.0
-offset_right = 41.0
-offset_bottom = -50.0
-grow_vertical = 0
-tooltip_text = "Settings"
-icon = ExtResource("12_77ryg")
-icon_alignment = 1
-expand_icon = true
-script = ExtResource("7_gs64f")
-
-[node name="SettingsPopup" type="PopupPanel" parent="ControlLayer/SettingsButton"]
-auto_translate_mode = 1
-mode = 2
-title = "Settings"
-initial_position = 1
-size = Vector2i(490, 560)
-borderless = false
-always_on_top = true
-
-[node name="TabContainer" type="TabContainer" parent="ControlLayer/SettingsButton/SettingsPopup"]
-offset_left = 4.0
-offset_top = 4.0
-offset_right = 486.0
-offset_bottom = 556.0
-current_tab = 0
-
-[node name="General" type="VBoxContainer" parent="ControlLayer/SettingsButton/SettingsPopup/TabContainer"]
-layout_mode = 2
-metadata/_tab_index = 0
-
-[node name="RabbitMQ" type="VBoxContainer" parent="ControlLayer/SettingsButton/SettingsPopup/TabContainer"]
-visible = false
-layout_mode = 2
-metadata/_tab_index = 1
-
 [node name="SettingsBackground" type="ColorRect" parent="ControlLayer"]
 visible = false
 anchors_preset = 15
@@ -283,19 +193,104 @@ anchor_right = 0.5
 anchor_bottom = 0.5
 IS_IN_GAME_MENU = false
 
+[node name="ButtonsContainer" type="PanelContainer" parent="ControlLayer"]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -72.0
+offset_right = 178.0
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_80vrr")
+
+[node name="ButtonGrid" type="GridContainer" parent="ControlLayer/ButtonsContainer"]
+layout_mode = 2
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 10
+columns = 2
+
+[node name="SettingsButton" type="Button" parent="ControlLayer/ButtonsContainer/ButtonGrid"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+tooltip_text = "Settings"
+icon = ExtResource("12_77ryg")
+icon_alignment = 1
+expand_icon = true
+script = ExtResource("7_gs64f")
+
+[node name="SettingsPopup" type="PopupPanel" parent="ControlLayer/ButtonsContainer/ButtonGrid/SettingsButton"]
+auto_translate_mode = 1
+mode = 2
+title = "Settings"
+initial_position = 1
+size = Vector2i(490, 560)
+borderless = false
+always_on_top = true
+
+[node name="TabContainer" type="TabContainer" parent="ControlLayer/ButtonsContainer/ButtonGrid/SettingsButton/SettingsPopup"]
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 486.0
+offset_bottom = 556.0
+current_tab = 0
+
+[node name="General" type="VBoxContainer" parent="ControlLayer/ButtonsContainer/ButtonGrid/SettingsButton/SettingsPopup/TabContainer"]
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="RabbitMQ" type="VBoxContainer" parent="ControlLayer/ButtonsContainer/ButtonGrid/SettingsButton/SettingsPopup/TabContainer"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="VisualEditingButton" type="CheckButton" parent="ControlLayer/ButtonsContainer/ButtonGrid" groups=["main_buttons"]]
+layout_mode = 2
+tooltip_text = "Enables the visual editing of the DT constellation"
+text = "Visual editing"
+
+[node name="HelpButton" type="Button" parent="ControlLayer/ButtonsContainer/ButtonGrid"]
+layout_mode = 2
+tooltip_text = "Get help"
+text = "?"
+icon_alignment = 1
+script = ExtResource("6_tgjmw")
+
+[node name="HelpPopup" type="PopupPanel" parent="ControlLayer/ButtonsContainer/ButtonGrid/HelpButton"]
+oversampling_override = 1.0
+title = "Help"
+position = Vector2i(18, 129)
+size = Vector2i(305, 455)
+unresizable = false
+borderless = false
+
+[node name="RichTextLabel" type="RichTextLabel" parent="ControlLayer/ButtonsContainer/ButtonGrid/HelpButton/HelpPopup"]
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 301.0
+offset_bottom = 451.0
+text = "DTInsight allows you to visualize the architecture of your Digital Twin. It does by gathering its ontological structure through a Fuseki server, and displaying the incoming RabbitMQ data.
+
+To get started, either:
+- Connect to Fuseki by clicking on the \"Call Fuseki\" button.
+- Load an existing dump by picking a dump file and selecting \"Load\"
+
+Once the graph is generated, hover on the nodes (clickable) to highlight connections."
+
+[node name="LinkDeletionButton" type="CheckButton" parent="ControlLayer/ButtonsContainer/ButtonGrid" groups=["main_buttons"]]
+layout_mode = 2
+text = "Link Deletion"
+
 [node name="FusekiData" parent="." instance=ExtResource("5_4e51a")]
 
-[node name="CICDServer" type="Node" parent="." node_paths=PackedStringArray("container", "to_hide")]
+[node name="CICDServer" type="Node" parent="." node_paths=PackedStringArray("container")]
 script = ExtResource("15_gmiik")
 container = NodePath("../DTContainer")
-to_hide = [NodePath("../ControlLayer")]
 
 [connection signal="toggled" from="ControlLayer/ControlPanel/MarginContainer/ControlContainer/RabbitButton" to="ControlLayer/ControlPanel/MarginContainer/ControlContainer/RabbitButton" method="_on_toggled"]
 [connection signal="item_selected" from="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/NodeBGOption" to="DTContainer" method="_on_node_bg_option_item_selected"]
 [connection signal="item_selected" from="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/NodeBGOption" to="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/Legends" method="_on_node_style_option_item_selected"]
 [connection signal="item_selected" from="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/NodeBorderOption" to="DTContainer" method="_on_node_border_option_item_selected"]
 [connection signal="item_selected" from="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/NodeBorderOption" to="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/Legends" method="_on_node_style_option_item_selected"]
-[connection signal="toggled" from="ControlLayer/VisualEditingPanelContainer/VisualEditingButton" to="DTContainer" method="_on_visual_editing_button_toggled"]
-[connection signal="pressed" from="ControlLayer/HelpButton" to="ControlLayer/HelpButton" method="_on_help_button_pressed"]
-[connection signal="pressed" from="ControlLayer/SettingsButton" to="ControlLayer/SettingsButton" method="_on_pressed"]
-[connection signal="settings_menu_closed" from="ControlLayer/SettingsBackground/Settings" to="ControlLayer/SettingsButton" method="_on_settings_settings_menu_closed"]
+[connection signal="settings_menu_closed" from="ControlLayer/SettingsBackground/Settings" to="ControlLayer/ButtonsContainer/ButtonGrid/SettingsButton" method="_on_settings_settings_menu_closed"]
+[connection signal="pressed" from="ControlLayer/ButtonsContainer/ButtonGrid/SettingsButton" to="ControlLayer/ButtonsContainer/ButtonGrid/SettingsButton" method="_on_pressed"]
+[connection signal="toggled" from="ControlLayer/ButtonsContainer/ButtonGrid/VisualEditingButton" to="DTContainer" method="_on_visual_editing_button_toggled"]
+[connection signal="pressed" from="ControlLayer/ButtonsContainer/ButtonGrid/HelpButton" to="ControlLayer/ButtonsContainer/ButtonGrid/HelpButton" method="_on_help_button_pressed"]

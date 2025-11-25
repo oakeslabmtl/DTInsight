@@ -34,6 +34,9 @@ var highlighted_element = null
 var all_highlighted_element = []
 var highlighted_with_click = false
 
+var deletion_mode = false
+var hovered_link = null
+
 # Border and background views
 var bg_view = 0
 var border_view = 0
@@ -53,6 +56,32 @@ func _ready():
 		if btn.name == "VisualEditingButton":
 			btn.toggled.connect(_on_visual_editing_toggled)
 			_on_visual_editing_toggled(btn.button_pressed)
+		elif btn.name == "LinkDeletionButton":
+			btn.toggled.connect(_on_link_deletion_toggled)
+
+func _input(event):
+	if not deletion_mode:
+		return	
+	if event is InputEventMouseMotion:
+		var mouse_pos = get_global_mouse_position()
+		var link = get_link_under_mouse(mouse_pos)		
+		if not link.is_empty():
+			hovered_link = link
+			if link["type"] == "fuseki":
+				Input.set_default_cursor_shape(Input.CURSOR_FORBIDDEN) 
+			else:
+				Input.set_default_cursor_shape(Input.CURSOR_POINTING_HAND)
+		else:
+			hovered_link = null
+			Input.set_default_cursor_shape(Input.CURSOR_ARROW)	
+	elif event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+			if hovered_link != null:
+				if hovered_link["type"] == "fuseki":
+					print("Warning: Deleting a Fuseki link (from data source)")
+				delete_link(hovered_link)
+				hovered_link = null
+				Input.set_default_cursor_shape(Input.CURSOR_ARROW)
 
 func set_fuseki_data(_fuseki_data: FusekiData) -> void:
 	fuseki_data = _fuseki_data
@@ -71,6 +100,17 @@ func get_node_under_mouse(pos : Vector2) -> GenericDisplay:
 		if node.get_global_rect().has_point(pos):
 			return node
 	return null
+
+func get_link_under_mouse(mouse_pos: Vector2) -> Dictionary:
+	const CLICK_TOLERANCE = 10.0  # tolerance pixels for clicking on a link	
+	for link in drawn_links:
+		if abs(mouse_pos.y - link["lane_y"]) > CLICK_TOLERANCE:
+			continue
+		var min_x = min(link["source_x"], link["dest_x"])
+		var max_x = max(link["source_x"], link["dest_x"])		
+		if mouse_pos.x >= min_x - CLICK_TOLERANCE and mouse_pos.x <= max_x + CLICK_TOLERANCE:
+			return link	
+	return {}
 
 func _on_start_drag(node):
 	dragging_from = node
@@ -258,6 +298,8 @@ var highlighted_lines : Array[Dictionary] = []
 var dimmed_triangles : Array[Dictionary] = []
 var highlighted_triangles : Array[Dictionary] = []
 
+var drawn_links : Array[Dictionary] = []
+
 # 3 dictionary with (source node -> [destination node, ...])
 # Differencing the bot and top containers for formatting the arrows correctly
 var user_links : Dictionary = {}
@@ -340,6 +382,16 @@ func draw_all_differed():
 	for triangle in triangles_draw_list:
 		draw_triangle(triangle["aimed_at"], triangle["vertical_shift"], triangle["color"], triangle["is_pointing_up"])
 
+func register_drawn_link(source_node: GenericDisplay, dest_node: GenericDisplay, lane_y: int, source_x: int, dest_x: int, link_dict_type: String):
+	drawn_links.append({
+		"source": source_node,
+		"destination": dest_node,
+		"lane_y": lane_y,
+		"source_x": source_x,
+		"dest_x": dest_x,
+		"type": link_dict_type  # "normal", "bot2bot", "top2top", "fuseki"
+	})
+
 #Update operator container and machine container, differenciate on attibute
 func update_provided_things(operator_container : HBoxContainer, machine_container : HBoxContainer, provided_data : Dictionary):
 	var operator_data : Dictionary = {}
@@ -353,7 +405,7 @@ func update_provided_things(operator_container : HBoxContainer, machine_containe
 	update_node_with(operator_container, operator_data)
 	update_node_with(machine_container, machine_data)
 
-#Update a node with Fuseki element data by creating a generic display node
+# Update a node with Fuseki element data by creating a generic display node
 func update_node_with(visual_container : HBoxContainer, fuseki_node_data : Dictionary):
 	#DT_PT.free_all_child(visual_container)
 	for key in fuseki_node_data.keys():
@@ -446,7 +498,7 @@ func get_viable_position(potential : int, concerned_list : Array[int], iteration
 		return potential
 
 #With Fuseki link data draw those links
-func update_link_with(links_as_dict: Dictionary, force_side_source : ContainerSide = ContainerSide.ANY):
+func update_link_with(links_as_dict: Dictionary, force_side_source : ContainerSide = ContainerSide.ANY, link_type: String = "fuseki"):
 	for key_node in links_as_dict.keys():
 		if key_node == null:
 			continue
@@ -470,7 +522,68 @@ func update_link_with(links_as_dict: Dictionary, force_side_source : ContainerSi
 			x_drawn_list.append(drawn_x)
 			if(destination_in_critical_path):
 				x_highlight_list.append(drawn_x)
+			register_drawn_link(key_node, association_element, drawable_y_position, source_x, drawn_x, link_type)
 		draw_link_lane(x_drawn_list, x_highlight_list, drawable_y_position)
+
+func delete_link(link_info: Dictionary):
+	if link_info.is_empty():
+		return
+	
+	var source = link_info["source"]
+	var dest = link_info["destination"]
+	var link_type = link_info["type"]
+	
+	# Delete a Fuseki link
+	if link_type == "fuseki":
+		delete_fuseki_link(source, dest)
+		return
+	
+	# Delete a user link
+	var target_dict = null
+	match link_type:
+		"normal":
+			target_dict = user_links
+		"bot2bot":
+			target_dict = user_links_bot2bot
+		"top2top":
+			target_dict = user_links_top2top
+	
+	if target_dict != null and target_dict.has(source):
+		target_dict[source].erase(dest)
+		if target_dict[source].is_empty():
+			target_dict.erase(source)
+		print("User link deleted: ", source.name, " -> ", dest.name)
+
+func delete_fuseki_link(source: GenericDisplay, dest: GenericDisplay):
+	if fuseki_data == null:
+		return
+	
+	var source_name = source.name
+	var dest_name = dest.name
+	
+	var link_arrays = [
+		fuseki_data.enabler_to_service,
+		fuseki_data.model_to_enabler,
+		fuseki_data.service_to_provided_thing,
+		fuseki_data.sensor_to_data_transmitted,
+		fuseki_data.data_transmitted_to_data,
+		fuseki_data.data_to_enabler
+	]
+	
+	var link_found = false
+	for link_array in link_arrays:
+		for i in range(link_array.size() - 1, -1, -1):
+			var link = link_array[i]
+			if link.source == source_name and link.destination == dest_name:
+				link_array.remove_at(i)
+				link_found = true
+				print("Fuseki link deleted: ", source_name, " -> ", dest_name)
+				break
+		if link_found:
+			break
+	
+	if link_found:
+		update_link_dicts()
 
 #Process and display -------------------------------------------------------------------------------
 
@@ -521,6 +634,7 @@ func _process(_delta):
 	highlighted_lines.clear()
 	dimmed_triangles.clear()
 	highlighted_triangles.clear()
+	drawn_links.clear()
 	queue_redraw()
 
 #Free all childs of a node
@@ -532,15 +646,15 @@ static func free_all_child(node : Node):
 #Draw all links
 func _draw():
 	if (fuseki_data):
-		update_link_with(links_as_dict_enabler_to_service)
-		update_link_with(links_as_dict_model_to_enabler)
-		update_link_with(links_as_dict_service_to_provided_thing, ContainerSide.TOP)
-		update_link_with(links_as_dict_sensor_to_data_transmitted)
-		update_link_with(links_as_dict_data_to_enabler)
-		update_link_with(links_as_dict_data_transmitted_to_data, ContainerSide.BOTTOM)
-		update_link_with(user_links)
-		update_link_with(user_links_bot2bot, ContainerSide.BOTTOM)
-		update_link_with(user_links_top2top, ContainerSide.TOP)
+		update_link_with(links_as_dict_enabler_to_service, ContainerSide.ANY, "fuseki")
+		update_link_with(links_as_dict_model_to_enabler, ContainerSide.ANY, "fuseki")
+		update_link_with(links_as_dict_service_to_provided_thing, ContainerSide.TOP, "fuseki")
+		update_link_with(links_as_dict_sensor_to_data_transmitted, ContainerSide.ANY, "fuseki")
+		update_link_with(links_as_dict_data_to_enabler, ContainerSide.ANY, "fuseki")
+		update_link_with(links_as_dict_data_transmitted_to_data, ContainerSide.BOTTOM, "fuseki")
+		update_link_with(user_links, ContainerSide.ANY, "normal")
+		update_link_with(user_links_bot2bot, ContainerSide.BOTTOM, "bot2bot")
+		update_link_with(user_links_top2top, ContainerSide.TOP, "top2top")
 		draw_all_differed()
 
 # Rabbit MQ data integration ---------------------------------------------------
@@ -633,6 +747,13 @@ func _on_visual_editing_toggled(toggled_on: bool) -> void:
 		enable_visual_editing()
 	else:
 		disable_visual_editing()
+
+func _on_link_deletion_toggled(toggled_on: bool) -> void:
+	deletion_mode = toggled_on
+	if not toggled_on:
+		hovered_link = null
+		Input.set_default_cursor_shape(Input.CURSOR_ARROW)
+	print("Link deletion mode: ", "ON" if deletion_mode else "OFF")
 
 func enable_visual_editing():
 	$DTContainer/EnablersPanel/AddComponentButton.show()
