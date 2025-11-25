@@ -181,11 +181,29 @@ func get_node_by_name(node_name : String) -> GenericDisplay:
 #Get a list of elements connected to inputed element
 func get_all_connected_to(element_name : String) -> Array[String]:
 	var all_connected : Array[String]= [element_name]
-	var all_links = fuseki_data.enabler_to_service + fuseki_data.model_to_enabler + fuseki_data.service_to_provided_thing + fuseki_data.sensor_to_data_transmitted + fuseki_data.data_transmitted_to_data + fuseki_data.data_to_enabler
+	var all_links = []
+	all_links += fuseki_data.enabler_to_service + fuseki_data.model_to_enabler + fuseki_data.service_to_provided_thing + fuseki_data.sensor_to_data_transmitted + fuseki_data.data_transmitted_to_data + fuseki_data.data_to_enabler
+	for src in user_links.keys():
+		for dst in user_links[src]:
+			all_links.append({"source": src.name, "destination": dst.name})
+	for src in user_links_top2top.keys():
+		for dst in user_links_top2top[src]:
+			all_links.append({"source": src.name, "destination": dst.name})
+	for src in user_links_bot2bot.keys():
+		for dst in user_links_bot2bot[src]:
+			all_links.append({"source": src.name, "destination": dst.name})
 	for link in all_links:
-		if link.source == element_name:
+		var source_name := ""
+		var dest_name := ""
+		if typeof(link) == TYPE_DICTIONARY: 
+			source_name = link["source"]
+			dest_name = link["destination"]
+		else :
+			source_name = link.source
+			dest_name = link.destination
+		if source_name == element_name:
 			all_connected.append(link.destination)
-		if link.destination == element_name:
+		if dest_name == element_name:
 			all_connected.append(link.source)
 	return all_connected
 
