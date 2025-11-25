@@ -102,14 +102,30 @@ func get_node_under_mouse(pos : Vector2) -> GenericDisplay:
 	return null
 
 func get_link_under_mouse(mouse_pos: Vector2) -> Dictionary:
-	const CLICK_TOLERANCE = 10.0  # tolerance pixels for clicking on a link	
-	for link in drawn_links:
-		if abs(mouse_pos.y - link["lane_y"]) > CLICK_TOLERANCE:
-			continue
+	const CLICK_TOLERANCE = 2.0  # tolerance pixels for clicking on a link	
+	var links_to_check = drawn_links
+	if highlighted_element != null:
+		links_to_check = drawn_links.filter(func(l): return l["source"] == highlighted_element or l["destination"] == highlighted_element)
+	for link in links_to_check:
 		var min_x = min(link["source_x"], link["dest_x"])
-		var max_x = max(link["source_x"], link["dest_x"])		
-		if mouse_pos.x >= min_x - CLICK_TOLERANCE and mouse_pos.x <= max_x + CLICK_TOLERANCE:
-			return link	
+		var max_x = max(link["source_x"], link["dest_x"])
+		var on_horizontal = abs(mouse_pos.y - link["lane_y"]) < CLICK_TOLERANCE and mouse_pos.x >= min_x - CLICK_TOLERANCE and mouse_pos.x <= max_x + CLICK_TOLERANCE
+		if on_horizontal:
+			return link
+		var src_node = link["source"]
+		var src_y_start = get_bottom_side(src_node).y if src_node.global_position.y < link["lane_y"] else get_top_side(src_node).y
+		var min_y_src = min(src_y_start, link["lane_y"])
+		var max_y_src = max(src_y_start, link["lane_y"])		
+		var on_vertical_src = abs(mouse_pos.x - link["source_x"]) < CLICK_TOLERANCE and mouse_pos.y >= min_y_src - CLICK_TOLERANCE and mouse_pos.y <= max_y_src + CLICK_TOLERANCE
+		if on_vertical_src:
+			return link
+		var dest_node = link["destination"]
+		var dest_y_end = get_bottom_side(dest_node).y if dest_node.global_position.y < link["lane_y"] else get_top_side(dest_node).y
+		var min_y_dest = min(link["lane_y"], dest_y_end)
+		var max_y_dest = max(link["lane_y"], dest_y_end)		
+		var on_vertical_dest = abs(mouse_pos.x - link["dest_x"]) < CLICK_TOLERANCE and mouse_pos.y >= min_y_dest - CLICK_TOLERANCE and mouse_pos.y <= max_y_dest + CLICK_TOLERANCE
+		if on_vertical_dest:
+			return link
 	return {}
 
 func _on_start_drag(node):
