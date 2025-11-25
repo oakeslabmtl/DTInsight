@@ -671,7 +671,32 @@ func rename_dict_key(dict: Dictionary, old_key, new_key) -> void:
 	for i in range(keys.size()):
 		dict[keys[i]] = values[i]
 
+func remove_all_user_links_for(node: GenericDisplay) -> void:
+	if user_links.has(node):
+		user_links.erase(node)
+	for src in user_links.keys():
+		user_links[src].erase(node)
+		if user_links[src].is_empty():
+			user_links.erase(src)
+
+	if user_links_bot2bot.has(node):
+		user_links_bot2bot.erase(node)
+	for src in user_links_bot2bot.keys():
+		user_links_bot2bot[src].erase(node)
+		if user_links_bot2bot[src].is_empty():
+			user_links_bot2bot.erase(src)
+			
+	if user_links_top2top.has(node):
+		user_links_top2top.erase(node)
+	for src in user_links_top2top.keys():
+		user_links_top2top[src].erase(node)
+		if user_links_top2top[src].is_empty():
+			user_links_top2top.erase(src)
+
+
 func delete_component(node_name, fuseki_dict, parent_container: Node):
+	var node = get_node_by_name(node_name)
+	remove_all_user_links_for(node)
 	fuseki_dict.erase(node_name)
 	get_node_by_name(node_name).queue_free()
 	displayed_node_list.erase(get_node_by_name(node_name))
