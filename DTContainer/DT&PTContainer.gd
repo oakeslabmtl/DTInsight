@@ -36,6 +36,7 @@ var highlighted_with_click = false
 
 var deletion_mode = false
 var hovered_link = null
+var visual_editing_mode = false
 
 # Border and background views
 var bg_view = 0
@@ -129,6 +130,8 @@ func get_link_under_mouse(mouse_pos: Vector2) -> Dictionary:
 	return {}
 
 func _on_start_drag(node):
+	if not visual_editing_mode:
+		return
 	dragging_from = node
 	current_hover_target = null
 	is_dragging = false
@@ -776,6 +779,7 @@ func _on_add_component_button_pressed_data() -> void:
 ## Visual editing
 
 func _on_visual_editing_toggled(toggled_on: bool) -> void:
+	visual_editing_mode = toggled_on
 	if toggled_on:
 		enable_visual_editing()
 	else:
