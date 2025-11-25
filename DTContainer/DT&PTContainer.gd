@@ -62,6 +62,9 @@ func set_fuseki_data(_fuseki_data: FusekiData) -> void:
 # Drag and drop functions
 var dragging_from : GenericDisplay = null
 var current_hover_target : GenericDisplay = null
+var drag_start_pos : Vector2
+var is_dragging := false
+const MIN_DRAG_DISTANCE := 5.0   # pixels, arbitrarily chosen
 
 func get_node_under_mouse(pos : Vector2) -> GenericDisplay:
 	for node in displayed_node_list:
@@ -72,23 +75,33 @@ func get_node_under_mouse(pos : Vector2) -> GenericDisplay:
 func _on_start_drag(node):
 	dragging_from = node
 	current_hover_target = null
+	is_dragging = false
+	drag_start_pos = get_global_mouse_position()
 
 func _on_dragging(node, mouse_pos):
 	if dragging_from == null:
-		return		
-	var hovered = get_node_under_mouse(mouse_pos)
-	if hovered != dragging_from:
-		current_hover_target = hovered
+		return
+	if not is_dragging:
+		if drag_start_pos.distance_to(mouse_pos) > MIN_DRAG_DISTANCE:
+			is_dragging = true
+	if is_dragging:	
+		var hovered = get_node_under_mouse(mouse_pos)
+		if hovered != dragging_from:
+			current_hover_target = hovered
 
 func _on_stop_drag(node):
 	if dragging_from == null:
 		return	
+	if not is_dragging:
+		dragging_from = null
+		current_hover_target = null
+		return
 	if current_hover_target != null and current_hover_target != dragging_from:
 		_add_user_link(dragging_from, current_hover_target)
-
 	# reset
 	dragging_from = null
 	current_hover_target = null
+	is_dragging = false
 
 #Array of displayes nodes
 var displayed_node_list: Array[Node]
