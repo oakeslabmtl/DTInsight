@@ -82,7 +82,7 @@ unique_name_in_owner = true
 layout_mode = 2
 tooltip_text = "Enable listening of messages from RabbitMQ"
 disabled = true
-text = "Record data form RabbitMQ :"
+text = "Record data from RabbitMQ :"
 script = ExtResource("9_qda1k")
 
 [node name="VSeparator4" type="VSeparator" parent="ControlLayer/ControlPanel/MarginContainer/ControlContainer"]
