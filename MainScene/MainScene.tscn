@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://cxj8tr6re2b4t"]
+[gd_scene load_steps=18 format=3 uid="uid://cxj8tr6re2b4t"]
 
 [ext_resource type="PackedScene" uid="uid://nqgolpvgp7yg" path="res://DTContainer/DT&PTContainer.tscn" id="1_lklxr"]
 [ext_resource type="Script" uid="uid://dfun6prbhxg7c" path="res://MainScene/MainSceneController.gd" id="1_r7thu"]
@@ -13,6 +13,7 @@
 [ext_resource type="Script" uid="uid://cfkgtkfhl06v5" path="res://RabbitMQ/Control/RabbitButton.gd" id="9_qda1k"]
 [ext_resource type="Texture2D" uid="uid://doyxcp824t4vw" path="res://gear.png" id="12_77ryg"]
 [ext_resource type="PackedScene" uid="uid://cf7nrorpbpbjb" path="res://Legends/Legends.tscn" id="12_80vrr"]
+[ext_resource type="Script" uid="uid://cdswvlml33tfq" path="res://MainScene/python_runner.gd" id="13_gmiik"]
 [ext_resource type="Script" uid="uid://0b3cap3tphwi" path="res://MainScene/CICDServer.gd" id="15_gmiik"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ffs3u"]
@@ -202,13 +203,16 @@ offset_right = 178.0
 grow_vertical = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_80vrr")
 
-[node name="ButtonGrid" type="GridContainer" parent="ControlLayer/ButtonsContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="ControlLayer/ButtonsContainer"]
+layout_mode = 2
+
+[node name="ButtonGrid" type="GridContainer" parent="ControlLayer/ButtonsContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/h_separation = 10
 theme_override_constants/v_separation = 10
 columns = 2
 
-[node name="SettingsButton" type="Button" parent="ControlLayer/ButtonsContainer/ButtonGrid"]
+[node name="SettingsButton" type="Button" parent="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid"]
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 tooltip_text = "Settings"
@@ -217,7 +221,7 @@ icon_alignment = 1
 expand_icon = true
 script = ExtResource("7_gs64f")
 
-[node name="SettingsPopup" type="PopupPanel" parent="ControlLayer/ButtonsContainer/ButtonGrid/SettingsButton"]
+[node name="SettingsPopup" type="PopupPanel" parent="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid/SettingsButton"]
 auto_translate_mode = 1
 mode = 2
 title = "Settings"
@@ -226,35 +230,35 @@ size = Vector2i(490, 560)
 borderless = false
 always_on_top = true
 
-[node name="TabContainer" type="TabContainer" parent="ControlLayer/ButtonsContainer/ButtonGrid/SettingsButton/SettingsPopup"]
+[node name="TabContainer" type="TabContainer" parent="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid/SettingsButton/SettingsPopup"]
 offset_left = 4.0
 offset_top = 4.0
 offset_right = 486.0
 offset_bottom = 556.0
 current_tab = 0
 
-[node name="General" type="VBoxContainer" parent="ControlLayer/ButtonsContainer/ButtonGrid/SettingsButton/SettingsPopup/TabContainer"]
+[node name="General" type="VBoxContainer" parent="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid/SettingsButton/SettingsPopup/TabContainer"]
 layout_mode = 2
 metadata/_tab_index = 0
 
-[node name="RabbitMQ" type="VBoxContainer" parent="ControlLayer/ButtonsContainer/ButtonGrid/SettingsButton/SettingsPopup/TabContainer"]
+[node name="RabbitMQ" type="VBoxContainer" parent="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid/SettingsButton/SettingsPopup/TabContainer"]
 visible = false
 layout_mode = 2
 metadata/_tab_index = 1
 
-[node name="VisualEditingButton" type="CheckButton" parent="ControlLayer/ButtonsContainer/ButtonGrid" groups=["main_buttons"]]
+[node name="VisualEditingButton" type="CheckButton" parent="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid" groups=["main_buttons"]]
 layout_mode = 2
 tooltip_text = "Enables the visual editing of the DT constellation"
 text = "Visual editing"
 
-[node name="HelpButton" type="Button" parent="ControlLayer/ButtonsContainer/ButtonGrid"]
+[node name="HelpButton" type="Button" parent="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid"]
 layout_mode = 2
 tooltip_text = "Get help"
 text = "?"
 icon_alignment = 1
 script = ExtResource("6_tgjmw")
 
-[node name="HelpPopup" type="PopupPanel" parent="ControlLayer/ButtonsContainer/ButtonGrid/HelpButton"]
+[node name="HelpPopup" type="PopupPanel" parent="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid/HelpButton"]
 oversampling_override = 1.0
 title = "Help"
 position = Vector2i(18, 129)
@@ -262,7 +266,7 @@ size = Vector2i(305, 455)
 unresizable = false
 borderless = false
 
-[node name="RichTextLabel" type="RichTextLabel" parent="ControlLayer/ButtonsContainer/ButtonGrid/HelpButton/HelpPopup"]
+[node name="RichTextLabel" type="RichTextLabel" parent="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid/HelpButton/HelpPopup"]
 offset_left = 4.0
 offset_top = 4.0
 offset_right = 301.0
@@ -275,9 +279,15 @@ To get started, either:
 
 Once the graph is generated, hover on the nodes (clickable) to highlight connections."
 
-[node name="LinkDeletionButton" type="CheckButton" parent="ControlLayer/ButtonsContainer/ButtonGrid" groups=["main_buttons"]]
+[node name="LinkDeletionButton" type="CheckButton" parent="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid" groups=["main_buttons"]]
 layout_mode = 2
 text = "Link Deletion"
+
+[node name="PythonButton" type="Button" parent="ControlLayer/ButtonsContainer/VBoxContainer"]
+layout_mode = 2
+text = "Call a script"
+script = ExtResource("13_gmiik")
+metadata/_custom_type_script = "uid://clu02vc02js06"
 
 [node name="FusekiData" parent="." instance=ExtResource("5_4e51a")]
 
@@ -290,7 +300,8 @@ container = NodePath("../DTContainer")
 [connection signal="item_selected" from="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/NodeBGOption" to="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/Legends" method="_on_node_style_option_item_selected"]
 [connection signal="item_selected" from="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/NodeBorderOption" to="DTContainer" method="_on_node_border_option_item_selected"]
 [connection signal="item_selected" from="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/NodeBorderOption" to="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/Legends" method="_on_node_style_option_item_selected"]
-[connection signal="settings_menu_closed" from="ControlLayer/SettingsBackground/Settings" to="ControlLayer/ButtonsContainer/ButtonGrid/SettingsButton" method="_on_settings_settings_menu_closed"]
-[connection signal="pressed" from="ControlLayer/ButtonsContainer/ButtonGrid/SettingsButton" to="ControlLayer/ButtonsContainer/ButtonGrid/SettingsButton" method="_on_pressed"]
-[connection signal="toggled" from="ControlLayer/ButtonsContainer/ButtonGrid/VisualEditingButton" to="DTContainer" method="_on_visual_editing_button_toggled"]
-[connection signal="pressed" from="ControlLayer/ButtonsContainer/ButtonGrid/HelpButton" to="ControlLayer/ButtonsContainer/ButtonGrid/HelpButton" method="_on_help_button_pressed"]
+[connection signal="settings_menu_closed" from="ControlLayer/SettingsBackground/Settings" to="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid/SettingsButton" method="_on_settings_settings_menu_closed"]
+[connection signal="pressed" from="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid/SettingsButton" to="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid/SettingsButton" method="_on_pressed"]
+[connection signal="toggled" from="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid/VisualEditingButton" to="DTContainer" method="_on_visual_editing_button_toggled"]
+[connection signal="pressed" from="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid/HelpButton" to="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid/HelpButton" method="_on_help_button_pressed"]
+[connection signal="pressed" from="ControlLayer/ButtonsContainer/VBoxContainer/PythonButton" to="ControlLayer/ButtonsContainer/VBoxContainer/PythonButton" method="_on_pressed"]
