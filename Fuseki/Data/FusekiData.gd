@@ -30,6 +30,7 @@ var c7 : Dictionary
 var c8 : Dictionary
 var c9 : Dictionary
 var c12 : Dictionary
+var c13 : Dictionary
 var c14 : Dictionary
 var c15 : Dictionary
 var c16 : Dictionary
@@ -92,6 +93,7 @@ func input_data_from_fuseki_JSON(json):
 		FusekiConfig.JsonHead.C8: "c8",
 		FusekiConfig.JsonHead.C9: "c9",
 		FusekiConfig.JsonHead.C12: "c12",
+		FusekiConfig.JsonHead.C13: "c13",
 		FusekiConfig.JsonHead.C14: "c14",
 		FusekiConfig.JsonHead.C15: "c15",
 		FusekiConfig.JsonHead.C16: "c16",

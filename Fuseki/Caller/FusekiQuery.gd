@@ -184,6 +184,15 @@ const QUERIES = {
 		?c12 a DTDFvocab:Constellation  .
 		OPTIONAL {?c12 ?attribute ?value}
 	}",
+"c13": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
+	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
+	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
+
+	SELECT *
+	WHERE {
+		?c13 a DTDFvocab:EvolutionStage  .
+		OPTIONAL {?c13 ?attribute ?value}
+	}",
 "c14": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
 	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
 	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
