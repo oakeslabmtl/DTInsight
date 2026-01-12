@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://cxj8tr6re2b4t"]
+[gd_scene load_steps=19 format=3 uid="uid://cxj8tr6re2b4t"]
 
 [ext_resource type="PackedScene" uid="uid://nqgolpvgp7yg" path="res://DTContainer/DT&PTContainer.tscn" id="1_lklxr"]
 [ext_resource type="Script" uid="uid://dfun6prbhxg7c" path="res://MainScene/MainSceneController.gd" id="1_r7thu"]
@@ -11,6 +11,7 @@
 [ext_resource type="PackedScene" uid="uid://px6a2dg8cawb" path="res://addons/modular-settings-menu/scenes/settings.tscn" id="8_ixws2"]
 [ext_resource type="PackedScene" uid="uid://cowug1mbtod0e" path="res://Fuseki/Caller/FusekiCallerBtton.tscn" id="8_ped26"]
 [ext_resource type="Script" uid="uid://cfkgtkfhl06v5" path="res://RabbitMQ/Control/RabbitButton.gd" id="9_qda1k"]
+[ext_resource type="PackedScene" uid="uid://3rf0dti147xm" path="res://ScriptRunnerPanel.tscn" id="10_xqnle"]
 [ext_resource type="Texture2D" uid="uid://doyxcp824t4vw" path="res://gear.png" id="12_77ryg"]
 [ext_resource type="PackedScene" uid="uid://cf7nrorpbpbjb" path="res://Legends/Legends.tscn" id="12_80vrr"]
 [ext_resource type="Script" uid="uid://cdswvlml33tfq" path="res://MainScene/python_runner.gd" id="13_gmiik"]
@@ -288,6 +289,19 @@ layout_mode = 2
 text = "Call a script"
 script = ExtResource("13_gmiik")
 metadata/_custom_type_script = "uid://clu02vc02js06"
+
+[node name="ScriptRunnerBackground" type="ColorRect" parent="ControlLayer"]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.639216)
+
+[node name="ScriptRunnerPanel" parent="ControlLayer/ScriptRunnerBackground" instance=ExtResource("10_xqnle")]
+unique_name_in_owner = true
+layout_mode = 1
 
 [node name="FusekiData" parent="." instance=ExtResource("5_4e51a")]
 

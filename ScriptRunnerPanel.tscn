@@ -1,0 +1,61 @@
+[gd_scene load_steps=2 format=3 uid="uid://3rf0dti147xm"]
+
+[ext_resource type="Script" uid="uid://d1h3p24nh6ahy" path="res://script_runner_panel.gd" id="1_gnab7"]
+
+[node name="ScriptRunnerPanel" type="Control"]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_gnab7")
+
+[node name="FileDialog" type="FileDialog" parent="."]
+title = "Open a File"
+file_mode = 0
+access = 2
+filters = PackedStringArray("*.py ; Python scripts")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_right = 151.0
+offset_bottom = 101.0
+theme_override_constants/separation = 20
+
+[node name="TitleLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Run a Python script"
+
+[node name="InputContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="PathLineEdit" type="LineEdit" parent="VBoxContainer/InputContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+editable = false
+
+[node name="PickButton" type="Button" parent="VBoxContainer/InputContainer"]
+layout_mode = 2
+text = "Pick file"
+
+[node name="ActionButtons" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="RunButton" type="Button" parent="VBoxContainer/ActionButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Apply"
+
+[node name="BackButton" type="Button" parent="VBoxContainer/ActionButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Back"
+
+[connection signal="file_selected" from="FileDialog" to="." method="_on_file_dialog_file_selected"]
+[connection signal="pressed" from="VBoxContainer/InputContainer/PickButton" to="." method="_on_pick_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/ActionButtons/RunButton" to="." method="_on_run_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/ActionButtons/BackButton" to="." method="_on_back_button_pressed"]
