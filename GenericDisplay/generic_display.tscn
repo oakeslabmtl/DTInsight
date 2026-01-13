@@ -113,11 +113,12 @@ layout_mode = 2
 text = "Script"
 
 [node name="EditButton" type="Button" parent="GenericDisplay"]
+custom_minimum_size = Vector2(60, 25)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 0
 tooltip_text = "Edit component"
-theme_override_font_sizes/font_size = 10
+theme_override_font_sizes/font_size = 14
 theme_override_styles/normal = SubResource("StyleBoxFlat_5nhr6")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_0c6qw")
 theme_override_styles/hover = SubResource("StyleBoxFlat_ycnc1")
