@@ -5,7 +5,7 @@ class_name GenericDisplay
 @onready var element : Label = $GenericDisplay/PresentationBox/GenericElementName
 @onready var realtime_element : Label = $GenericDisplay/RealTimeContainer/GenericElementAttributes
 @onready var script_button = $GenericDisplay/PresentationBox/ScriptButton
-@onready var edit_button = $GenericDisplay/PresentationBox/EditButton
+@onready var edit_button = $GenericDisplay/EditButton
 @onready var real_time_container = $GenericDisplay/RealTimeContainer
 @onready var attributes : Label = $GenericDisplay/RealTimeContainer/GenericElementAttributes
 @onready var visualization_container = $GenericDisplay/VisualizationContainer
@@ -63,7 +63,7 @@ func _gui_input(event: InputEvent) -> void:
 			await get_tree().create_timer(0.2).timeout
 			highlightable = true
 		if event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
-			if $GenericDisplay/PresentationBox/EditButton.visible:
+			if $GenericDisplay/EditButton.visible:
 				$PopupDescription.popup()
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			if event.pressed:
