@@ -36,7 +36,7 @@ const CHARACTERISTICS_CONFIG = [
 	{id = "C<sub>10</sub>", name = "DT models and data", fields = ["model", "data"], desc_only = false, is_composite = true},
 	{id = "C<sub>11</sub>", name = "Tooling and enablers", field = "enabler", desc_only = false},
 	{id = "C<sub>12</sub>", name = "DT constellation", field = "c12", desc_only = true},
-	{id = "C<sub>13</sub>", name = "Twinning process and DT evolution", field = "c15", desc_only = true},
+	{id = "C<sub>13</sub>", name = "Twinning process and DT evolution", field = "c13", desc_only = true},
 	{id = "C<sub>14</sub>", name = "Fidelity and validity considerations", field = "c14", desc_only = true},
 	{id = "C<sub>15</sub>", name = "DT technical connection", field = "c15", desc_only = true},
 	{id = "C<sub>16</sub>", name = "DT hosting/deployment", field = "c16", desc_only = true},
