@@ -305,9 +305,10 @@ layout_mode = 1
 
 [node name="FusekiData" parent="." instance=ExtResource("5_4e51a")]
 
-[node name="CICDServer" type="Node" parent="." node_paths=PackedStringArray("container")]
+[node name="CICDServer" type="Node" parent="." node_paths=PackedStringArray("container", "to_hide")]
 script = ExtResource("15_gmiik")
 container = NodePath("../DTContainer")
+to_hide = [NodePath("../ControlLayer")]
 
 [connection signal="toggled" from="ControlLayer/ControlPanel/MarginContainer/ControlContainer/RabbitButton" to="ControlLayer/ControlPanel/MarginContainer/ControlContainer/RabbitButton" method="_on_toggled"]
 [connection signal="item_selected" from="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/NodeBGOption" to="DTContainer" method="_on_node_bg_option_item_selected"]
