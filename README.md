@@ -1,6 +1,7 @@
 # DTInsight: A Tool for Explicit, Interactive, and Continuous Digital Twin Reporting
 
 [![DOI](https://img.shields.io/badge/DOI-10.1109%2Fmodels--c68889.2025.00030-blue)](https://doi.org/10.1109/models-c68889.2025.00030)
+[![arXiv](https://img.shields.io/badge/arXiv-2508.18431-b31b1b.svg)](https://arxiv.org/pdf/2508.18431)
 [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
 The purpose of this project is to provide users with a graphical and interactive representation of a Digital Twin.
@@ -120,7 +121,7 @@ Once loaded if a script is associated with a Digital Twin component, a new butto
 
 ## Citation
 
-If you use DTInsight in your research, please cite our paper:
+If you use DTInsight in your research, please cite our paper. An open-access preprint is available on [arXiv](https://arxiv.org/pdf/2508.18431).
 
 ```bibtex
 @INPROCEEDINGS{fiter2025dtinsight,
