@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://cxj8tr6re2b4t"]
+[gd_scene load_steps=20 format=3 uid="uid://cxj8tr6re2b4t"]
 
 [ext_resource type="PackedScene" uid="uid://nqgolpvgp7yg" path="res://DTContainer/DT&PTContainer.tscn" id="1_lklxr"]
 [ext_resource type="Script" uid="uid://dfun6prbhxg7c" path="res://MainScene/MainSceneController.gd" id="1_r7thu"]
@@ -16,6 +16,16 @@
 [ext_resource type="PackedScene" uid="uid://cf7nrorpbpbjb" path="res://Legends/Legends.tscn" id="12_80vrr"]
 [ext_resource type="Script" uid="uid://cdswvlml33tfq" path="res://MainScene/python_runner.gd" id="13_gmiik"]
 [ext_resource type="Script" uid="uid://0b3cap3tphwi" path="res://MainScene/CICDServer.gd" id="15_gmiik"]
+
+[sub_resource type="GDScript" id="GDScript_xqnle"]
+resource_name = "VersionLabel"
+script/source = "extends Label
+
+func _ready() -> void:
+	# Get the version string from Project Settings
+	var version = ProjectSettings.get_setting(\"application/config/version\")
+	text = \"v\" + version
+"
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ffs3u"]
 border_color = Color(0.259294, 0.259294, 0.259294, 1)
@@ -48,6 +58,36 @@ mouse_filter = 1
 color = Color(0.933333, 0.913725, 0.933333, 1)
 
 [node name="ControlLayer" type="CanvasLayer" parent="."]
+
+[node name="InformationContainer" type="HBoxContainer" parent="ControlLayer"]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -152.0
+offset_top = -19.0
+offset_right = 152.0
+offset_bottom = -1.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="LinkButton" type="LinkButton" parent="ControlLayer/InformationContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_focus_color = Color(0.11858126, 0.11858139, 0.11858175, 1)
+theme_override_colors/font_pressed_color = Color(0.288518, 0.28851798, 0.28851798, 1)
+theme_override_colors/font_hover_color = Color(0.18000469, 0.18000486, 0.18000537, 1)
+theme_override_font_sizes/font_size = 13
+text = "https://github.com/oakeslabmtl/DTInsight"
+uri = "https://github.com/oakeslabmtl/DTInsight"
+
+[node name="VersionLabel" type="Label" parent="ControlLayer/InformationContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.038397167, 0.038397167, 0.03839716, 1)
+theme_override_font_sizes/font_size = 13
+text = "vX.X"
+script = SubResource("GDScript_xqnle")
 
 [node name="ControlPanel" type="PanelContainer" parent="ControlLayer"]
 anchors_preset = 5
@@ -224,6 +264,7 @@ script = ExtResource("7_gs64f")
 
 [node name="SettingsPopup" type="PopupPanel" parent="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid/SettingsButton"]
 auto_translate_mode = 1
+oversampling_override = 1.0
 mode = 2
 title = "Settings"
 initial_position = 1
