@@ -138,7 +138,7 @@ If you use DTInsight in your research, please cite our paper:
 
 ## Credits
 
-- **Kérian Fiter** (@Kérian Fiter)
+- **[Kérian Fiter](https://kerianfiter.github.io/)** (@KerianFiter)
 - **Louis Malassigné-Onfroy** (@Ryskann)
 - Under the supervision of **[Prof. Bentley Oakes](https://bentleyjoakes.github.io/)**
 
