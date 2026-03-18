@@ -1,10 +1,21 @@
+## Catalogue of SPARQL queries used to retrieve Digital Twin Description Framework
+## (DTDF) data from the Fuseki triple store.
+##
+## All queries follow the same three-column SELECT pattern:
+##   ?<entity>  ?attribute  ?value
+## which maps directly to the FusekiData parsing pipeline.
+##
+## Queries are grouped into three logical sections:
+##   1. DTDF / DT–PT objects   – core DT entities defined in DTDFVocab.
+##   2. RabbitMQ objects       – messaging infrastructure entities.
+##   3. DT Characteristics     – numbered characteristics (C1–C21) from the DTDF taxonomy.
+
 extends Node
 
-#Sparql queries intended to interact with the Fuseki Server
-
 const QUERIES = {
-#Dt/PT objects -------------------------------------------------------------------------------------
-"services": "PREFIX DTDFvocab:   <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
+	# ── DTDF / DT–PT objects ──────────────────────────────────────────────────
+
+	"services": "PREFIX DTDFvocab:   <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
 	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
 
 	SELECT *
@@ -12,7 +23,8 @@ const QUERIES = {
 		?service a DTDFvocab:Service .
 		OPTIONAL {?service ?attribute ?value}
 	}",
-"enablers": "PREFIX DTDFvocab:   <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
+
+	"enablers": "PREFIX DTDFvocab:   <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
 	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
 
 	SELECT *
@@ -20,6 +32,7 @@ const QUERIES = {
 		?enabler a DTDFvocab:Enabler .
 		OPTIONAL {?enabler ?attribute ?value}
 	}",
+
 	"models": "PREFIX DTDFvocab:   <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
 	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
 
@@ -28,7 +41,8 @@ const QUERIES = {
 		?model a DTDFvocab:Model .
 		OPTIONAL {?model ?attribute ?value}
 	}",
-"provided_things": "PREFIX DTDFvocab:   <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
+
+	"provided_things": "PREFIX DTDFvocab:   <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
 	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
 
 	SELECT *
@@ -36,6 +50,7 @@ const QUERIES = {
 		?provided a DTDFvocab:ProvidedThing .
 		OPTIONAL {?provided ?attribute ?value}
 	}",
+
 	"data_transmitted": "PREFIX DTDFvocab:   <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
 	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
 
@@ -44,7 +59,8 @@ const QUERIES = {
 		?dataT a DTDFvocab:DataTransmitted .
 		OPTIONAL {?dataT ?attribute ?value}
 	}",
-"data": "PREFIX DTDFvocab:   <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
+
+	"data": "PREFIX DTDFvocab:   <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
 	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
 
 	SELECT *
@@ -52,6 +68,7 @@ const QUERIES = {
 		?data a DTDFvocab:Data .
 		OPTIONAL {?data ?attribute ?value}
 	}",
+
 	"sensors": "PREFIX DTDFvocab:   <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
 	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
 
@@ -60,7 +77,8 @@ const QUERIES = {
 		?sensor a DTDFvocab:SensingComponent .
 		OPTIONAL {?sensor ?attribute ?value}
 	}",
-"env": "PREFIX DTDFvocab:   <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
+
+	"env": "PREFIX DTDFvocab:   <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
 	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
 	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
 
@@ -71,7 +89,8 @@ const QUERIES = {
 		?env base:isContainedIn ?envS .
 		OPTIONAL {?env ?attribute ?value}
 	}",
-"sys_component": "PREFIX DTDFvocab:   <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
+
+	"sys_component": "PREFIX DTDFvocab:   <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
 	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
 	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
 
@@ -82,37 +101,44 @@ const QUERIES = {
 		?sysComponent base:isContainedIn ?sys .
 		OPTIONAL {?sysComponent ?attribute ?value}
 	}",
-#Rabbit objects ------------------------------------------------------------------------------------
-"rabbit_exchange": "PREFIX rabbit:		<https://bentleyjoakes.github.io/DTaaS/RabbitMQVocab#>
+
+	# ── RabbitMQ objects ──────────────────────────────────────────────────────
+
+	"rabbit_exchange": "PREFIX rabbit:		<https://bentleyjoakes.github.io/DTaaS/RabbitMQVocab#>
 
 	SELECT ?exc ?attribute ?value
 	WHERE {
 		?exc a rabbit:ExchangeName .
 		?exc ?attribute ?value
 	}",
-"rabbit_routing_key": "PREFIX rabbit:		<https://bentleyjoakes.github.io/DTaaS/RabbitMQVocab#>
+
+	"rabbit_routing_key": "PREFIX rabbit:		<https://bentleyjoakes.github.io/DTaaS/RabbitMQVocab#>
 
 	SELECT ?route ?attribute ?value
 	WHERE {
 		?route a rabbit:RoutingKey  .
 		?route ?attribute ?value
 	}",
-"rabbit_source": "PREFIX rabbit:		<https://bentleyjoakes.github.io/DTaaS/RabbitMQVocab#>
+
+	"rabbit_source": "PREFIX rabbit:		<https://bentleyjoakes.github.io/DTaaS/RabbitMQVocab#>
 
 	SELECT ?source ?attribute ?value
 	WHERE {
 		?source a rabbit:Source  .
 		?source ?attribute ?value
 	}",
-"rabbit_message_listener": "PREFIX rabbit:		<https://bentleyjoakes.github.io/DTaaS/RabbitMQVocab#>
+
+	"rabbit_message_listener": "PREFIX rabbit:		<https://bentleyjoakes.github.io/DTaaS/RabbitMQVocab#>
 
 	SELECT ?ml ?attribute ?value
 	WHERE {
 		?ml a rabbit:MessageListener   .
 		?ml ?attribute ?value
 	}",
-#Characteristics ------------------------------------------------------------------------------------
-"c1": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
+
+	# ── DT Characteristics (C1–C21) ───────────────────────────────────────────
+
+	"characteristic_system_under_study": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
 	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
 	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
 
@@ -121,7 +147,8 @@ const QUERIES = {
 		?c1 a DTDFvocab:SystemUnderStudy  .
 		OPTIONAL {?c1 ?attribute ?value}
 	}",
-"c2": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
+
+	"characteristic_acting_component": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
 	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
 	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
 
@@ -130,7 +157,8 @@ const QUERIES = {
 		?c2 a DTDFvocab:ActingComponent  .
 		OPTIONAL {?c2 ?attribute ?value}
 	}",
-"c4": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
+
+	"characteristic_data_transmitted": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
 	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
 	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
 
@@ -139,7 +167,8 @@ const QUERIES = {
 		?c4 a DTDFvocab:DataTransmitted  .
 		OPTIONAL {?c4 ?attribute ?value}
 	}",
-"c5": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
+
+	"characteristic_virtual_to_physical": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
 	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
 	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
 
@@ -148,7 +177,8 @@ const QUERIES = {
 		?c5 a DTDFvocab:VirtualToPhysical  .
 		OPTIONAL {?c5 ?attribute ?value}
 	}",
-"c7": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
+
+	"characteristic_time_scale": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
 	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
 	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
 
@@ -157,7 +187,8 @@ const QUERIES = {
 		?c7 a DTDFvocab:TimeScale  .
 		OPTIONAL {?c7 ?attribute ?value}
 	}",
-"c8": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
+
+	"characteristic_multiplicity": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
 	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
 	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
 
@@ -166,7 +197,8 @@ const QUERIES = {
 		?c8 a DTDFvocab:Multiplicity  .
 		OPTIONAL {?c8 ?attribute ?value}
 	}",
-"c9": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
+
+	"characteristic_life_cycle_stage": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
 	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
 	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
 
@@ -175,7 +207,8 @@ const QUERIES = {
 		?c9 a DTDFvocab:LifeCycleStage  .
 		OPTIONAL {?c9 ?attribute ?value}
 	}",
-"c12": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
+
+	"characteristic_constellation": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
 	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
 	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
 
@@ -184,7 +217,8 @@ const QUERIES = {
 		?c12 a DTDFvocab:Constellation  .
 		OPTIONAL {?c12 ?attribute ?value}
 	}",
-"c13": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
+
+	"characteristic_evolution_stage": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
 	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
 	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
 
@@ -193,7 +227,8 @@ const QUERIES = {
 		?c13 a DTDFvocab:EvolutionStage  .
 		OPTIONAL {?c13 ?attribute ?value}
 	}",
-"c14": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
+
+	"characteristic_fidelity_consideration": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
 	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
 	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
 
@@ -202,7 +237,8 @@ const QUERIES = {
 		?c14 a DTDFvocab:FidelityConsideration  .
 		OPTIONAL {?c14 ?attribute ?value}
 	}",
-"c15": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
+
+	"characteristic_technical_connection": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
 	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
 	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
 
@@ -211,7 +247,8 @@ const QUERIES = {
 		?c15 a DTDFvocab:TechnicalConnection  .
 		OPTIONAL {?c15 ?attribute ?value}
 	}",
-"c16": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
+
+	"characteristic_deployment": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
 	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
 	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
 
@@ -220,7 +257,8 @@ const QUERIES = {
 		?c16 a DTDFvocab:Deployment  .
 		OPTIONAL {?c16 ?attribute ?value}
 	}",
-"c18": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
+
+	"characteristic_horizontal_integration": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
 	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
 	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
 
@@ -229,7 +267,8 @@ const QUERIES = {
 		?c18 a DTDFvocab:HoriIntegration  .
 		OPTIONAL {?c18 ?attribute ?value}
 	}",
-"c19": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
+
+	"characteristic_data_ownership": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
 	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
 	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
 
@@ -238,7 +277,8 @@ const QUERIES = {
 		?c19 a DTDFvocab:DataOwnershipPrivacy  .
 		OPTIONAL {?c19 ?attribute ?value}
 	}",
-"c20": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
+
+	"characteristic_standardization": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
 	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
 	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
 
@@ -247,7 +287,8 @@ const QUERIES = {
 		?c20 a DTDFvocab:Standardization  .
 		OPTIONAL {?c20 ?attribute ?value}
 	}",
-"c21": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
+
+	"characteristic_security_safety": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
 	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
 	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
 
