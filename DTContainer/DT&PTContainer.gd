@@ -759,29 +759,24 @@ func _on_link_deletion_toggled(toggled_on: bool) -> void:
 		Input.set_default_cursor_shape(Input.CURSOR_ARROW)
 	print("Link deletion mode: ", "ON" if deletion_mode else "OFF")
 
-func enable_visual_editing():
-	$DTContainer/EnablersPanel/AddComponentButton.show()
-	$DTContainer/ServicesPanel/AddComponentButton.show()
-	$DTContainer/ModelsDataPanel/AddComponentButton.show()
-	$PTContainer/DataTravelContainer/DataOutPanel/AddComponentButton.show()
-	$PTContainer/DataTravelContainer/MachinePanel/AddComponentButton.show()
-	$"PTContainer/Operator&EnvContainer/OperatorPanel/AddComponentButton".show()
-	$"PTContainer/Operator&EnvContainer/ExperimentContainer/EnvPanel/AddComponentButton".show()
-	$"PTContainer/Operator&EnvContainer/ExperimentContainer/SystemPanel/AddComponentButton".show()
-	$DTContainer/ModelsDataPanel/ModelsDataContainer/ModelsPanelContainer/AddComponentButton.show()
-	$PTContainer/DataTravelContainer/DataOutPanel/DataOutContainer/HBoxContainer/AddComponentButton.show()
+func _set_visual_editing_buttons_visible(is_visible: bool):
+	var buttons = [
+		$DTContainer/EnablersPanel/AddComponentButton,
+		$DTContainer/ServicesPanel/AddComponentButton,
+		$DTContainer/ModelsDataPanel/AddComponentButton,
+		$PTContainer/DataTravelContainer/DataOutPanel/AddComponentButton,
+		$PTContainer/DataTravelContainer/MachinePanel/AddComponentButton,
+		$"PTContainer/Operator&EnvContainer/OperatorPanel/AddComponentButton",
+		$"PTContainer/Operator&EnvContainer/ExperimentContainer/EnvPanel/AddComponentButton",
+		$"PTContainer/Operator&EnvContainer/ExperimentContainer/SystemPanel/AddComponentButton",
+		$DTContainer/ModelsDataPanel/ModelsDataContainer/ModelsPanelContainer/AddComponentButton,
+		$PTContainer/DataTravelContainer/DataOutPanel/DataOutContainer/HBoxContainer/AddComponentButton
+	]
+	for btn in buttons:
+		if btn: btn.visible = is_visible
 
-func disable_visual_editing():
-	$DTContainer/EnablersPanel/AddComponentButton.hide()
-	$DTContainer/ServicesPanel/AddComponentButton.hide()
-	$DTContainer/ModelsDataPanel/AddComponentButton.hide()
-	$PTContainer/DataTravelContainer/DataOutPanel/AddComponentButton.hide()
-	$PTContainer/DataTravelContainer/MachinePanel/AddComponentButton.hide()
-	$"PTContainer/Operator&EnvContainer/OperatorPanel/AddComponentButton".hide()
-	$"PTContainer/Operator&EnvContainer/ExperimentContainer/EnvPanel/AddComponentButton".hide()
-	$"PTContainer/Operator&EnvContainer/ExperimentContainer/SystemPanel/AddComponentButton".hide()
-	$DTContainer/ModelsDataPanel/ModelsDataContainer/ModelsPanelContainer/AddComponentButton.hide()
-	$PTContainer/DataTravelContainer/DataOutPanel/DataOutContainer/HBoxContainer/AddComponentButton.hide()
+func enable_visual_editing(): _set_visual_editing_buttons_visible(true)
+func disable_visual_editing(): _set_visual_editing_buttons_visible(false)
 
 func rename_dict_key(dict: Dictionary, old_key, new_key) -> void:
 	if old_key == new_key or not dict.has(old_key):
@@ -796,27 +791,18 @@ func rename_dict_key(dict: Dictionary, old_key, new_key) -> void:
 	for i in range(keys.size()):
 		dict[keys[i]] = values[i]
 
-func remove_all_user_links_for(node: GenericDisplay) -> void:
-	if user_links.has(node):
-		user_links.erase(node)
-	for src in user_links.keys():
-		user_links[src].erase(node)
-		if user_links[src].is_empty():
-			user_links.erase(src)
+func _remove_node_from_link_dict(node: GenericDisplay, link_dict: Dictionary) -> void:
+	if link_dict.has(node):
+		link_dict.erase(node)
+	for src in link_dict.keys():
+		link_dict[src].erase(node)
+		if link_dict[src].is_empty():
+			link_dict.erase(src)
 
-	if user_links_bot2bot.has(node):
-		user_links_bot2bot.erase(node)
-	for src in user_links_bot2bot.keys():
-		user_links_bot2bot[src].erase(node)
-		if user_links_bot2bot[src].is_empty():
-			user_links_bot2bot.erase(src)
-			
-	if user_links_top2top.has(node):
-		user_links_top2top.erase(node)
-	for src in user_links_top2top.keys():
-		user_links_top2top[src].erase(node)
-		if user_links_top2top[src].is_empty():
-			user_links_top2top.erase(src)
+func remove_all_user_links_for(node: GenericDisplay) -> void:
+	_remove_node_from_link_dict(node, user_links)
+	_remove_node_from_link_dict(node, user_links_bot2bot)
+	_remove_node_from_link_dict(node, user_links_top2top)
 
 
 func delete_component(node_name, fuseki_dict, parent_container: Node):
@@ -832,114 +818,46 @@ func rename_component(fuseki_dict, node_name, new_node_name):
 	
 # Edit the FusekiData of a specific node
 func edit_node(node_name: String, parent_container: Node, delete: bool, new_node_name: String, new_node_description: String):
-	match parent_container:
-		service_container:
-			if delete:
-				delete_component(node_name, fuseki_data.service, parent_container)
-			else:
-				if node_name != new_node_name:
-					rename_component(fuseki_data.service, node_name, new_node_name)
-					node_name = new_node_name
-				if new_node_description:
-					fuseki_data.service[node_name]["desc"] = [new_node_description]
-			update_node_with(service_container, fuseki_data.service)
+	var target_dict = null
+	var update_func = null
+	
+	if parent_container == service_container:
+		target_dict = fuseki_data.service
+		update_func = func(): update_node_with(service_container, target_dict)
+	elif parent_container == enabler_container:
+		target_dict = fuseki_data.enabler
+		update_func = func(): update_node_with(enabler_container, target_dict)
+	elif parent_container == model_container:
+		target_dict = fuseki_data.model
+		update_func = func(): update_node_with(model_container, target_dict)
+	elif parent_container == data_container:
+		target_dict = fuseki_data.data
+		update_func = func(): update_node_with(data_container, target_dict)
+	elif parent_container == data_transmitted_container:
+		target_dict = fuseki_data.data_transmitted
+		update_func = func(): update_node_with(data_transmitted_container, target_dict)
+	elif parent_container == sensor_container:
+		target_dict = fuseki_data.sensing_component
+		update_func = func(): update_node_with(sensor_container, target_dict)
+	elif parent_container == env_container:
+		target_dict = fuseki_data.env
+		update_func = func(): update_node_with(env_container, target_dict)
+	elif parent_container == sys_container:
+		target_dict = fuseki_data.sys_component
+		update_func = func(): update_node_with(sys_container, target_dict)
+	elif parent_container == operator_container or parent_container == machine_container:
+		target_dict = fuseki_data.provided_thing
+		update_func = func(): update_provided_things(operator_container, machine_container, target_dict)
+	
+	if target_dict != null and update_func != null:
+		if delete:
+			delete_component(node_name, target_dict, parent_container)
+		else:
+			if node_name != new_node_name:
+				rename_component(target_dict, node_name, new_node_name)
+				node_name = new_node_name
+			if new_node_description:
+				target_dict[node_name]["desc"] = [new_node_description]
+		update_func.call()
 
-		enabler_container:
-			if delete:
-				delete_component(node_name, fuseki_data.enabler, parent_container)
-			else:
-				if node_name != new_node_name:
-					rename_component(fuseki_data.enabler, node_name, new_node_name)
-					node_name = new_node_name
-				if new_node_description:
-					fuseki_data.enabler[node_name]["desc"] = [new_node_description]
-			update_node_with(enabler_container, fuseki_data.enabler)
-
-		model_container:
-			if delete:
-				delete_component(node_name, fuseki_data.model, parent_container)
-			else:
-				if node_name != new_node_name:
-					rename_component(fuseki_data.model, node_name, new_node_name)
-					node_name = new_node_name
-				if new_node_description:
-					fuseki_data.model[node_name]["desc"] = [new_node_description]
-			update_node_with(model_container, fuseki_data.model)
-
-		data_container:
-			if delete:
-				delete_component(node_name, fuseki_data.data, parent_container)
-			else:
-				if node_name != new_node_name:
-					rename_component(fuseki_data.data, node_name, new_node_name)
-					node_name = new_node_name
-				if new_node_description:
-					fuseki_data.data[node_name]["desc"] = [new_node_description]
-			update_node_with(data_container, fuseki_data.data)
-
-		operator_container:
-			if delete:
-				delete_component(node_name, fuseki_data.provided_thing, parent_container)
-			else:
-				if node_name != new_node_name:
-					rename_component(fuseki_data.provided_thing, node_name, new_node_name)
-					node_name = new_node_name
-				if new_node_description:
-					fuseki_data.provided_thing[node_name]["desc"] = [new_node_description]
-			update_provided_things(operator_container, machine_container, fuseki_data.provided_thing)
-
-		machine_container:
-			if delete:
-				delete_component(node_name, fuseki_data.provided_thing, parent_container)
-			else:
-				if node_name != new_node_name:
-					rename_component(fuseki_data.provided_thing, node_name, new_node_name)
-					node_name = new_node_name
-				if new_node_description:
-					fuseki_data.provided_thing[node_name]["desc"] = [new_node_description]
-			update_provided_things(operator_container, machine_container, fuseki_data.provided_thing)
-
-		data_transmitted_container:
-			if delete:
-				delete_component(node_name, fuseki_data.data_transmitted, parent_container)
-			else:
-				if node_name != new_node_name:
-					rename_component(fuseki_data.data_transmitted, node_name, new_node_name)
-					node_name = new_node_name
-				if new_node_description:
-					fuseki_data.data_transmitted[node_name]["desc"] = [new_node_description]
-			update_node_with(data_transmitted_container, fuseki_data.data_transmitted)
-
-		sensor_container:
-			if delete:
-				delete_component(node_name, fuseki_data.sensing_component, parent_container)
-			else:
-				if node_name != new_node_name:
-					rename_component(fuseki_data.sensing_component, node_name, new_node_name)
-					node_name = new_node_name
-				if new_node_description:
-					fuseki_data.sensing_component[node_name]["desc"] = [new_node_description]
-			update_node_with(sensor_container, fuseki_data.sensing_component)
-
-		env_container:
-			if delete:
-				delete_component(node_name, fuseki_data.env, parent_container)
-			else:
-				if node_name != new_node_name:
-					rename_component(fuseki_data.env, node_name, new_node_name)
-					node_name = new_node_name
-				if new_node_description:
-					fuseki_data.env[node_name]["desc"] = [new_node_description]
-			update_node_with(env_container, fuseki_data.env)
-
-		sys_container:
-			if delete:
-				delete_component(node_name, fuseki_data.sys_component, parent_container)
-			else:
-				if node_name != new_node_name:
-					rename_component(fuseki_data.sys_component, node_name, new_node_name)
-					node_name = new_node_name
-				if new_node_description:
-					fuseki_data.sys_component[node_name]["desc"] = [new_node_description]
-			update_node_with(sys_container, fuseki_data.sys_component)
 	fuseki_data.build_relations()
