@@ -1,6 +1,7 @@
-[gd_scene load_steps=10 format=3 uid="uid://nqgolpvgp7yg"]
+[gd_scene load_steps=14 format=3 uid="uid://nqgolpvgp7yg"]
 
 [ext_resource type="Script" uid="uid://cijvy55ehil" path="res://DTContainer/DT&PTContainer.gd" id="1_juoha"]
+[ext_resource type="PackedScene" uid="uid://ru63hln676hc" path="res://DTContainer/add_component_button.tscn" id="2_panlg"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sp6md"]
 content_margin_left = 20.0
@@ -41,6 +42,8 @@ content_margin_bottom = 20.0
 bg_color = Color(0.933333, 0.733333, 1, 1)
 corner_radius_bottom_right = 20
 
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_panlg"]
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xj583"]
 content_margin_left = 20.0
 content_margin_top = 20.0
@@ -74,11 +77,34 @@ corner_radius_top_right = 20
 corner_radius_bottom_right = 20
 corner_radius_bottom_left = 20
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qb3t8"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.10196078, 0.10196078, 0.10196078, 0)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panlg"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.10196078, 0.10196078, 0.10196078, 0)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
 [node name="DT&PTContainer" type="HBoxContainer"]
-offset_top = 732.0
-offset_right = 240.0
-offset_bottom = 732.0
-theme_override_constants/separation = 50
+offset_right = 1260.0
+offset_bottom = 505.0
+theme_override_constants/separation = 0
 script = ExtResource("1_juoha")
 
 [node name="PTContainer" type="HBoxContainer" parent="."]
@@ -93,7 +119,6 @@ theme_override_constants/separation = 0
 [node name="OperatorPanel" type="PanelContainer" parent="PTContainer/Operator&EnvContainer"]
 z_index = -1
 layout_mode = 2
-size_flags_vertical = 3
 mouse_filter = 1
 theme_override_styles/panel = SubResource("StyleBoxFlat_sp6md")
 
@@ -110,20 +135,21 @@ uppercase = true
 layout_mode = 2
 
 [node name="OperatorContainer" type="HBoxContainer" parent="PTContainer/Operator&EnvContainer/OperatorPanel/OperatorOrganizer"]
-custom_minimum_size = Vector2(200, 200)
+custom_minimum_size = Vector2(200, 175)
 layout_mode = 2
 size_flags_horizontal = 6
 size_flags_vertical = 3
 
+[node name="AddComponentButton" parent="PTContainer/Operator&EnvContainer/OperatorPanel" instance=ExtResource("2_panlg")]
+layout_mode = 2
+
 [node name="ExperimentContainer" type="HBoxContainer" parent="PTContainer/Operator&EnvContainer"]
 layout_mode = 2
-size_flags_vertical = 3
 theme_override_constants/separation = 0
 
 [node name="EnvPanel" type="PanelContainer" parent="PTContainer/Operator&EnvContainer/ExperimentContainer"]
 z_index = -1
 layout_mode = 2
-size_flags_horizontal = 3
 mouse_filter = 1
 theme_override_styles/panel = SubResource("StyleBoxFlat_ts1y0")
 
@@ -140,9 +166,12 @@ uppercase = true
 layout_mode = 2
 
 [node name="EnvContainer" type="HBoxContainer" parent="PTContainer/Operator&EnvContainer/ExperimentContainer/EnvPanel/EnvOrganizer"]
-custom_minimum_size = Vector2(200, 200)
+custom_minimum_size = Vector2(200, 250)
 layout_mode = 2
 size_flags_horizontal = 6
+
+[node name="AddComponentButton" parent="PTContainer/Operator&EnvContainer/ExperimentContainer/EnvPanel" instance=ExtResource("2_panlg")]
+layout_mode = 2
 
 [node name="SystemPanel" type="PanelContainer" parent="PTContainer/Operator&EnvContainer/ExperimentContainer"]
 z_index = -1
@@ -165,9 +194,12 @@ uppercase = true
 layout_mode = 2
 
 [node name="SystemContainer" type="HBoxContainer" parent="PTContainer/Operator&EnvContainer/ExperimentContainer/SystemPanel/SystemOrganizer"]
-custom_minimum_size = Vector2(200, 200)
+custom_minimum_size = Vector2(200, 250)
 layout_mode = 2
 size_flags_horizontal = 6
+
+[node name="AddComponentButton" parent="PTContainer/Operator&EnvContainer/ExperimentContainer/SystemPanel" instance=ExtResource("2_panlg")]
+layout_mode = 2
 
 [node name="DataTravelContainer" type="VBoxContainer" parent="PTContainer"]
 layout_mode = 2
@@ -176,7 +208,6 @@ theme_override_constants/separation = 0
 [node name="MachinePanel" type="PanelContainer" parent="PTContainer/DataTravelContainer"]
 z_index = -1
 layout_mode = 2
-size_flags_vertical = 3
 mouse_filter = 1
 theme_override_styles/panel = SubResource("StyleBoxFlat_qb31t")
 
@@ -193,18 +224,24 @@ uppercase = true
 layout_mode = 2
 
 [node name="MachineContainer" type="HBoxContainer" parent="PTContainer/DataTravelContainer/MachinePanel/MachineOrganizer"]
-custom_minimum_size = Vector2(200, 200)
+custom_minimum_size = Vector2(200, 175)
 layout_mode = 2
 size_flags_horizontal = 6
+
+[node name="AddComponentButton" parent="PTContainer/DataTravelContainer/MachinePanel" instance=ExtResource("2_panlg")]
+layout_mode = 2
 
 [node name="DataOutPanel" type="PanelContainer" parent="PTContainer/DataTravelContainer"]
 z_index = -1
 layout_mode = 2
-size_flags_vertical = 3
 mouse_filter = 1
 theme_override_styles/panel = SubResource("StyleBoxFlat_rl1kt")
 
-[node name="SensorsLabel" type="Label" parent="PTContainer/DataTravelContainer/DataOutPanel"]
+[node name="DataOutContainer" type="VBoxContainer" parent="PTContainer/DataTravelContainer/DataOutPanel"]
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 2
+
+[node name="SensorsLabel" type="Label" parent="PTContainer/DataTravelContainer/DataOutPanel/DataOutContainer"]
 z_index = 1
 layout_mode = 2
 size_flags_horizontal = 0
@@ -213,11 +250,8 @@ theme_override_colors/font_color = Color(0, 0, 0, 1)
 text = "Sensors"
 uppercase = true
 
-[node name="DataOutContainer" type="VBoxContainer" parent="PTContainer/DataTravelContainer/DataOutPanel"]
-custom_minimum_size = Vector2(200, 200)
-layout_mode = 2
-
 [node name="SensorsOrganizer" type="HBoxContainer" parent="PTContainer/DataTravelContainer/DataOutPanel/DataOutContainer"]
+custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
 size_flags_vertical = 3
 
@@ -226,7 +260,10 @@ layout_mode = 2
 size_flags_horizontal = 6
 size_flags_vertical = 3
 
-[node name="DataTransmittedLabel" type="Label" parent="PTContainer/DataTravelContainer/DataOutPanel/DataOutContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="PTContainer/DataTravelContainer/DataOutPanel/DataOutContainer"]
+layout_mode = 2
+
+[node name="DataTransmittedLabel" type="Label" parent="PTContainer/DataTravelContainer/DataOutPanel/DataOutContainer/HBoxContainer"]
 z_index = 1
 layout_mode = 2
 size_flags_horizontal = 0
@@ -235,7 +272,15 @@ theme_override_colors/font_color = Color(0, 0, 0, 1)
 text = "Data transmitted"
 uppercase = true
 
+[node name="HFill" type="Control" parent="PTContainer/DataTravelContainer/DataOutPanel/DataOutContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="AddComponentButton" parent="PTContainer/DataTravelContainer/DataOutPanel/DataOutContainer/HBoxContainer" instance=ExtResource("2_panlg")]
+layout_mode = 2
+
 [node name="DataTransmittedOrganizer" type="HBoxContainer" parent="PTContainer/DataTravelContainer/DataOutPanel/DataOutContainer"]
+custom_minimum_size = Vector2(0, 92)
 layout_mode = 2
 size_flags_vertical = 3
 
@@ -243,6 +288,14 @@ size_flags_vertical = 3
 layout_mode = 2
 size_flags_horizontal = 6
 size_flags_vertical = 3
+
+[node name="AddComponentButton" parent="PTContainer/DataTravelContainer/DataOutPanel" instance=ExtResource("2_panlg")]
+layout_mode = 2
+
+[node name="VSeparator" type="VSeparator" parent="."]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+theme_override_styles/separator = SubResource("StyleBoxEmpty_panlg")
 
 [node name="DTContainer" type="VBoxContainer" parent="."]
 layout_mode = 2
@@ -267,9 +320,12 @@ uppercase = true
 layout_mode = 2
 
 [node name="ServicesContainer" type="HBoxContainer" parent="DTContainer/ServicesPanel/ServicesOrganizer"]
-custom_minimum_size = Vector2(200, 200)
+custom_minimum_size = Vector2(200, 125)
 layout_mode = 2
 size_flags_horizontal = 6
+
+[node name="AddComponentButton" parent="DTContainer/ServicesPanel" instance=ExtResource("2_panlg")]
+layout_mode = 2
 
 [node name="EnablersPanel" type="PanelContainer" parent="DTContainer"]
 z_index = -1
@@ -290,10 +346,13 @@ uppercase = true
 layout_mode = 2
 
 [node name="EnablersContainer" type="HBoxContainer" parent="DTContainer/EnablersPanel/EnablerOrganizer"]
-custom_minimum_size = Vector2(200, 200)
+custom_minimum_size = Vector2(200, 125)
 layout_mode = 2
 size_flags_horizontal = 6
 size_flags_vertical = 3
+
+[node name="AddComponentButton" parent="DTContainer/EnablersPanel" instance=ExtResource("2_panlg")]
+layout_mode = 2
 
 [node name="ModelsDataPanel" type="PanelContainer" parent="DTContainer"]
 z_index = -1
@@ -301,7 +360,15 @@ layout_mode = 2
 mouse_filter = 1
 theme_override_styles/panel = SubResource("StyleBoxFlat_ox2pm")
 
-[node name="ModelsLabel" type="Label" parent="DTContainer/ModelsDataPanel"]
+[node name="ModelsDataContainer" type="HBoxContainer" parent="DTContainer/ModelsDataPanel"]
+layout_mode = 2
+theme_override_constants/separation = 50
+
+[node name="ModelsPanelContainer" type="PanelContainer" parent="DTContainer/ModelsDataPanel/ModelsDataContainer"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_qb3t8")
+
+[node name="ModelsLabel" type="Label" parent="DTContainer/ModelsDataPanel/ModelsDataContainer/ModelsPanelContainer"]
 z_index = 1
 layout_mode = 2
 size_flags_horizontal = 0
@@ -311,17 +378,20 @@ text = "Models
 "
 uppercase = true
 
-[node name="ModelsDataContainer" type="HBoxContainer" parent="DTContainer/ModelsDataPanel"]
-layout_mode = 2
-theme_override_constants/separation = 50
-
-[node name="ModelsContainer" type="HBoxContainer" parent="DTContainer/ModelsDataPanel/ModelsDataContainer"]
-custom_minimum_size = Vector2(200, 200)
+[node name="ModelsContainer" type="HBoxContainer" parent="DTContainer/ModelsDataPanel/ModelsDataContainer/ModelsPanelContainer"]
+custom_minimum_size = Vector2(200, 125)
 layout_mode = 2
 size_flags_horizontal = 6
 size_flags_vertical = 3
 
-[node name="DataLabel" type="Label" parent="DTContainer/ModelsDataPanel/ModelsDataContainer"]
+[node name="AddComponentButton" parent="DTContainer/ModelsDataPanel/ModelsDataContainer/ModelsPanelContainer" instance=ExtResource("2_panlg")]
+layout_mode = 2
+
+[node name="DataPanelContainer" type="PanelContainer" parent="DTContainer/ModelsDataPanel/ModelsDataContainer"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panlg")
+
+[node name="DataLabel" type="Label" parent="DTContainer/ModelsDataPanel/ModelsDataContainer/DataPanelContainer"]
 z_index = 1
 layout_mode = 2
 size_flags_horizontal = 0
@@ -330,7 +400,21 @@ theme_override_colors/font_color = Color(0, 0, 0, 1)
 text = "Data"
 uppercase = true
 
-[node name="DataContainer" type="HBoxContainer" parent="DTContainer/ModelsDataPanel/ModelsDataContainer"]
-custom_minimum_size = Vector2(200, 200)
+[node name="DataContainer" type="HBoxContainer" parent="DTContainer/ModelsDataPanel/ModelsDataContainer/DataPanelContainer"]
+custom_minimum_size = Vector2(200, 125)
 layout_mode = 2
 size_flags_horizontal = 6
+
+[node name="AddComponentButton" parent="DTContainer/ModelsDataPanel" instance=ExtResource("2_panlg")]
+layout_mode = 2
+
+[connection signal="pressed" from="PTContainer/Operator&EnvContainer/OperatorPanel/AddComponentButton" to="." method="_on_add_component_button_pressed_operator"]
+[connection signal="pressed" from="PTContainer/Operator&EnvContainer/ExperimentContainer/EnvPanel/AddComponentButton" to="." method="_on_add_component_button_pressed_env"]
+[connection signal="pressed" from="PTContainer/Operator&EnvContainer/ExperimentContainer/SystemPanel/AddComponentButton" to="." method="_on_add_component_button_pressed_system"]
+[connection signal="pressed" from="PTContainer/DataTravelContainer/MachinePanel/AddComponentButton" to="." method="_on_add_component_button_pressed_machine"]
+[connection signal="pressed" from="PTContainer/DataTravelContainer/DataOutPanel/DataOutContainer/HBoxContainer/AddComponentButton" to="." method="_on_add_component_button_pressed_data_trans"]
+[connection signal="pressed" from="PTContainer/DataTravelContainer/DataOutPanel/AddComponentButton" to="." method="_on_add_component_button_pressed_sensors"]
+[connection signal="pressed" from="DTContainer/ServicesPanel/AddComponentButton" to="." method="_on_add_component_button_pressed_services"]
+[connection signal="pressed" from="DTContainer/EnablersPanel/AddComponentButton" to="." method="_on_add_component_button_pressed_enablers"]
+[connection signal="pressed" from="DTContainer/ModelsDataPanel/ModelsDataContainer/ModelsPanelContainer/AddComponentButton" to="." method="_on_add_component_button_pressed_models"]
+[connection signal="pressed" from="DTContainer/ModelsDataPanel/AddComponentButton" to="." method="_on_add_component_button_pressed_data"]

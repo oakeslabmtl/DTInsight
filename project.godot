@@ -11,6 +11,7 @@ config_version=5
 [application]
 
 config/name="DTInsight"
+config/version="1.2.0"
 run/main_scene="res://MainScene/MainScene.tscn"
 config/features=PackedStringArray("4.5", "C#", "Forward Plus")
 run/low_processor_mode=true
@@ -45,6 +46,10 @@ project/assembly_name="DigitalTwinVisualisationProject"
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/easy_charts/plugin.cfg", "res://addons/modular-settings-menu/plugin.cfg")
+
+[global_group]
+
+main_buttons=""
 
 [input]
 

@@ -28,6 +28,7 @@ class JsonHead:
 	const C8 = "c8"
 	const C9 = "c9"
 	const C12 = "c12"
+	const C13 = "c13"
 	const C14 = "c14"
 	const C15 = "c15"
 	const C16 = "c16"

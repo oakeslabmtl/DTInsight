@@ -5,8 +5,10 @@ class_name CameraControl
 var movement_enabled : bool = true
 var zoom_enabled : bool = true
 var currently_zooming : bool = false
+var target_zoom : Vector2 = Vector2(1.0, 1.0)
 
 func _ready() -> void:
+	target_zoom = zoom
 	CameraSignals.disable_camera_movement.connect(_disable_camera_movement)
 	CameraSignals.enable_camera_movement.connect(_enable_camera_movement)
 	CameraSignals.enable_camera_zoom.connect(_enable_camera_zoom)
@@ -18,8 +20,11 @@ func _process(delta : float):
 		var inputmovementVector : Vector2 = handle_movement_input()
 		moveCamera(inputmovementVector, delta)
 	if zoom_enabled:
-		var inputZoomVector : Vector2 = handle_zoom_input(false)
-		zoom_camera(inputZoomVector)
+		var keyZoomVector : Vector2 = handle_zoom_input(false)
+		if keyZoomVector != Vector2.ZERO:
+			set_target_zoom(keyZoomVector * delta)
+		
+		zoom = zoom.lerp(target_zoom, 15.0 * delta)
 
 #Movement functions -----------------------------------------------------------
 var current_velocity : Vector2 = Vector2(0, 0)
@@ -71,7 +76,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		handle_mouse_movement(event)
 	if zoom_enabled:
 		var inputZoomVector : Vector2 = handle_zoom_input(true)
-		zoom_camera(inputZoomVector)
+		if inputZoomVector != Vector2.ZERO:
+			set_target_zoom(inputZoomVector)
 
 func handle_mouse_movement(event : InputEventMouseMotion) -> void:
 	translate(-event.relative / zoom)
@@ -91,8 +97,8 @@ func handle_zoom_input(using_mouse : bool):
 			input_vector += Vector2(-CameraConfig.Zoom.ZOOM_SCROLL_SPEED, -CameraConfig.Zoom.ZOOM_SCROLL_SPEED)
 	return input_vector
 
-func zoom_camera(input_vector: Vector2):
-	zoom = clamp(lerp(zoom, zoom + input_vector, 0.01), Vector2(CameraConfig.Zoom.MAX_ZOOM_OUT_SCALE, CameraConfig.Zoom.MAX_ZOOM_OUT_SCALE), Vector2(CameraConfig.Zoom.MAX_ZOOM_IN_SCALE, CameraConfig.Zoom.MAX_ZOOM_IN_SCALE))
+func set_target_zoom(input_vector: Vector2):
+	target_zoom = clamp(target_zoom + input_vector, Vector2(CameraConfig.Zoom.MAX_ZOOM_OUT_SCALE, CameraConfig.Zoom.MAX_ZOOM_OUT_SCALE), Vector2(CameraConfig.Zoom.MAX_ZOOM_IN_SCALE, CameraConfig.Zoom.MAX_ZOOM_IN_SCALE))
 
 #Signal handling ---------------------------------------------------------------
 func _disable_camera_movement() -> void:
@@ -114,7 +120,7 @@ func _zoom_to_fit(target_rect: Rect2):
 
 	# Use the smaller scale to ensure the whole target fits
 	var zoom_factor = min(scale_x, scale_y)
-	zoom = Vector2(zoom_factor, zoom_factor)
+	target_zoom = Vector2(zoom_factor, zoom_factor)
 
 	# Center the camera on the target
 	position = target_rect.position + target_rect.size * 0.5

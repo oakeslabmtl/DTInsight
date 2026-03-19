@@ -1,34 +1,44 @@
-[gd_scene load_steps=16 format=3 uid="uid://cxj8tr6re2b4t"]
+[gd_scene load_steps=20 format=3 uid="uid://cxj8tr6re2b4t"]
 
 [ext_resource type="PackedScene" uid="uid://nqgolpvgp7yg" path="res://DTContainer/DT&PTContainer.tscn" id="1_lklxr"]
 [ext_resource type="Script" uid="uid://dfun6prbhxg7c" path="res://MainScene/MainSceneController.gd" id="1_r7thu"]
 [ext_resource type="Script" uid="uid://chsxi3pvlcut1" path="res://Camera/CameraControl.gd" id="3_5mxu4"]
 [ext_resource type="Script" uid="uid://cwl13x3trg1o3" path="res://ControlPanel/ControlPanelSuperviser.gd" id="4_xqnle"]
 [ext_resource type="PackedScene" uid="uid://bx42q4hl46td1" path="res://Fuseki/Data/FusekiData.tscn" id="5_4e51a"]
-[ext_resource type="PackedScene" uid="uid://cwd5j8qr66eh3" path="res://Legends/Legends.tscn" id="5_8cnmr"]
 [ext_resource type="Theme" uid="uid://xukk6lvgcpaa" path="res://main_theme.tres" id="5_77ryg"]
 [ext_resource type="Script" uid="uid://wfoj63h06hpx" path="res://MainScene/help_button.gd" id="6_tgjmw"]
 [ext_resource type="Script" uid="uid://b0mon1bk14hp6" path="res://MainScene/settings_button.gd" id="7_gs64f"]
 [ext_resource type="PackedScene" uid="uid://px6a2dg8cawb" path="res://addons/modular-settings-menu/scenes/settings.tscn" id="8_ixws2"]
 [ext_resource type="PackedScene" uid="uid://cowug1mbtod0e" path="res://Fuseki/Caller/FusekiCallerBtton.tscn" id="8_ped26"]
 [ext_resource type="Script" uid="uid://cfkgtkfhl06v5" path="res://RabbitMQ/Control/RabbitButton.gd" id="9_qda1k"]
+[ext_resource type="PackedScene" uid="uid://3rf0dti147xm" path="res://ScriptRunnerPanel.tscn" id="10_xqnle"]
 [ext_resource type="Texture2D" uid="uid://doyxcp824t4vw" path="res://gear.png" id="12_77ryg"]
+[ext_resource type="PackedScene" uid="uid://cf7nrorpbpbjb" path="res://Legends/Legends.tscn" id="12_80vrr"]
+[ext_resource type="Script" uid="uid://cdswvlml33tfq" path="res://MainScene/python_runner.gd" id="13_gmiik"]
 [ext_resource type="Script" uid="uid://0b3cap3tphwi" path="res://MainScene/CICDServer.gd" id="15_gmiik"]
+
+[sub_resource type="GDScript" id="GDScript_xqnle"]
+resource_name = "VersionLabel"
+script/source = "extends Label
+
+func _ready() -> void:
+	# Get the version string from Project Settings
+	var version = ProjectSettings.get_setting(\"application/config/version\")
+	text = \"v\" + version
+"
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ffs3u"]
 border_color = Color(0.259294, 0.259294, 0.259294, 1)
 corner_radius_bottom_right = 20
 corner_radius_bottom_left = 20
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_80vrr"]
+
 [node name="MainScene" type="Node"]
 script = ExtResource("1_r7thu")
 
 [node name="DTContainer" parent="." instance=ExtResource("1_lklxr")]
 z_as_relative = false
-offset_left = -9.0
-offset_top = -2.0
-offset_right = 1344.0
-offset_bottom = 726.0
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(575, 326)
@@ -48,6 +58,36 @@ mouse_filter = 1
 color = Color(0.933333, 0.913725, 0.933333, 1)
 
 [node name="ControlLayer" type="CanvasLayer" parent="."]
+
+[node name="InformationContainer" type="HBoxContainer" parent="ControlLayer"]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -152.0
+offset_top = -19.0
+offset_right = 152.0
+offset_bottom = -1.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="LinkButton" type="LinkButton" parent="ControlLayer/InformationContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_focus_color = Color(0.11858126, 0.11858139, 0.11858175, 1)
+theme_override_colors/font_pressed_color = Color(0.288518, 0.28851798, 0.28851798, 1)
+theme_override_colors/font_hover_color = Color(0.18000469, 0.18000486, 0.18000537, 1)
+theme_override_font_sizes/font_size = 13
+text = "https://github.com/oakeslabmtl/DTInsight"
+uri = "https://github.com/oakeslabmtl/DTInsight"
+
+[node name="VersionLabel" type="Label" parent="ControlLayer/InformationContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.038397167, 0.038397167, 0.03839716, 1)
+theme_override_font_sizes/font_size = 13
+text = "vX.X"
+script = SubResource("GDScript_xqnle")
 
 [node name="ControlPanel" type="PanelContainer" parent="ControlLayer"]
 anchors_preset = 5
@@ -82,85 +122,99 @@ theme = ExtResource("5_77ryg")
 [node name="RabbitButton" type="CheckButton" parent="ControlLayer/ControlPanel/MarginContainer/ControlContainer"]
 unique_name_in_owner = true
 layout_mode = 2
+tooltip_text = "Enable listening of messages from RabbitMQ"
 disabled = true
-text = "Record data form RabbitMQ :"
+text = "Record data from RabbitMQ :"
 script = ExtResource("9_qda1k")
 
-[node name="Legends" parent="ControlLayer" instance=ExtResource("5_8cnmr")]
-
-[node name="HelpButton" type="Button" parent="ControlLayer"]
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_left = 10.0
-offset_top = -41.0
-offset_right = 41.0
-offset_bottom = -10.0
-grow_vertical = 0
-tooltip_text = "Get help"
-text = "?"
-icon_alignment = 1
-script = ExtResource("6_tgjmw")
-
-[node name="HelpPopup" type="PopupPanel" parent="ControlLayer/HelpButton"]
-title = "Help"
-position = Vector2i(18, 129)
-size = Vector2i(305, 455)
-unresizable = false
-borderless = false
-
-[node name="RichTextLabel" type="RichTextLabel" parent="ControlLayer/HelpButton/HelpPopup"]
-offset_left = 4.0
-offset_top = 4.0
-offset_right = 301.0
-offset_bottom = 451.0
-text = "DTInsight allows you to visualize the architecture of your Digital Twin. It does by gathering its ontological structure through a Fuseki server, and displaying the incoming RabbitMQ data.
-
-To get started, either:
-- Connect to Fuseki by clicking on the \"Call Fuseki\" button.
-- Load an existing dump by picking a dump file and selecting \"Load\"
-
-Once the graph is generated, hover on the nodes (clickable) to highlight connections."
-
-[node name="SettingsButton" type="Button" parent="ControlLayer"]
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_left = 10.0
-offset_top = -81.0
-offset_right = 41.0
-offset_bottom = -50.0
-grow_vertical = 0
-tooltip_text = "Settings"
-icon = ExtResource("12_77ryg")
-icon_alignment = 1
-expand_icon = true
-script = ExtResource("7_gs64f")
-
-[node name="SettingsPopup" type="PopupPanel" parent="ControlLayer/SettingsButton"]
-auto_translate_mode = 1
-mode = 2
-title = "Settings"
-initial_position = 1
-size = Vector2i(490, 560)
-borderless = false
-always_on_top = true
-
-[node name="TabContainer" type="TabContainer" parent="ControlLayer/SettingsButton/SettingsPopup"]
-offset_left = 4.0
-offset_top = 4.0
-offset_right = 486.0
-offset_bottom = 556.0
-current_tab = 0
-
-[node name="General" type="VBoxContainer" parent="ControlLayer/SettingsButton/SettingsPopup/TabContainer"]
+[node name="VSeparator4" type="VSeparator" parent="ControlLayer/ControlPanel/MarginContainer/ControlContainer"]
 layout_mode = 2
-metadata/_tab_index = 0
+theme = ExtResource("5_77ryg")
 
-[node name="RabbitMQ" type="VBoxContainer" parent="ControlLayer/SettingsButton/SettingsPopup/TabContainer"]
-visible = false
+[node name="ViewPanel" type="PanelContainer" parent="ControlLayer"]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -340.0
+offset_top = -114.0
+offset_right = -12.0
+offset_bottom = -7.0
+grow_horizontal = 0
+grow_vertical = 0
+size_flags_horizontal = 0
+size_flags_vertical = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="ControlLayer/ViewPanel"]
 layout_mode = 2
-metadata/_tab_index = 1
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ControlLayer/ViewPanel/MarginContainer"]
+layout_mode = 2
+
+[node name="ViewLabel" type="Label" parent="ControlLayer/ViewPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "dt component views"
+horizontal_alignment = 1
+uppercase = true
+
+[node name="HSeparator" type="HSeparator" parent="ControlLayer/ViewPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ControlLayer/ViewPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="NodeBGLabel" type="Label" parent="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "Background Color"
+
+[node name="NodeBGOption" type="OptionButton" parent="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+selected = 0
+allow_reselect = true
+item_count = 4
+popup/item_0/text = "None"
+popup/item_0/id = 0
+popup/item_1/text = "Deployment"
+popup/item_1/id = 1
+popup/item_2/text = "Implementation"
+popup/item_2/id = 2
+popup/item_3/text = "Timescale"
+popup/item_3/id = 3
+
+[node name="Legends" parent="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer" instance=ExtResource("12_80vrr")]
+layout_mode = 2
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="NodeBorderLabel" type="Label" parent="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2"]
+layout_mode = 2
+text = "Border Color"
+
+[node name="NodeBorderOption" type="OptionButton" parent="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2"]
+layout_mode = 2
+selected = 0
+allow_reselect = true
+item_count = 4
+popup/item_0/text = "None"
+popup/item_0/id = 0
+popup/item_1/text = "Deployment"
+popup/item_1/id = 1
+popup/item_2/text = "Implementation"
+popup/item_2/id = 2
+popup/item_3/text = "Timescale"
+popup/item_3/id = 3
+
+[node name="Legends" parent="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2" instance=ExtResource("12_80vrr")]
+layout_mode = 2
 
 [node name="SettingsBackground" type="ColorRect" parent="ControlLayer"]
 visible = false
@@ -181,16 +235,128 @@ anchor_right = 0.5
 anchor_bottom = 0.5
 IS_IN_GAME_MENU = false
 
-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+[node name="ButtonsContainer" type="PanelContainer" parent="ControlLayer"]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -72.0
+offset_right = 178.0
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_80vrr")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ControlLayer/ButtonsContainer"]
+layout_mode = 2
+
+[node name="ButtonGrid" type="GridContainer" parent="ControlLayer/ButtonsContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 10
+columns = 2
+
+[node name="SettingsButton" type="Button" parent="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+tooltip_text = "Settings"
+icon = ExtResource("12_77ryg")
+icon_alignment = 1
+expand_icon = true
+script = ExtResource("7_gs64f")
+
+[node name="SettingsPopup" type="PopupPanel" parent="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid/SettingsButton"]
+auto_translate_mode = 1
+oversampling_override = 1.0
+mode = 2
+title = "Settings"
+initial_position = 1
+size = Vector2i(490, 560)
+borderless = false
+always_on_top = true
+
+[node name="TabContainer" type="TabContainer" parent="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid/SettingsButton/SettingsPopup"]
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 486.0
+offset_bottom = 556.0
+current_tab = 0
+
+[node name="General" type="VBoxContainer" parent="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid/SettingsButton/SettingsPopup/TabContainer"]
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="RabbitMQ" type="VBoxContainer" parent="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid/SettingsButton/SettingsPopup/TabContainer"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="VisualEditingButton" type="CheckButton" parent="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid" groups=["main_buttons"]]
+layout_mode = 2
+tooltip_text = "Enables the visual editing of the DT constellation"
+text = "Visual editing"
+
+[node name="HelpButton" type="Button" parent="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid"]
+layout_mode = 2
+tooltip_text = "Get help"
+text = "?"
+icon_alignment = 1
+script = ExtResource("6_tgjmw")
+
+[node name="HelpPopup" type="PopupPanel" parent="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid/HelpButton"]
+oversampling_override = 1.0
+title = "Help"
+position = Vector2i(18, 129)
+size = Vector2i(305, 455)
+unresizable = false
+borderless = false
+
+[node name="RichTextLabel" type="RichTextLabel" parent="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid/HelpButton/HelpPopup"]
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 301.0
+offset_bottom = 451.0
+text = "DTInsight allows you to visualize the architecture of your Digital Twin. It does by gathering its ontological structure through a Fuseki server, and displaying the incoming RabbitMQ data.
+
+To get started, either:
+- Connect to Fuseki by clicking on the \"Call Fuseki\" button.
+- Load an existing dump by picking a dump file and selecting \"Load\"
+
+Once the graph is generated, hover on the nodes (clickable) to highlight connections."
+
+[node name="LinkDeletionButton" type="CheckButton" parent="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid" groups=["main_buttons"]]
+layout_mode = 2
+text = "Link Deletion"
+
+[node name="PythonButton" type="Button" parent="ControlLayer/ButtonsContainer/VBoxContainer"]
+layout_mode = 2
+text = "Call a script"
+script = ExtResource("13_gmiik")
+metadata/_custom_type_script = "uid://clu02vc02js06"
+
+[node name="ScriptRunnerBackground" type="ColorRect" parent="ControlLayer"]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.639216)
+
+[node name="ScriptRunnerPanel" parent="ControlLayer/ScriptRunnerBackground" instance=ExtResource("10_xqnle")]
+unique_name_in_owner = true
+layout_mode = 1
 
 [node name="FusekiData" parent="." instance=ExtResource("5_4e51a")]
 
-[node name="CICDServer" type="Node" parent="." node_paths=PackedStringArray("container", "to_hide")]
+[node name="CICDServer" type="Node" parent="." node_paths=PackedStringArray("container")]
 script = ExtResource("15_gmiik")
 container = NodePath("../DTContainer")
-to_hide = [NodePath("../ControlLayer")]
 
 [connection signal="toggled" from="ControlLayer/ControlPanel/MarginContainer/ControlContainer/RabbitButton" to="ControlLayer/ControlPanel/MarginContainer/ControlContainer/RabbitButton" method="_on_toggled"]
-[connection signal="pressed" from="ControlLayer/HelpButton" to="ControlLayer/HelpButton" method="_on_help_button_pressed"]
-[connection signal="pressed" from="ControlLayer/SettingsButton" to="ControlLayer/SettingsButton" method="_on_pressed"]
-[connection signal="settings_menu_closed" from="ControlLayer/SettingsBackground/Settings" to="ControlLayer/SettingsButton" method="_on_settings_settings_menu_closed"]
+[connection signal="item_selected" from="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/NodeBGOption" to="DTContainer" method="_on_node_bg_option_item_selected"]
+[connection signal="item_selected" from="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/NodeBGOption" to="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/Legends" method="_on_node_style_option_item_selected"]
+[connection signal="item_selected" from="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/NodeBorderOption" to="DTContainer" method="_on_node_border_option_item_selected"]
+[connection signal="item_selected" from="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/NodeBorderOption" to="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/Legends" method="_on_node_style_option_item_selected"]
+[connection signal="settings_menu_closed" from="ControlLayer/SettingsBackground/Settings" to="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid/SettingsButton" method="_on_settings_settings_menu_closed"]
+[connection signal="pressed" from="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid/SettingsButton" to="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid/SettingsButton" method="_on_pressed"]
+[connection signal="toggled" from="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid/VisualEditingButton" to="DTContainer" method="_on_visual_editing_button_toggled"]
+[connection signal="pressed" from="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid/HelpButton" to="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid/HelpButton" method="_on_help_button_pressed"]
+[connection signal="pressed" from="ControlLayer/ButtonsContainer/VBoxContainer/PythonButton" to="ControlLayer/ButtonsContainer/VBoxContainer/PythonButton" method="_on_pressed"]

@@ -1,9 +1,23 @@
-[gd_scene load_steps=7 format=3 uid="uid://tvcjlrt40n0q"]
+[gd_scene load_steps=12 format=3 uid="uid://tvcjlrt40n0q"]
 
 [ext_resource type="Script" uid="uid://ost4ju4q0ybe" path="res://GenericDisplay/GenericDisplay.gd" id="1_5lixw"]
 [ext_resource type="Script" uid="uid://jeh5r2brp2mt" path="res://GenericDisplay/PopUpChart/PopUpChartControl.gd" id="2_5nhr6"]
 [ext_resource type="PackedScene" uid="uid://dlwq4kmdb3bhs" path="res://addons/easy_charts/control_charts/chart.tscn" id="3_0c6qw"]
 [ext_resource type="Script" uid="uid://qe3n3obtygdn" path="res://GenericDisplay/PopUpScript/PopUpScriptControl.gd" id="3_ipcor"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6yx0x"]
+content_margin_left = 10.0
+content_margin_top = 5.0
+content_margin_right = 10.0
+content_margin_bottom = 5.0
+bg_color = Color(0, 0, 0, 0.7490196)
+corner_radius_top_left = 25
+corner_radius_top_right = 25
+corner_radius_bottom_right = 25
+corner_radius_bottom_left = 25
+
+[sub_resource type="Theme" id="Theme_5nhr6"]
+TooltipPanel/styles/panel = SubResource("StyleBoxFlat_6yx0x")
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2niug"]
 content_margin_left = 20.0
@@ -11,19 +25,61 @@ content_margin_top = 10.0
 content_margin_right = 20.0
 content_margin_bottom = 10.0
 bg_color = Color(0.843137, 0.843137, 0.843137, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.270222, 0.270222, 0.270222, 1)
 corner_radius_top_left = 20
 corner_radius_top_right = 20
 corner_radius_bottom_right = 20
 corner_radius_bottom_left = 20
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5nhr6"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(0.1, 0.1, 0.1, 0.6)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+corner_detail = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0c6qw"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(0, 0, 0, 0.6)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+corner_detail = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ycnc1"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(0.225, 0.225, 0.225, 0.6)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+corner_detail = 5
+
 [sub_resource type="ViewportTexture" id="ViewportTexture_ipcor"]
 viewport_path = NodePath("GenericDisplay/VisualizationContainer/HBoxContainer/VizPopUpButton/PopupPanel/TextureRect/SubViewport")
 
 [node name="GenericDisplayContainer" type="PanelContainer"]
-offset_right = 97.0
+offset_right = 123.0
 offset_bottom = 43.0
 size_flags_vertical = 4
 mouse_default_cursor_shape = 2
+theme = SubResource("Theme_5nhr6")
 theme_override_styles/panel = SubResource("StyleBoxFlat_2niug")
 script = ExtResource("1_5lixw")
 
@@ -55,6 +111,20 @@ vertical_alignment = 3
 visible = false
 layout_mode = 2
 text = "Script"
+
+[node name="EditButton" type="Button" parent="GenericDisplay"]
+custom_minimum_size = Vector2(60, 25)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+tooltip_text = "Edit component"
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_5nhr6")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_0c6qw")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ycnc1")
+text = "Edit"
+icon_alignment = 1
+expand_icon = true
 
 [node name="RealTimeContainer" type="VBoxContainer" parent="GenericDisplay"]
 visible = false
@@ -126,8 +196,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 4.0
 offset_top = 4.0
-offset_right = 516.0
-offset_bottom = 516.0
+offset_right = -4.0
+offset_bottom = -4.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("2_5nhr6")
@@ -149,6 +219,77 @@ alignment = 1
 [node name="Chart" parent="PopupChart/ChartControl/VBoxContainer/ChartContainer" instance=ExtResource("3_0c6qw")]
 layout_mode = 2
 
+[node name="PopupDescription" type="PopupPanel" parent="."]
+disable_3d = true
+oversampling_override = 1.0
+title = "Component Information"
+initial_position = 4
+size = Vector2i(400, 225)
+unresizable = false
+borderless = false
+always_on_top = true
+
+[node name="DescriptionControl" type="Control" parent="PopupDescription"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = -4.0
+offset_bottom = -4.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="DescriptionContainer" type="VBoxContainer" parent="PopupDescription/DescriptionControl"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ComponentNameContainer" type="HBoxContainer" parent="PopupDescription/DescriptionControl/DescriptionContainer"]
+custom_minimum_size = Vector2(0, 35)
+layout_mode = 2
+
+[node name="ComponentNameLabel" type="Label" parent="PopupDescription/DescriptionControl/DescriptionContainer/ComponentNameContainer"]
+layout_mode = 2
+text = "Name:"
+
+[node name="ComponentNameEdit" type="TextEdit" parent="PopupDescription/DescriptionControl/DescriptionContainer/ComponentNameContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+focus_next = NodePath("../../Description")
+placeholder_text = "Placeholder component name"
+context_menu_enabled = false
+
+[node name="HSeparator" type="HSeparator" parent="PopupDescription/DescriptionControl/DescriptionContainer"]
+layout_mode = 2
+
+[node name="DescriptionLabel" type="Label" parent="PopupDescription/DescriptionControl/DescriptionContainer"]
+layout_mode = 2
+text = "Description:"
+
+[node name="Description" type="TextEdit" parent="PopupDescription/DescriptionControl/DescriptionContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+placeholder_text = "No description"
+context_menu_enabled = false
+wrap_mode = 1
+
+[node name="HSeparator2" type="HSeparator" parent="PopupDescription/DescriptionControl/DescriptionContainer"]
+layout_mode = 2
+
+[node name="DeleteButton" type="Button" parent="PopupDescription/DescriptionControl/DescriptionContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.87, 0.25230002, 0.25230002, 1)
+theme_override_colors/font_focus_color = Color(0.87058824, 0.2509804, 0.2509804, 1)
+theme_override_colors/font_pressed_color = Color(0.87058824, 0.2509804, 0.2509804, 1)
+theme_override_colors/font_hover_color = Color(0.87058824, 0.2509804, 0.2509804, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.87058824, 0.2509804, 0.2509804, 1)
+text = "Delete"
+
 [node name="PopupScript" type="PopupPanel" parent="."]
 disable_3d = true
 oversampling_override = 1.0
@@ -166,8 +307,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 4.0
 offset_top = 4.0
-offset_right = 516.0
-offset_bottom = 516.0
+offset_right = -4.0
+offset_bottom = -4.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("3_ipcor")
@@ -188,7 +329,13 @@ text = "Select the DT script folder in the settings first"
 [connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
 [connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]
 [connection signal="file_selected" from="GenericDisplay/FilePicker" to="." method="_on_file_selected"]
+[connection signal="pressed" from="GenericDisplay/EditButton" to="." method="_on_edit_button_pressed"]
 [connection signal="pressed" from="GenericDisplay/PresentationBox/ScriptButton" to="." method="_on_script_button_pressed"]
 [connection signal="pressed" from="GenericDisplay/RealTimeContainer/PopUpButton" to="." method="_on_pop_up_button_pressed"]
 [connection signal="pressed" from="GenericDisplay/VisualizationContainer/HBoxContainer/VizPickerButton" to="." method="_on_viz_picker_button_pressed"]
 [connection signal="pressed" from="GenericDisplay/VisualizationContainer/HBoxContainer/VizPopUpButton" to="." method="_on_viz_pop_up_button_pressed"]
+[connection signal="about_to_popup" from="PopupDescription" to="." method="_on_popup_description_about_to_popup"]
+[connection signal="popup_hide" from="PopupDescription" to="." method="_on_popup_description_popup_hide"]
+[connection signal="text_changed" from="PopupDescription/DescriptionControl/DescriptionContainer/ComponentNameContainer/ComponentNameEdit" to="." method="_on_component_name_edit_text_changed"]
+[connection signal="text_changed" from="PopupDescription/DescriptionControl/DescriptionContainer/Description" to="." method="_on_description_text_changed"]
+[connection signal="pressed" from="PopupDescription/DescriptionControl/DescriptionContainer/DeleteButton" to="." method="_on_delete_button_pressed"]

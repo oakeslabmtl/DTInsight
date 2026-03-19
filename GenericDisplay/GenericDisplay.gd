@@ -5,6 +5,7 @@ class_name GenericDisplay
 @onready var element : Label = $GenericDisplay/PresentationBox/GenericElementName
 @onready var realtime_element : Label = $GenericDisplay/RealTimeContainer/GenericElementAttributes
 @onready var script_button = $GenericDisplay/PresentationBox/ScriptButton
+@onready var edit_button = $GenericDisplay/EditButton
 @onready var real_time_container = $GenericDisplay/RealTimeContainer
 @onready var attributes : Label = $GenericDisplay/RealTimeContainer/GenericElementAttributes
 @onready var visualization_container = $GenericDisplay/VisualizationContainer
@@ -18,6 +19,11 @@ var script_file_path : String = ""
 var absolute_path : String = ""
 var data : Array = []
 var highlightable : bool = true
+var bg_color : Color = StyleConfig.DTElement.DIMMED_COLOR
+var border_color : Color = StyleConfig.DTElement.BORDER_COLOR
+
+var node_name_before_edit: String
+var node_desc_before_edit: String
 
 var last_loaded_pck_path: String = ""
 
@@ -26,26 +32,53 @@ func _ready():
 	ChartSignals.hide.connect(_on_hide_chart_pop_up_signal)
 	ScriptSignals.hide.connect(_on_hide_script_pop_up_signal)
 	ScriptSignals.scripts_folder_selected.connect(_on_script_folder_updated)
+	
+	var buttons = get_tree().get_nodes_in_group("main_buttons")
+	for btn in buttons:
+		if btn.name == "VisualEditingButton":
+			btn.toggled.connect(_on_visual_editing_toggled)
+			_on_visual_editing_toggled(btn.button_pressed)
 
 #Signal handling ---------------------------------------------------------------
 func _on_display_highlight(highlighted_elements_names : Array):
 	if (element.text in highlighted_elements_names):
 		set_highlight_style()
 	else:
-		set_dimmed_style()
+		set_default_style()
 
 func _on_mouse_entered():
 	GenericDisplaySignals.generic_display_over.emit(element.text, false)
 
 func _on_mouse_exited():
 	GenericDisplaySignals.generic_display_over.emit("", false)
-	
+
+var is_dragging = false
+var drag_start_position : Vector2
+
 func _gui_input(event: InputEvent) -> void:
-	if event.button_mask == MOUSE_BUTTON_LEFT and highlightable:
-		highlightable = false
-		GenericDisplaySignals.generic_display_over.emit(element.text, true)
-		await get_tree().create_timer(0.2).timeout
-		highlightable = true
+	if event is InputEventMouseButton:
+		if event.button_mask == MOUSE_BUTTON_LEFT and highlightable:
+			highlightable = false
+			GenericDisplaySignals.generic_display_over.emit(element.text, true)
+			await get_tree().create_timer(0.2).timeout
+			highlightable = true
+		if event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
+			if $GenericDisplay/EditButton.visible:
+				$PopupDescription.popup()
+		if event.button_index == MOUSE_BUTTON_LEFT:
+			if event.pressed:
+				# Drag start
+				is_dragging = true
+				drag_start_position = get_global_mouse_position()
+				GenericDisplaySignals.start_drag.emit(self)
+			else:
+				# End drag
+				if is_dragging:
+					is_dragging = false
+					GenericDisplaySignals.stop_drag.emit(self)
+	if event is InputEventMouseMotion and is_dragging:
+		GenericDisplaySignals.dragging.emit(self, get_global_mouse_position())
+
 
 func _on_pop_up_button_pressed() -> void:
 	chart.feed_historic(data)
@@ -65,6 +98,12 @@ func _on_script_folder_updated(dir : String) -> void:
 	script_software_directory = dir
 	set_python_script()
 
+func _on_visual_editing_toggled(enabled: bool):
+	if enabled:
+		edit_button.show()
+	else:
+		edit_button.hide()
+
  #Trigger the file dialog when the button is pressed
 func _on_viz_picker_button_pressed() -> void:
 	var file_picker = $GenericDisplay/FilePicker
@@ -75,6 +114,26 @@ func _on_file_selected(pck_path: String) -> void:
 	last_loaded_pck_path = pck_path
 	if not last_loaded_pck_path.is_empty():
 		$GenericDisplay/VisualizationContainer/HBoxContainer/VizPopUpButton.disabled = false
+
+func _on_edit_button_pressed() -> void:
+	$PopupDescription.popup()
+
+func _on_popup_description_about_to_popup() -> void:
+	CameraSignals.disable_camera_movement.emit()
+	CameraSignals.disable_camera_zoom.emit()
+	# Save current variables
+	node_name_before_edit = $GenericDisplay/PresentationBox/GenericElementName.text
+	
+func _on_popup_description_popup_hide() -> void:
+	CameraSignals.enable_camera_movement.emit()
+	CameraSignals.enable_camera_zoom.emit()
+	
+	# Emit signal to edit the node's FusekiData
+	var node_name = $GenericDisplay/PresentationBox/GenericElementName.text
+	var node_desc = $PopupDescription/DescriptionControl/DescriptionContainer/Description.text
+	var parent_container = get_parent()
+	# Edit the descirption
+	GenericDisplaySignals.generic_display_edit.emit(node_name_before_edit, parent_container, false, node_name, node_desc)
 
 func _on_viz_pop_up_button_pressed():
 	var pop_up_panel = $GenericDisplay/VisualizationContainer/HBoxContainer/VizPopUpButton/PopupPanel
@@ -103,7 +162,7 @@ func _on_viz_pop_up_button_pressed():
 
 #Informations ------------------------------------------------------------------
 func set_text(text : String) -> void:
-	var node : Label = get_node("GenericDisplay/PresentationBox/GenericElementName")
+	var node : Label = $GenericDisplay/PresentationBox/GenericElementName
 	node.text = text
 
 func set_python_script_location(path : String) -> void:
@@ -126,6 +185,21 @@ func set_visualization():
 		if last_loaded_pck_path.is_empty():
 			$GenericDisplay/VisualizationContainer/HBoxContainer/VizPopUpButton.disabled = true
 
+# Enables a button showing DTComponent information
+func set_description(description):
+	tooltip_text = description
+	$PopupDescription/DescriptionControl/DescriptionContainer/ComponentNameContainer/ComponentNameEdit.text = $GenericDisplay/PresentationBox/GenericElementName.text
+	$PopupDescription/DescriptionControl/DescriptionContainer/Description.text = description
+	$PopupDescription/DescriptionControl/DescriptionContainer/ComponentNameContainer/ComponentNameEdit.grab_focus()
+
+# Editable component name
+func _on_component_name_edit_text_changed() -> void:
+	$GenericDisplay/PresentationBox/GenericElementName.text = $PopupDescription/DescriptionControl/DescriptionContainer/ComponentNameContainer/ComponentNameEdit.text
+
+# Editable component description
+func _on_description_text_changed() -> void:
+	tooltip_text = $PopupDescription/DescriptionControl/DescriptionContainer/Description.text
+
 func set_info(new_data : Array[String], is_bool = false) -> void:
 	data = to_float_array(new_data, is_bool)
 	var node : Label = get_node("GenericDisplay/RealTimeContainer/GenericElementAttributes")
@@ -136,7 +210,6 @@ func set_info(new_data : Array[String], is_bool = false) -> void:
 			info = "on"
 		else:
 			info = "off"
-	
 	else:
 		info = format_float(last_data, 4)
 	node.text = "Real time info : \n" + info
@@ -158,8 +231,8 @@ func format_float(f: float, sig_digits: int = 4) -> String:
 
 	var abs_f = abs(f)
 	var exponent = floor(log(abs_f) / log(10))
-	var scale = pow(10, sig_digits - 1 - exponent)
-	var rounded = round(f * scale) / scale
+	var _scale = pow(10, sig_digits - 1 - exponent)
+	var rounded = round(f * _scale) / _scale
 
 	var result = String.num(rounded, 10)
 
@@ -167,7 +240,6 @@ func format_float(f: float, sig_digits: int = 4) -> String:
 		result = result.rstrip("0").rstrip(".")
 	
 	return result
-
 
 func update_chart(last_data) -> void:
 	if pop_up_chart.visible == false :
@@ -177,36 +249,45 @@ func update_chart(last_data) -> void:
 	else :
 		chart.add_value(last_data)
 
-#Background style --------------------------------------------------------------
-func set_dimmed_style():
-	set_bg_color(StyleConfig.DTElement.DIMMED_COLOR)
-	set_text_color(Color.BLACK)
+# Style --------------------------------------------------------------
+## Highlights
+func set_default_style():
+	set_node_style(bg_color, true, false)
+	set_node_style(border_color, false, true)
+	change_text_color(Color.BLACK)
 
 func set_highlight_style():
-	set_bg_color(StyleConfig.DTElement.HIGHLIGHT_COLOR)
-	set_text_color(StyleConfig.DTElement.TEXT_HIGHLIGHT_COLOR)
+	change_bg_color(StyleConfig.DTElement.HIGHLIGHT_COLOR)
+	change_text_color(StyleConfig.DTElement.TEXT_HIGHLIGHT_COLOR)
 
-func set_bg_color(color : Color):
+## Changing styles
+func change_bg_color(color : Color):
 	var styleBox : StyleBoxFlat = get_theme_stylebox("panel").duplicate()
 	styleBox.bg_color = color
 	add_theme_stylebox_override("panel", styleBox)
 	
-func set_text_color(color: Color):
+func change_border_color(color : Color):
+	var styleBox : StyleBoxFlat = get_theme_stylebox("panel").duplicate()
+	styleBox.border_color = color
+	styleBox.set_border_width_all(StyleConfig.DTElement.BORDER_WIDTH)
+	add_theme_stylebox_override("panel", styleBox)
+	
+func change_text_color(color: Color):
 	element.set("theme_override_colors/font_color", color)
 	realtime_element.set("theme_override_colors/font_color", color)
 
-#Border style ------------------------------------------------------------------
-func set_slower_style():
-	set_border_color(StyleConfig.RTBorder.SLOWER_THAN_RT_COLOR)
+## Style definitions
+func set_node_style(_color: Color, is_bg: bool, is_border: bool):
+	if is_bg:
+		bg_color = _color
+		change_bg_color(bg_color)
+	if is_border:
+		border_color = _color
+		change_border_color(border_color)
 
-func set_rt_style():
-	set_border_color(StyleConfig.RTBorder.RT_COLOR)
-
-func set_faster_style():
-	set_border_color(StyleConfig.RTBorder.FASTER_THAN_RT_COLOR)
-
-func set_border_color(color : Color):
-	var styleBox : StyleBoxFlat = get_theme_stylebox("panel").duplicate()
-	styleBox.border_color = color
-	styleBox.set_border_width_all(StyleConfig.RTBorder.BORDER_WIDTH)
-	add_theme_stylebox_override("panel", styleBox)
+func _on_delete_button_pressed() -> void:
+	var node_name = $GenericDisplay/PresentationBox/GenericElementName.text
+	var parent_container = get_parent()
+	GenericDisplaySignals.generic_display_edit.emit(node_name, parent_container, true, "", "")
+	CameraSignals.enable_camera_movement.emit()
+	CameraSignals.enable_camera_zoom.emit()

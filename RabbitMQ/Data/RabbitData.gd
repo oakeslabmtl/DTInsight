@@ -28,15 +28,21 @@ func set_fuseki_data_manager(fuseki : FusekiData) -> void:
 	fuseki_data = fuseki
 
 func update_rabbit_data() -> void:
-	exchange_name = fuseki_data.rabbit_exchange["incubator_exchange"]["exchange_name_str"][0]
-	routing_key = fuseki_data.rabbit_route["incubator_routing_key"]["routing_key_str"][0]
-	source = fuseki_data.rabbit_source["incubator_source"]["source_str"][0]
-	for ml in fuseki_data.rabbit_message_listener.keys():
-		var new_ml = MessageListner.new()
-		new_ml.viz_container = fuseki_data.rabbit_message_listener[ml]["MLTarget"][0]
-		new_ml.data = Fifo.new()
-		message_listeners[fuseki_data.rabbit_message_listener[ml]["MLSource"][0]] = new_ml
-	rabbit_mq_controller.get_rabbit_parameters(exchange_name, [routing_key] as Array[String])
+	# Check if the necessary data exists
+	if "rabbit_exchange" in fuseki_data and "incubator_exchange" in fuseki_data.rabbit_exchange and "exchange_name_str" in fuseki_data.rabbit_exchange["incubator_exchange"]:
+		exchange_name = fuseki_data.rabbit_exchange["incubator_exchange"]["exchange_name_str"][0]
+	
+	if "rabbit_route" in fuseki_data and "incubator_routing_key" in fuseki_data.rabbit_route and "routing_key_str" in fuseki_data.rabbit_route["incubator_routing_key"]:
+		routing_key = fuseki_data.rabbit_route["incubator_routing_key"]["routing_key_str"][0]
+		
+	if "rabbit_source" in fuseki_data and "incubator_source" in fuseki_data.rabbit_source and "source_str" in fuseki_data.rabbit_source["incubator_source"]:
+		source = fuseki_data.rabbit_source["incubator_source"]["source_str"][0]
+
+	# Only proceed if all necessary data exists
+	if exchange_name != "" and routing_key != "" and source != "":
+		rabbit_mq_controller.get_rabbit_parameters(exchange_name, [routing_key] as Array[String])
+	else:
+		print("Missing required data. Skipping operation.")
 
 func _on_updated_rabbit(rabbit_data : String) -> void:
 	# Emit signal for sending data to other nodes
