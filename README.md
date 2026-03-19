@@ -82,11 +82,20 @@ Click the **gear icon** (bottom-left) to open the settings panel.
 #### Option A: Load from Fuseki (recommended for development)
 
 1. Open your OML ontology project in **openCAESAR Rosetta**.
-2. In the **Gradle Tasks** tab, start the Fuseki server and run the **`LoadOML`** task to push the ontology data.
+2. In the **Gradle Tasks** tab, start the Fuseki server with the **`startFuseki`** task and run the **`owlLoad`** task to push the ontology data.
 
    <img width="364" alt="Gradle tasks in Rosetta" src="https://github.com/user-attachments/assets/c6a36115-5984-497b-91fb-4bd2d9c2b795">
 
-3. In DTInsight, click the **"Call Fuseki"** button:
+   On Windows, you can also call these tasks with:
+   ```
+   gradlew.bat startFuseki
+   ```
+   and then
+   ```
+   gradlew.bat owlLoad
+   ```
+
+4. In DTInsight, click the **"Call Fuseki"** button:
 
    <img width="47" alt="Call Fuseki button" src="https://github.com/user-attachments/assets/1771428d-2f6d-493e-bd4b-a698f8d09989">
 
