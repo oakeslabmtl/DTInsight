@@ -102,31 +102,36 @@ func get_node_under_mouse(pos : Vector2) -> GenericDisplay:
 			return node
 	return null
 
+func _is_point_on_segment(pos: Vector2, start: Vector2, end: Vector2, tolerance: float) -> bool:
+	var min_x = min(start.x, end.x) - tolerance
+	var max_x = max(start.x, end.x) + tolerance
+	var min_y = min(start.y, end.y) - tolerance
+	var max_y = max(start.y, end.y) + tolerance
+	return pos.x >= min_x and pos.x <= max_x and pos.y >= min_y and pos.y <= max_y
+
 func get_link_under_mouse(mouse_pos: Vector2) -> Dictionary:
-	const CLICK_TOLERANCE = 2.0  # tolerance pixels for clicking on a link	
+	const CLICK_TOLERANCE = 2.0  # tolerance pixels for clicking on a link
 	var links_to_check = drawn_links
 	if highlighted_element != null:
 		links_to_check = drawn_links.filter(func(l): return l["source"] == highlighted_element or l["destination"] == highlighted_element)
+	
 	for link in links_to_check:
-		var min_x = min(link["source_x"], link["dest_x"])
-		var max_x = max(link["source_x"], link["dest_x"])
-		var on_horizontal = abs(mouse_pos.y - link["lane_y"]) < CLICK_TOLERANCE and mouse_pos.x >= min_x - CLICK_TOLERANCE and mouse_pos.x <= max_x + CLICK_TOLERANCE
-		if on_horizontal:
+		# Horizontal lane
+		if _is_point_on_segment(mouse_pos, Vector2(link["source_x"], link["lane_y"]), Vector2(link["dest_x"], link["lane_y"]), CLICK_TOLERANCE):
 			return link
+		
+		# Vertical source branch
 		var src_node = link["source"]
 		var src_y_start = get_bottom_side(src_node).y if src_node.global_position.y < link["lane_y"] else get_top_side(src_node).y
-		var min_y_src = min(src_y_start, link["lane_y"])
-		var max_y_src = max(src_y_start, link["lane_y"])		
-		var on_vertical_src = abs(mouse_pos.x - link["source_x"]) < CLICK_TOLERANCE and mouse_pos.y >= min_y_src - CLICK_TOLERANCE and mouse_pos.y <= max_y_src + CLICK_TOLERANCE
-		if on_vertical_src:
+		if _is_point_on_segment(mouse_pos, Vector2(link["source_x"], src_y_start), Vector2(link["source_x"], link["lane_y"]), CLICK_TOLERANCE):
 			return link
+		
+		# Vertical dest branch
 		var dest_node = link["destination"]
 		var dest_y_end = get_bottom_side(dest_node).y if dest_node.global_position.y < link["lane_y"] else get_top_side(dest_node).y
-		var min_y_dest = min(link["lane_y"], dest_y_end)
-		var max_y_dest = max(link["lane_y"], dest_y_end)		
-		var on_vertical_dest = abs(mouse_pos.x - link["dest_x"]) < CLICK_TOLERANCE and mouse_pos.y >= min_y_dest - CLICK_TOLERANCE and mouse_pos.y <= max_y_dest + CLICK_TOLERANCE
-		if on_vertical_dest:
+		if _is_point_on_segment(mouse_pos, Vector2(link["dest_x"], link["lane_y"]), Vector2(link["dest_x"], dest_y_end), CLICK_TOLERANCE):
 			return link
+			
 	return {}
 
 func _on_start_drag(node):
@@ -714,67 +719,29 @@ func _on_node_bg_option_item_selected(index: int) -> void:
 var new_node_index = 1
 var default_fuseki_node_data : Dictionary = { "type": ["NamedIndividual", "Component", "ContainedElement", "Thing", "DescribedThing", "ImplementationThing", "ConnectionComponent", "TimeScaleThing", "ConceptInstance"], "desc": [""] }
 
-func _on_add_component_button_pressed_env() -> void:
+func _add_component(target_dict: Dictionary, container, extra_types: Array = []) -> void:
 	var new_fuseki_node_data = default_fuseki_node_data.duplicate_deep()
-	fuseki_data.env["new_node_" + str(new_node_index)] = new_fuseki_node_data
+	for type in extra_types:
+		new_fuseki_node_data["type"].append(type)
+	
+	target_dict["new_node_" + str(new_node_index)] = new_fuseki_node_data
 	new_node_index += 1
-	update_node_with(env_container, fuseki_data.env)
+	
+	if container is Callable:
+		container.call()
+	else:
+		update_node_with(container, target_dict)
 
-func _on_add_component_button_pressed_system() -> void:
-	var new_fuseki_node_data = default_fuseki_node_data.duplicate_deep()
-	fuseki_data.sys_component["new_node_" + str(new_node_index)] = new_fuseki_node_data
-	new_node_index += 1
-	update_node_with(sys_container, fuseki_data.sys_component)
-
-func _on_add_component_button_pressed_operator() -> void:
-	var new_fuseki_node_data = default_fuseki_node_data.duplicate_deep()
-	new_fuseki_node_data["type"].append("Insight")
-	fuseki_data.provided_thing["new_node_" + str(new_node_index)] = new_fuseki_node_data
-	new_node_index += 1
-	update_provided_things(operator_container, machine_container, fuseki_data.provided_thing)
-
-func _on_add_component_button_pressed_machine() -> void:
-	var new_fuseki_node_data = default_fuseki_node_data.duplicate_deep()
-	new_fuseki_node_data["type"].append("Action")
-	fuseki_data.provided_thing["new_node_" + str(new_node_index)] = new_fuseki_node_data
-	new_node_index += 1
-	update_provided_things(operator_container, machine_container, fuseki_data.provided_thing)
-
-func _on_add_component_button_pressed_sensors() -> void:
-	var new_fuseki_node_data = default_fuseki_node_data.duplicate_deep()
-	fuseki_data.sensing_component["new_node_" + str(new_node_index)] = new_fuseki_node_data
-	new_node_index += 1
-	update_node_with(sensor_container, fuseki_data.sensing_component)
-
-func _on_add_component_button_pressed_data_trans() -> void:
-	var new_fuseki_node_data = default_fuseki_node_data.duplicate_deep()
-	fuseki_data.data_transmitted["new_node_" + str(new_node_index)] = new_fuseki_node_data
-	new_node_index += 1
-	update_node_with(data_transmitted_container, fuseki_data.data_transmitted)
-
-func _on_add_component_button_pressed_services() -> void:
-	var new_fuseki_node_data = default_fuseki_node_data.duplicate_deep()
-	fuseki_data.service["new_node_" + str(new_node_index)] = new_fuseki_node_data
-	new_node_index += 1
-	update_node_with(service_container, fuseki_data.service)
-
-func _on_add_component_button_pressed_enablers() -> void:
-	var new_fuseki_node_data = default_fuseki_node_data.duplicate_deep()
-	fuseki_data.enabler["new_node_" + str(new_node_index)] = new_fuseki_node_data
-	new_node_index += 1
-	update_node_with(enabler_container, fuseki_data.enabler)
-
-func _on_add_component_button_pressed_models() -> void:
-	var new_fuseki_node_data = default_fuseki_node_data.duplicate_deep()
-	fuseki_data.model["new_node_" + str(new_node_index)] = new_fuseki_node_data
-	new_node_index += 1
-	update_node_with(model_container, fuseki_data.model)
-
-func _on_add_component_button_pressed_data() -> void:
-	var new_fuseki_node_data = default_fuseki_node_data.duplicate_deep()
-	fuseki_data.data["new_node_" + str(new_node_index)] = new_fuseki_node_data
-	new_node_index += 1
-	update_node_with(data_container, fuseki_data.data)
+func _on_add_component_button_pressed_env(): _add_component(fuseki_data.env, env_container)
+func _on_add_component_button_pressed_system(): _add_component(fuseki_data.sys_component, sys_container)
+func _on_add_component_button_pressed_operator(): _add_component(fuseki_data.provided_thing, func(): update_provided_things(operator_container, machine_container, fuseki_data.provided_thing), ["Insight"])
+func _on_add_component_button_pressed_machine(): _add_component(fuseki_data.provided_thing, func(): update_provided_things(operator_container, machine_container, fuseki_data.provided_thing), ["Action"])
+func _on_add_component_button_pressed_sensors(): _add_component(fuseki_data.sensing_component, sensor_container)
+func _on_add_component_button_pressed_data_trans(): _add_component(fuseki_data.data_transmitted, data_transmitted_container)
+func _on_add_component_button_pressed_services(): _add_component(fuseki_data.service, service_container)
+func _on_add_component_button_pressed_enablers(): _add_component(fuseki_data.enabler, enabler_container)
+func _on_add_component_button_pressed_models(): _add_component(fuseki_data.model, model_container)
+func _on_add_component_button_pressed_data(): _add_component(fuseki_data.data, data_container)
 
 ## Visual editing
 
