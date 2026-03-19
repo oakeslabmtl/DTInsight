@@ -254,8 +254,6 @@ func update_chart(last_data) -> void:
 func set_default_style():
 	set_node_style(bg_color, true, false)
 	set_node_style(border_color, false, true)
-	change_bg_color(bg_color)
-	change_border_color(border_color)
 	change_text_color(Color.BLACK)
 
 func set_highlight_style():
