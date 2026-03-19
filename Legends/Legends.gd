@@ -41,17 +41,14 @@ func _on_node_style_option_item_selected(index: int) -> void:
 		child.queue_free()
 	match index:
 		1:
-			var deployment = StyleConfig.Deployment.new()
-			var deployment_map = deployment.get_script().get_script_constant_map()
-			for key in deployment_map:
+			var deployment_map = StyleConfig.Deployment.MAP
+			for key in deployment_map.keys():
 				instanciate_legend_element(key, deployment_map[key])
 		2:
-			var implementation = StyleConfig.Implementation.new()
-			var implementation_map = implementation.get_script().get_script_constant_map()
-			for key in implementation_map:
+			var implementation_map = StyleConfig.Implementation.MAP
+			for key in implementation_map.keys():
 				instanciate_legend_element(key, implementation_map[key])
 		3:
-			var timescale = StyleConfig.Timescale.new()
-			var timescale_map = timescale.get_script().get_script_constant_map()
-			for key in timescale_map:
+			var timescale_map = StyleConfig.Timescale.MAP
+			for key in timescale_map.keys():
 				instanciate_legend_element(key, timescale_map[key])
