@@ -4,297 +4,104 @@
 ## All queries follow the same three-column SELECT pattern:
 ##   ?<entity>  ?attribute  ?value
 ## which maps directly to the FusekiData parsing pipeline.
-##
-## Queries are grouped into three logical sections:
-##   1. DTDF / DT–PT objects   – core DT entities defined in DTDFVocab.
-##   2. RabbitMQ objects       – messaging infrastructure entities.
-##   3. DT Characteristics     – numbered characteristics (C1–C21) from the DTDF taxonomy.
 
 extends Node
 
-const QUERIES = {
-	# ── DTDF / DT–PT objects ──────────────────────────────────────────────────
+var QUERIES: Dictionary = {}
 
-	"services": "PREFIX DTDFvocab:   <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
-	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
-
-	SELECT *
-	WHERE {
-		?service a DTDFvocab:Service .
-		OPTIONAL {?service ?attribute ?value}
-	}",
-
-	"enablers": "PREFIX DTDFvocab:   <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
-	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
-
-	SELECT *
-	WHERE {
-		?enabler a DTDFvocab:Enabler .
-		OPTIONAL {?enabler ?attribute ?value}
-	}",
-
-	"models": "PREFIX DTDFvocab:   <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
-	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
-
-	SELECT *
-	WHERE {
-		?model a DTDFvocab:Model .
-		OPTIONAL {?model ?attribute ?value}
-	}",
-
-	"provided_things": "PREFIX DTDFvocab:   <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
-	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
-
-	SELECT *
-	WHERE {
-		?provided a DTDFvocab:ProvidedThing .
-		OPTIONAL {?provided ?attribute ?value}
-	}",
-
-	"data_transmitted": "PREFIX DTDFvocab:   <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
-	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
-
-	SELECT *
-	WHERE {
-		?dataT a DTDFvocab:DataTransmitted .
-		OPTIONAL {?dataT ?attribute ?value}
-	}",
-
-	"data": "PREFIX DTDFvocab:   <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
-	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
-
-	SELECT *
-	WHERE {
-		?data a DTDFvocab:Data .
-		OPTIONAL {?data ?attribute ?value}
-	}",
-
-	"sensors": "PREFIX DTDFvocab:   <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
-	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
-
-	SELECT *
-	WHERE {
-		?sensor a DTDFvocab:SensingComponent .
-		OPTIONAL {?sensor ?attribute ?value}
-	}",
-
-	"env": "PREFIX DTDFvocab:   <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
-	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
-	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
-
-	SELECT ?env ?attribute ?value
-	WHERE {
-		?sus a DTDFvocab:SystemUnderStudy .
-		?sus DTDFvocab:hasEnvironment ?envS .
-		?env base:isContainedIn ?envS .
-		OPTIONAL {?env ?attribute ?value}
-	}",
-
-	"sys_component": "PREFIX DTDFvocab:   <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
-	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
-	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
-
-	SELECT ?sysComponent ?attribute ?value
-	WHERE {
-		?sus a DTDFvocab:SystemUnderStudy .
-		?sus DTDFvocab:hasSystem ?sys .
-		?sysComponent base:isContainedIn ?sys .
-		OPTIONAL {?sysComponent ?attribute ?value}
-	}",
-
-	# ── RabbitMQ objects ──────────────────────────────────────────────────────
-
-	"rabbit_exchange": "PREFIX rabbit:		<https://bentleyjoakes.github.io/DTaaS/RabbitMQVocab#>
-
-	SELECT ?exc ?attribute ?value
-	WHERE {
-		?exc a rabbit:ExchangeName .
-		?exc ?attribute ?value
-	}",
-
-	"rabbit_routing_key": "PREFIX rabbit:		<https://bentleyjoakes.github.io/DTaaS/RabbitMQVocab#>
-
-	SELECT ?route ?attribute ?value
-	WHERE {
-		?route a rabbit:RoutingKey  .
-		?route ?attribute ?value
-	}",
-
-	"rabbit_source": "PREFIX rabbit:		<https://bentleyjoakes.github.io/DTaaS/RabbitMQVocab#>
-
-	SELECT ?source ?attribute ?value
-	WHERE {
-		?source a rabbit:Source  .
-		?source ?attribute ?value
-	}",
-
-	"rabbit_message_listener": "PREFIX rabbit:		<https://bentleyjoakes.github.io/DTaaS/RabbitMQVocab#>
-
-	SELECT ?ml ?attribute ?value
-	WHERE {
-		?ml a rabbit:MessageListener   .
-		?ml ?attribute ?value
-	}",
-
-	# ── DT Characteristics (C1–C21) ───────────────────────────────────────────
-
-	"characteristic_system_under_study": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
-	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
-	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
-
-	SELECT *
-	WHERE {
-		?c1 a DTDFvocab:SystemUnderStudy  .
-		OPTIONAL {?c1 ?attribute ?value}
-	}",
-
-	"characteristic_acting_component": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
-	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
-	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
-
-	SELECT *
-	WHERE {
-		?c2 a DTDFvocab:ActingComponent  .
-		OPTIONAL {?c2 ?attribute ?value}
-	}",
-
-	"characteristic_data_transmitted": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
-	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
-	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
-
-	SELECT *
-	WHERE {
-		?c4 a DTDFvocab:DataTransmitted  .
-		OPTIONAL {?c4 ?attribute ?value}
-	}",
-
-	"characteristic_virtual_to_physical": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
-	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
-	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
-
-	SELECT *
-	WHERE {
-		?c5 a DTDFvocab:VirtualToPhysical  .
-		OPTIONAL {?c5 ?attribute ?value}
-	}",
-
-	"characteristic_time_scale": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
-	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
-	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
-
-	SELECT *
-	WHERE {
-		?c7 a DTDFvocab:TimeScale  .
-		OPTIONAL {?c7 ?attribute ?value}
-	}",
-
-	"characteristic_multiplicity": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
-	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
-	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
-
-	SELECT *
-	WHERE {
-		?c8 a DTDFvocab:Multiplicity  .
-		OPTIONAL {?c8 ?attribute ?value}
-	}",
-
-	"characteristic_life_cycle_stage": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
-	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
-	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
-
-	SELECT *
-	WHERE {
-		?c9 a DTDFvocab:LifeCycleStage  .
-		OPTIONAL {?c9 ?attribute ?value}
-	}",
-
-	"characteristic_constellation": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
-	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
-	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
-
-	SELECT *
-	WHERE {
-		?c12 a DTDFvocab:Constellation  .
-		OPTIONAL {?c12 ?attribute ?value}
-	}",
-
-	"characteristic_evolution_stage": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
-	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
-	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
-
-	SELECT *
-	WHERE {
-		?c13 a DTDFvocab:EvolutionStage  .
-		OPTIONAL {?c13 ?attribute ?value}
-	}",
-
-	"characteristic_fidelity_consideration": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
-	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
-	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
-
-	SELECT *
-	WHERE {
-		?c14 a DTDFvocab:FidelityConsideration  .
-		OPTIONAL {?c14 ?attribute ?value}
-	}",
-
-	"characteristic_technical_connection": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
-	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
-	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
-
-	SELECT *
-	WHERE {
-		?c15 a DTDFvocab:TechnicalConnection  .
-		OPTIONAL {?c15 ?attribute ?value}
-	}",
-
-	"characteristic_deployment": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
-	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
-	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
-
-	SELECT *
-	WHERE {
-		?c16 a DTDFvocab:Deployment  .
-		OPTIONAL {?c16 ?attribute ?value}
-	}",
-
-	"characteristic_horizontal_integration": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
-	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
-	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
-
-	SELECT *
-	WHERE {
-		?c18 a DTDFvocab:HoriIntegration  .
-		OPTIONAL {?c18 ?attribute ?value}
-	}",
-
-	"characteristic_data_ownership": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
-	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
-	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
-
-	SELECT *
-	WHERE {
-		?c19 a DTDFvocab:DataOwnershipPrivacy  .
-		OPTIONAL {?c19 ?attribute ?value}
-	}",
-
-	"characteristic_standardization": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
-	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
-	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
-
-	SELECT *
-	WHERE {
-		?c20 a DTDFvocab:Standardization  .
-		OPTIONAL {?c20 ?attribute ?value}
-	}",
-
-	"characteristic_security_safety": "PREFIX DTDFvocab: <https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>
-	PREFIX rdfs:        <http://www.w3.org/2000/01/rdf-schema#>
-	PREFIX base:        <https://bentleyjoakes.github.io/DTDF/vocab/base#>
-
-	SELECT *
-	WHERE {
-		?c21 a DTDFvocab:SecuritySafety  .
-		OPTIONAL {?c21 ?attribute ?value}
-	}",
+const PREFIXES = {
+	"DTDFvocab": "<https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#>",
+	"rdfs": "<http://www.w3.org/2000/01/rdf-schema#>",
+	"base": "<https://bentleyjoakes.github.io/DTDF/vocab/base#>",
+	"rabbit": "<https://bentleyjoakes.github.io/DTaaS/RabbitMQVocab#>"
 }
+
+const TEMPLATES = {
+	"standard": """PREFIX DTDFvocab: {DTDFvocab}
+PREFIX rdfs: {rdfs}
+PREFIX base: {base}
+
+SELECT * WHERE {{
+	?{alias} a {rdf_type} .
+	OPTIONAL {{?{alias} ?attribute ?value}}
+}}""",
+
+	"env": """PREFIX DTDFvocab: {DTDFvocab}
+PREFIX rdfs: {rdfs}
+PREFIX base: {base}
+
+SELECT ?env ?attribute ?value WHERE {{
+	?sus a DTDFvocab:SystemUnderStudy .
+	?sus DTDFvocab:hasEnvironment ?envS .
+	?env base:isContainedIn ?envS .
+	OPTIONAL {{?env ?attribute ?value}}
+}}""",
+
+	"sys_component": """PREFIX DTDFvocab: {DTDFvocab}
+PREFIX rdfs: {rdfs}
+PREFIX base: {base}
+
+SELECT ?sysComponent ?attribute ?value WHERE {{
+	?sus a DTDFvocab:SystemUnderStudy .
+	?sus DTDFvocab:hasSystem ?sys .
+	?sysComponent base:isContainedIn ?sys .
+	OPTIONAL {{?sysComponent ?attribute ?value}}
+}}""",
+
+	"rabbit": """PREFIX rabbit: {rabbit}
+
+SELECT ?{alias} ?attribute ?value WHERE {{
+	?{alias} a {rdf_type} .
+	?{alias} ?attribute ?value
+}}"""
+}
+
+# ── Metadata for Query Generation ──────────────────────────────────────────────
+const QUERY_METADATA = [
+	{ id = "services", alias = "service", type = "DTDFvocab:Service" },
+	{ id = "enablers", alias = "enabler", type = "DTDFvocab:Enabler" },
+	{ id = "models", alias = "model", type = "DTDFvocab:Model" },
+	{ id = "provided_things", alias = "provided", type = "DTDFvocab:ProvidedThing" },
+	{ id = "data_transmitted", alias = "dataT", type = "DTDFvocab:DataTransmitted" },
+	{ id = "data", alias = "data", type = "DTDFvocab:Data" },
+	{ id = "sensors", alias = "sensor", type = "DTDFvocab:SensingComponent" },
+	
+	# Explicit template queries
+	{ id = "env", template = "env" },
+	{ id = "sys_component", template = "sys_component" },
+
+	# RabbitMQ
+	{ id = "rabbit_exchange", alias = "exc", type = "rabbit:ExchangeName", template = "rabbit" },
+	{ id = "rabbit_routing_key", alias = "route", type = "rabbit:RoutingKey", template = "rabbit" },
+	{ id = "rabbit_source", alias = "source", type = "rabbit:Source", template = "rabbit" },
+	{ id = "rabbit_message_listener", alias = "ml", type = "rabbit:MessageListener", template = "rabbit" },
+
+	# Characteristics
+	{ id = "characteristic_system_under_study", alias = "c1", type = "DTDFvocab:SystemUnderStudy" },
+	{ id = "characteristic_acting_component", alias = "c2", type = "DTDFvocab:ActingComponent" },
+	{ id = "characteristic_data_transmitted", alias = "c4", type = "DTDFvocab:DataTransmitted" },
+	{ id = "characteristic_virtual_to_physical", alias = "c5", type = "DTDFvocab:VirtualToPhysical" },
+	{ id = "characteristic_time_scale", alias = "c7", type = "DTDFvocab:TimeScale" },
+	{ id = "characteristic_multiplicity", alias = "c8", type = "DTDFvocab:Multiplicity" },
+	{ id = "characteristic_life_cycle_stage", alias = "c9", type = "DTDFvocab:LifeCycleStage" },
+	{ id = "characteristic_constellation", alias = "c12", type = "DTDFvocab:Constellation" },
+	{ id = "characteristic_evolution_stage", alias = "c13", type = "DTDFvocab:EvolutionStage" },
+	{ id = "characteristic_fidelity_consideration", alias = "c14", type = "DTDFvocab:FidelityConsideration" },
+	{ id = "characteristic_technical_connection", alias = "c15", type = "DTDFvocab:TechnicalConnection" },
+	{ id = "characteristic_deployment", alias = "c16", type = "DTDFvocab:Deployment" },
+	{ id = "characteristic_horizontal_integration", alias = "c18", type = "DTDFvocab:HoriIntegration" },
+	{ id = "characteristic_data_ownership", alias = "c19", type = "DTDFvocab:DataOwnershipPrivacy" },
+	{ id = "characteristic_standardization", alias = "c20", type = "DTDFvocab:Standardization" },
+	{ id = "characteristic_security_safety", alias = "c21", type = "DTDFvocab:SecuritySafety" }
+]
+
+func _init() -> void:
+	for meta in QUERY_METADATA:
+		QUERIES[meta.id] = _build_query(meta)
+
+func _build_query(meta: Dictionary) -> String:
+	var template_name = meta.get("template", "standard")
+	var format_data = PREFIXES.duplicate()
+	format_data["alias"] = meta.get("alias", "")
+	format_data["rdf_type"] = meta.get("type", "")
+	return TEMPLATES[template_name].format(format_data)

@@ -96,7 +96,7 @@ func input_data_from_fuseki_JSON(json) -> void:
 
 	# The first variable name identifies which entity type this query covers.
 	var json_variable: String = json["head"]["vars"][0]
-	var value = parse_fuseki_json(json)
+	var value = FusekiParser.parse_fuseki_json(json)
 
 	# Map the SPARQL variable name to the corresponding FusekiData member.
 	var targets := {
@@ -135,67 +135,7 @@ func input_data_from_fuseki_JSON(json) -> void:
 		set(targets[json_variable], value)
 
 
-## Parses a Fuseki JSON response into either:
-##   - A Dictionary  (when is_link = false, the default) — for entity data.
-##   - An Array[GenericLinkedNodes] (when is_link = true) — for relationship data.
-static func parse_fuseki_json(json, is_link: bool = false):
-	var json_head = json["head"]["vars"]
-	var json_results = json["results"]["bindings"]
-	var result_aggregator := []
 
-	for result in json_results:
-		if result == null:
-			break
-		var tuple_aggregator := []
-		for head in json_head:
-			if result.has(head):
-				var new_json_value := JsonValue.new()
-				new_json_value.json_name = head
-				new_json_value.json_value = parse_fuseki_value(result[head]["value"])
-				tuple_aggregator.append(new_json_value)
-		result_aggregator.append(tuple_aggregator)
-
-	return parse_link_result(result_aggregator) if is_link else parse_element_result(result_aggregator)
-
-
-## Strips the namespace prefix from a URI value, keeping only the fragment
-## after '#'. Non-URI values are returned unchanged.
-static func parse_fuseki_value(value: String) -> String:
-	if value.contains("#"):
-		return value.split("#")[1]
-	return value
-
-
-## Converts a flat result aggregator into an Array[GenericLinkedNodes].
-## Expects each inner array to have exactly two JsonValue entries:
-##   [0] = source entity name, [1] = destination entity name.
-static func parse_link_result(result_aggregator) -> Array[GenericLinkedNodes]:
-	var formatted_result: Array[GenericLinkedNodes] = []
-	for result in result_aggregator:
-		var link := GenericLinkedNodes.new()
-		link.source = result[0].json_value
-		link.destination = result[1].json_value
-		formatted_result.append(link)
-	return formatted_result
-
-
-## Converts a flat result aggregator into a nested Dictionary of the form:
-##   { "<entity>": { "<attribute>": ["<value>", ...], ... }, ... }
-## Multiple rows for the same entity are merged; multiple values for the same
-## attribute are accumulated into an array.
-static func parse_element_result(result_aggregator) -> Dictionary:
-	var formatted_result: Dictionary = {}
-	for result in result_aggregator:
-		var entry_name: String = result[0].json_value
-		if not formatted_result.has(entry_name):
-			formatted_result[entry_name] = {}
-		var attribute_name: String = result[1].json_value
-		var attribute_value: String = result[2].json_value
-		if attribute_name in formatted_result[entry_name].keys():
-			formatted_result[entry_name][attribute_name].append(attribute_value)
-		else:
-			formatted_result[entry_name].merge({attribute_name: [attribute_value]})
-	return formatted_result
 
 
 ## Rebuilds all directed-relationship arrays from the current entity data.
@@ -237,30 +177,12 @@ func build_relations_from(
 ## Clears all cached entity data, characteristic data, relationship arrays,
 ## and RabbitMQ data. Called before each new Fuseki query cycle.
 func empty() -> void:
-	# DTDF entities
-	service           = {}
-	enabler           = {}
-	model             = {}
-	provided_thing    = {}
-	data_transmitted  = {}
-	sensing_component = {}
-	env               = {}
-	sys_component     = {}
-	data              = {}
-
-	# Relationship arrays
-	service_to_provided_thing  = []
-	enabler_to_service         = []
-	model_to_enabler           = []
-	sensor_to_data_transmitted = []
-	data_to_enabler            = []
-	data_transmitted_to_data   = []
-
-	# RabbitMQ entities
-	rabbit_exchange         = {}
-	rabbit_route            = {}
-	rabbit_source           = {}
-	rabbit_message_listener = {}
+	for prop in get_property_list():
+		var val = get(prop["name"])
+		if typeof(val) == TYPE_DICTIONARY:
+			val.clear()
+		elif typeof(val) == TYPE_ARRAY:
+			val.clear()
 
 
 ## Convenience wrapper: dumps the architecture to [param dump_path] via

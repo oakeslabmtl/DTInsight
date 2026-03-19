@@ -1,6 +1,3 @@
-## help_button.gd
-## Opens the help popup when the Help button is pressed.
-
 extends Button
 
 

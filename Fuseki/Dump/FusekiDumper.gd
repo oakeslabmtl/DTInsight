@@ -147,12 +147,12 @@ static func dump_characteristics_table(data: FusekiData, dump_path: String, to_c
 
 static func _build_characteristics_html(data: FusekiData) -> String:
 	var html := PackedStringArray()
-	html.append("    <table>")
-	html.append("        <tr>")
-	html.append("            <th></th>")
-	html.append("            <th>Characteristics</th>")
-	html.append("            <th>Description</th>")
-	html.append("        </tr>")
+	html.append("""    <table>
+        <tr>
+            <th></th>
+            <th>Characteristics</th>
+            <th>Description</th>
+		</tr>""")
 
 	for config in CHARACTERISTICS_CONFIG:
 		var description := _get_characteristic_description(data, config)
@@ -179,13 +179,11 @@ static func _get_characteristic_description(data: FusekiData, config: Dictionary
 
 
 static func _create_html_table_row(id: String, characteristic: String, description: String) -> String:
-	return (
-		"        <tr>\n"
-		+ "            <td class=\"characteristic-id\">" + id + "</td>\n"
-		+ "            <td>" + characteristic + "</td>\n"
-		+ "            <td>" + description + "</td>\n"
-		+ "        </tr>"
-	)
+	return """        <tr>
+			<td class="characteristic-id">%s</td>
+            <td>%s</td>
+            <td>%s</td>
+		</tr>""" % [id, characteristic, description]
 
 
 ## Formats a FusekiData entity dictionary as HTML.

@@ -1,4 +1,3 @@
-## settings_button.gd
 ## Manages the Settings panel lifecycle:
 ##   - Pressing the button shows the Settings panel and locks camera movement.
 ##   - Receiving the "menu_closed" signal hides the panel and restores camera movement.
