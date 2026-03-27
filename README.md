@@ -49,6 +49,8 @@ DTInsight/
 
 ## Getting Started
 
+Note: You can view tutorial slides at https://1drv.ms/p/c/86984f2cdf02822a/IQDsOu-5YYM6QKA_Xj-bf8tYAROfy-sjk1sZlwdcaXVK_aY?e=CK9JFc
+
 ### Prerequisites
 
 - **Godot Engine 4.5** (.NET / C# version) — [download](https://godotengine.org/download)
