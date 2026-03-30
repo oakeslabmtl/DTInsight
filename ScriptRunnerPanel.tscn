@@ -13,11 +13,10 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_gnab7")
 
-[node name="FileDialog" type="FileDialog" parent="."]
-title = "Open a File"
-file_mode = 0
+[node name="ProjectDirDialog" type="FileDialog" parent="."]
+title = "Open a Directory"
+file_mode = 2
 access = 2
-filters = PackedStringArray("*.py ; Python scripts")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 0
@@ -30,17 +29,34 @@ layout_mode = 2
 size_flags_horizontal = 4
 text = "Run a Python script"
 
-[node name="InputContainer" type="HBoxContainer" parent="VBoxContainer"]
+[node name="ProjectDirContainer" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
 
-[node name="PathLineEdit" type="LineEdit" parent="VBoxContainer/InputContainer"]
+[node name="ProjectDirLineEdit" type="LineEdit" parent="VBoxContainer/ProjectDirContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
+placeholder_text = "Project folder (contains .venv)"
 editable = false
 
-[node name="PickButton" type="Button" parent="VBoxContainer/InputContainer"]
+[node name="ProjectDirPickButton" type="Button" parent="VBoxContainer/ProjectDirContainer"]
 layout_mode = 2
-text = "Pick file"
+text = "Pick folder"
+
+[node name="ScriptContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="ScriptLabel" type="Label" parent="VBoxContainer/ScriptContainer"]
+layout_mode = 2
+text = "Script:"
+
+[node name="ScriptLineEdit" type="LineEdit" parent="VBoxContainer/ScriptContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "e.g. main.py"
+
+[node name="DynamicParamsContainer" type="VBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 5
 
 [node name="ActionButtons" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
@@ -55,7 +71,11 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "Back"
 
-[connection signal="file_selected" from="FileDialog" to="." method="_on_file_dialog_file_selected"]
-[connection signal="pressed" from="VBoxContainer/InputContainer/PickButton" to="." method="_on_pick_button_pressed"]
+[node name="StatusLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+horizontal_alignment = 1
+
+[connection signal="dir_selected" from="ProjectDirDialog" to="." method="_on_project_dir_dialog_dir_selected"]
+[connection signal="pressed" from="VBoxContainer/ProjectDirContainer/ProjectDirPickButton" to="." method="_on_project_dir_pick_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/ActionButtons/RunButton" to="." method="_on_run_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/ActionButtons/BackButton" to="." method="_on_back_button_pressed"]
