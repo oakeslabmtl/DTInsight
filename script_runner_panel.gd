@@ -1,14 +1,37 @@
 extends Window
 
-@export var string_parameters: Array[String] = [
-	"--mode", "--input-path", "--output-dir", "--chunk-size",
-	"--chunk-overlap", "--temperature", "--model-name",
-	"--judge-model-name", "--embedding-model", "--exp-id",
+# Basic parameters shown by default
+@export var basic_string_parameters: Array[String] = [
+	"--input-path", "--model-name"
+]
+
+# Advanced parameters hidden behind a toggle
+@export var advanced_string_parameters: Array[String] = [
+	"--mode", "--output-dir", "--chunk-size", "--chunk-overlap", "--temperature",
+	"--embedding-model", "--exp-id", "--judge-model-name",
 	"--max-judge-retries", "--max-oml-retries", "--baseline-max-chars"
 ]
-@export var boolean_parameters: Array[String] = [
+@export var advanced_boolean_parameters: Array[String] = [
 	"--no-save", "--baseline-full-doc"
 ]
+
+var default_values: Dictionary = {
+	"--mode": "both",
+	"--input-path": "",
+	"--output-dir": "experiments",
+	"--chunk-size": "3000",
+	"--chunk-overlap": "500",
+	"--temperature": "0.1",
+	"--model-name": "glm-4.7:cloud",
+	"--judge-model-name": "deepseek-v3.2:cloud",
+	"--embedding-model": "embeddinggemma",
+	"--exp-id": "",
+	"--max-judge-retries": "0",
+	"--max-oml-retries": "3",
+	"--baseline-max-chars": "24000",
+	"--no-save": true,
+	"--baseline-full-doc": true
+}
 
 # Node references
 @onready var project_dir_line_edit = $VBoxContainer/ProjectDirContainer/ProjectDirLineEdit
@@ -18,12 +41,29 @@ extends Window
 @onready var run_button = $VBoxContainer/ActionButtons/RunButton
 @onready var status_label = $VBoxContainer/StatusLabel
 
+var _input_path_line_edit: LineEdit
+var _input_path_dialog: FileDialog
+var _advanced_container: VBoxContainer
+
 var _run_thread: Thread
 
 func _ready():
+	script_line_edit.text = "src\\main.py"
+	_build_input_path_dialog()
 	_build_dynamic_ui()
 	close_requested.connect(_on_back_button_pressed)
 	visibility_changed.connect(_on_visibility_changed)
+
+func _build_input_path_dialog():
+	_input_path_dialog = FileDialog.new()
+	_input_path_dialog.title = "Select Input File"
+	_input_path_dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILE
+	_input_path_dialog.access = FileDialog.ACCESS_FILESYSTEM
+	_input_path_dialog.filters = PackedStringArray(["*.pdf ; PDF Files", "*.*"])
+	_input_path_dialog.size = Vector2i(935, 550)
+	_input_path_dialog.initial_position = Window.WINDOW_INITIAL_POSITION_CENTER_MAIN_WINDOW_SCREEN
+	_input_path_dialog.file_selected.connect(_on_input_path_dialog_file_selected)
+	add_child(_input_path_dialog)
 
 func _on_visibility_changed():
 	if visible:
@@ -34,27 +74,61 @@ func _on_visibility_changed():
 		CameraSignals.enable_camera_zoom.emit()
 
 func _build_dynamic_ui():
-	# Build String inputs
-	for param in string_parameters:
-		var hbox = HBoxContainer.new()
-		var label = Label.new()
-		label.text = param
-		label.custom_minimum_size = Vector2(160, 0)
+	# Build basic string inputs (always visible)
+	for param in basic_string_parameters:
+		dynamic_params_container.add_child(_create_string_param_row(param))
 
-		var line_edit = LineEdit.new()
-		line_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		line_edit.set_meta("param_flag", param)
+	# Advanced toggle button
+	var toggle_btn = CheckButton.new()
+	toggle_btn.text = "Advanced Options"
+	toggle_btn.toggled.connect(_on_advanced_toggled)
+	dynamic_params_container.add_child(toggle_btn)
 
-		hbox.add_child(label)
-		hbox.add_child(line_edit)
-		dynamic_params_container.add_child(hbox)
+	# Advanced container (hidden by default)
+	_advanced_container = VBoxContainer.new()
+	_advanced_container.visible = false
+	_advanced_container.add_theme_constant_override("separation", 5)
+	dynamic_params_container.add_child(_advanced_container)
 
-	# Build Boolean inputs
-	for param in boolean_parameters:
+	for param in advanced_string_parameters:
+		_advanced_container.add_child(_create_string_param_row(param))
+	
+	for param in advanced_boolean_parameters:
 		var checkbox = CheckBox.new()
 		checkbox.text = param
 		checkbox.set_meta("param_flag", param)
-		dynamic_params_container.add_child(checkbox)
+		if default_values.has(param):
+			checkbox.button_pressed = default_values[param]
+		_advanced_container.add_child(checkbox)
+
+func _create_string_param_row(param: String) -> HBoxContainer:
+	var hbox = HBoxContainer.new()
+	var label = Label.new()
+	label.text = param
+	label.custom_minimum_size = Vector2(160, 0)
+
+	var line_edit = LineEdit.new()
+	line_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	line_edit.set_meta("param_flag", param)
+	if default_values.has(param):
+		line_edit.text = default_values[param]
+		line_edit.placeholder_text = default_values[param]
+
+	hbox.add_child(label)
+	hbox.add_child(line_edit)
+
+	# Add a file picker button for --input-path
+	if param == "--input-path":
+		_input_path_line_edit = line_edit
+		var pick_btn = Button.new()
+		pick_btn.text = "Pick file"
+		pick_btn.pressed.connect(_on_input_path_pick_button_pressed)
+		hbox.add_child(pick_btn)
+
+	return hbox
+
+func _on_advanced_toggled(toggled_on: bool):
+	_advanced_container.visible = toggled_on
 
 # Called when the user clicks "Pick folder"
 func _on_project_dir_pick_button_pressed():
@@ -63,6 +137,28 @@ func _on_project_dir_pick_button_pressed():
 # Called when the user has chosen a project directory
 func _on_project_dir_dialog_dir_selected(dir: String):
 	project_dir_line_edit.text = dir
+
+func _on_input_path_pick_button_pressed():
+	_input_path_dialog.popup_centered()
+
+func _on_input_path_dialog_file_selected(path: String):
+	# Make the path relative to the project directory if possible
+	var project_dir = project_dir_line_edit.text.strip_edges()
+	if project_dir != "" and path.begins_with(project_dir):
+		path = path.substr(project_dir.length()).lstrip("/").lstrip("\\")
+	_input_path_line_edit.text = path
+
+func _collect_params_from(container: Control, args: PackedStringArray):
+	for child in container.get_children():
+		if child is HBoxContainer:
+			var line_edit = child.get_child(1) as LineEdit
+			var val = line_edit.text.strip_edges()
+			if val != "":
+				args.append(line_edit.get_meta("param_flag"))
+				args.append(val)
+		elif child is CheckBox:
+			if child.button_pressed:
+				args.append(child.get_meta("param_flag"))
 
 # Called when the user clicks "Run"
 func _on_run_button_pressed():
@@ -85,16 +181,9 @@ func _on_run_button_pressed():
 	args.append("run")
 	args.append(script_name)
 
-	for child in dynamic_params_container.get_children():
-		if child is HBoxContainer:
-			var line_edit = child.get_child(1) as LineEdit
-			var val = line_edit.text.strip_edges()
-			if val != "":
-				args.append(line_edit.get_meta("param_flag"))
-				args.append(val)
-		elif child is CheckBox:
-			if child.button_pressed:
-				args.append(child.get_meta("param_flag"))
+	_collect_params_from(dynamic_params_container, args)
+	if _advanced_container:
+		_collect_params_from(_advanced_container, args)
 
 	print("Running from: ", project_dir)
 	print("Command: uv ", " ".join(args))
@@ -111,12 +200,17 @@ func _execute_script(project_dir: String, args: PackedStringArray):
 	var shell_command: String
 	var shell_args: PackedStringArray
 
+	# Quote each argument so paths with spaces are handled correctly
+	var quoted_args: PackedStringArray = PackedStringArray()
+	for arg in args:
+		quoted_args.append("\"" + arg + "\"")
+
 	if OS.has_feature("windows"):
 		shell_command = "cmd.exe"
-		shell_args = PackedStringArray(["/c", "cd /d " + project_dir + " && uv " + " ".join(args)])
+		shell_args = PackedStringArray(["/c", "cd /d \"" + project_dir + "\" && uv " + " ".join(quoted_args)])
 	else:
 		shell_command = "/bin/sh"
-		shell_args = PackedStringArray(["-c", "cd " + project_dir.c_escape() + " && uv " + " ".join(args)])
+		shell_args = PackedStringArray(["-c", "cd \"" + project_dir.c_escape() + "\" && uv " + " ".join(quoted_args)])
 
 	var exit_code = OS.execute(shell_command, shell_args, output, true)
 

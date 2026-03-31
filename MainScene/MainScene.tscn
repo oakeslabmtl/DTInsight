@@ -381,7 +381,7 @@ text = "Script:"
 [node name="ScriptLineEdit" type="LineEdit" parent="ControlLayer/ButtonsContainer/VBoxContainer/ScriptRunnerButton/ScriptRunnerPopup/VBoxContainer/ScriptContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-placeholder_text = "e.g. main.py"
+placeholder_text = "e.g. src\\main.py"
 
 [node name="ParamsScrollContainer" type="ScrollContainer" parent="ControlLayer/ButtonsContainer/VBoxContainer/ScriptRunnerButton/ScriptRunnerPopup/VBoxContainer"]
 layout_mode = 2
