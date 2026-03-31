@@ -5,6 +5,8 @@ extends Container
 
 const LegendElement = preload("res://Legends/LegendElement.tscn")
 
+var timescales : Dictionary
+
 func _ready() -> void:
 	set_panel_color(StyleConfig.Legends.PANEL_COLOR)
 
@@ -49,6 +51,5 @@ func _on_node_style_option_item_selected(index: int) -> void:
 			for key in implementation_map.keys():
 				instanciate_legend_element(key, implementation_map[key])
 		3:
-			var timescale_map = StyleConfig.Timescale.MAP
-			for key in timescale_map.keys():
-				instanciate_legend_element(key, timescale_map[key])
+			for timescale in timescales.keys():
+				instanciate_legend_element(timescale, timescales[timescale])

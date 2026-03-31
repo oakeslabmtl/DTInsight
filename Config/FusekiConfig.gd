@@ -20,6 +20,7 @@ class JsonHead:
 	const RABBIT_ROUTE = "route"
 	const RABBIT_SOURCE = "source"
 	const RABBIT_MESSAGE_LISTENER = "ml"
+	const TIMESCALES = "ts"
 	const C1 = "c1"
 	const C2 = "c2"
 	const C4 = "c4"
