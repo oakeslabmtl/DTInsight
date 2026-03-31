@@ -76,6 +76,9 @@ const QUERY_METADATA = [
 	{ id = "rabbit_source", alias = "source", type = "rabbit:Source", template = "rabbit" },
 	{ id = "rabbit_message_listener", alias = "ml", type = "rabbit:MessageListener", template = "rabbit" },
 
+	# Misc
+	{ id = "time_scales", alias = "ts", type = "DTDFvocab:TimeScale" },
+
 	# Characteristics
 	{ id = "characteristic_system_under_study", alias = "c1", type = "DTDFvocab:SystemUnderStudy" },
 	{ id = "characteristic_acting_component", alias = "c2", type = "DTDFvocab:ActingComponent" },

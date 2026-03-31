@@ -14,6 +14,7 @@ class_name DT_PT
 @onready var sensor_container = $PTContainer/DataTravelContainer/DataOutPanel/DataOutContainer/SensorsOrganizer/SensorsContainer
 @onready var env_container = $"PTContainer/Operator&EnvContainer/ExperimentContainer/EnvPanel/EnvOrganizer/EnvContainer"
 @onready var sys_container = $"PTContainer/Operator&EnvContainer/ExperimentContainer/SystemPanel/SystemOrganizer/SystemContainer"
+@onready var legends = [%Legends1, %Legends2]
 
 #Access to fuseki data
 var fuseki_data : FusekiData = null
@@ -24,6 +25,8 @@ var links_as_dict_service_to_provided_thing : Dictionary = {}
 var links_as_dict_sensor_to_data_transmitted : Dictionary = {}
 var links_as_dict_data_to_enabler : Dictionary = {}
 var links_as_dict_data_transmitted_to_data : Dictionary = {}
+
+var timescale_colors: Dictionary
 
 
 #Load the generic display scene
@@ -207,13 +210,9 @@ func set_starting_node_style(generic_node : GenericDisplay, attributes : Diction
 	elif (timescale_key in attributes.keys()):
 		var is_border = border_view == 3
 		var is_bg = bg_view == 3
-		match attributes[timescale_key]:
-			["slower_trt"]:
-				generic_node.set_node_style(StyleConfig.Timescale.SLOWER_THAN_REALTIME, is_bg, is_border)
-			["rt"]:
-				generic_node.set_node_style(StyleConfig.Timescale.REALTIME, is_bg, is_border)
-			["faster_trt"]:
-				generic_node.set_node_style(StyleConfig.Timescale.FASTER_THAN_REALTIME, is_bg, is_border)
+		var attr = attributes[timescale_key][0]
+		if attr in timescale_colors:
+			generic_node.set_node_style(timescale_colors[attr], is_bg, is_border)
 
 #Set highlighted element on signal
 func _on_element_over(element_name, click: bool):
@@ -637,6 +636,8 @@ func on_fuseki_data_updated():
 	
 	update_link_dicts()
 
+	update_legends()
+
 func update_link_dicts():
 	links_as_dict_enabler_to_service.clear()
 	links_as_dict_model_to_enabler.clear()
@@ -650,6 +651,16 @@ func update_link_dicts():
 	to_link_dictionary(links_as_dict_sensor_to_data_transmitted, fuseki_data.sensor_to_data_transmitted)
 	to_link_dictionary(links_as_dict_data_to_enabler, fuseki_data.data_to_enabler)
 	to_link_dictionary(links_as_dict_data_transmitted_to_data, fuseki_data.data_transmitted_to_data)
+
+func update_legends():
+	var timescales = fuseki_data.timescales.keys()
+	timescale_colors.clear()
+	var s = timescales.size();
+	for timescale_index in s:
+		timescale_colors[timescales[timescale_index]] = Color.from_hsv(0.8 * float(timescale_index) / float(s - 1), 0.7, 0.9)
+	
+	for legend in legends:
+		legend.timescales = timescale_colors
 
 func _process(_delta):
 	already_drawn_x.clear()

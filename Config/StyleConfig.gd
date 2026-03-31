@@ -26,18 +26,6 @@ class Implementation:
 		"IMPLEMENTED": IMPLEMENTED
 	}
 
-# Timescale relationship style
-class Timescale:
-	const SLOWER_THAN_REALTIME : Color = Color.BLUE_VIOLET
-	const REALTIME : Color = Color.AQUAMARINE
-	const FASTER_THAN_REALTIME : Color = Color.GOLD
-	
-	const MAP : Dictionary = {
-		"SLOWER_THAN_REALTIME": SLOWER_THAN_REALTIME,
-		"REALTIME": REALTIME,
-		"FASTER_THAN_REALTIME": FASTER_THAN_REALTIME
-	}
-
 #DT/RT displayed element style
 class DTElement:
 	const BORDER_WIDTH : int = 5

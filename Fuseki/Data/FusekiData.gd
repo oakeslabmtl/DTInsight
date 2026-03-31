@@ -38,6 +38,9 @@ var env: Dictionary
 var sys_component: Dictionary
 var data: Dictionary
 
+# ── Misc ──────────────────────────────────────────────────────────────────────
+var timescales: Dictionary
+
 # ── DT characteristic dictionaries (numbered per the DTDF taxonomy) ───────────
 var c1: Dictionary   # System under study
 var c2: Dictionary   # Physical acting components
@@ -113,6 +116,7 @@ func input_data_from_fuseki_JSON(json) -> void:
 		FusekiConfig.JsonHead.RABBIT_ROUTE:           "rabbit_route",
 		FusekiConfig.JsonHead.RABBIT_SOURCE:          "rabbit_source",
 		FusekiConfig.JsonHead.RABBIT_MESSAGE_LISTENER:"rabbit_message_listener",
+		FusekiConfig.JsonHead.TIMESCALES:			  "timescales",
 		FusekiConfig.JsonHead.C1:  "c1",
 		FusekiConfig.JsonHead.C2:  "c2",
 		FusekiConfig.JsonHead.C4:  "c4",

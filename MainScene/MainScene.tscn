@@ -189,7 +189,8 @@ popup/item_2/id = 2
 popup/item_3/text = "Timescale"
 popup/item_3/id = 3
 
-[node name="Legends" parent="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer" instance=ExtResource("12_80vrr")]
+[node name="Legends1" parent="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer" instance=ExtResource("12_80vrr")]
+unique_name_in_owner = true
 layout_mode = 2
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer"]
@@ -213,7 +214,8 @@ popup/item_2/id = 2
 popup/item_3/text = "Timescale"
 popup/item_3/id = 3
 
-[node name="Legends" parent="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2" instance=ExtResource("12_80vrr")]
+[node name="Legends2" parent="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2" instance=ExtResource("12_80vrr")]
+unique_name_in_owner = true
 layout_mode = 2
 
 [node name="SettingsBackground" type="ColorRect" parent="ControlLayer"]
@@ -353,9 +355,9 @@ to_hide = [NodePath("../ControlLayer")]
 
 [connection signal="toggled" from="ControlLayer/ControlPanel/MarginContainer/ControlContainer/RabbitButton" to="ControlLayer/ControlPanel/MarginContainer/ControlContainer/RabbitButton" method="_on_toggled"]
 [connection signal="item_selected" from="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/NodeBGOption" to="DTContainer" method="_on_node_bg_option_item_selected"]
-[connection signal="item_selected" from="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/NodeBGOption" to="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/Legends" method="_on_node_style_option_item_selected"]
+[connection signal="item_selected" from="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/NodeBGOption" to="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/Legends1" method="_on_node_style_option_item_selected"]
 [connection signal="item_selected" from="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/NodeBorderOption" to="DTContainer" method="_on_node_border_option_item_selected"]
-[connection signal="item_selected" from="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/NodeBorderOption" to="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/Legends" method="_on_node_style_option_item_selected"]
+[connection signal="item_selected" from="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/NodeBorderOption" to="ControlLayer/ViewPanel/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/Legends2" method="_on_node_style_option_item_selected"]
 [connection signal="settings_menu_closed" from="ControlLayer/SettingsBackground/Settings" to="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid/SettingsButton" method="_on_settings_settings_menu_closed"]
 [connection signal="pressed" from="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid/SettingsButton" to="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid/SettingsButton" method="_on_pressed"]
 [connection signal="toggled" from="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid/VisualEditingButton" to="DTContainer" method="_on_visual_editing_button_toggled"]
