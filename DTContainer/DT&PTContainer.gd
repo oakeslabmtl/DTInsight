@@ -26,7 +26,7 @@ var links_as_dict_sensor_to_data_transmitted : Dictionary = {}
 var links_as_dict_data_to_enabler : Dictionary = {}
 var links_as_dict_data_transmitted_to_data : Dictionary = {}
 
-var timescale_colors: Dictionary
+var timescale_colors: Dictionary = {}
 
 
 #Load the generic display scene
@@ -653,14 +653,23 @@ func update_link_dicts():
 	to_link_dictionary(links_as_dict_data_transmitted_to_data, fuseki_data.data_transmitted_to_data)
 
 func update_legends():
-	var timescales = fuseki_data.timescales.keys()
+	var timescale_keys = fuseki_data.timescales.keys()
 	timescale_colors.clear()
-	var s = timescales.size();
+	var s = timescale_keys.size();
+	var legend_colors : Dictionary = {}
 	for timescale_index in s:
-		timescale_colors[timescales[timescale_index]] = Color.from_hsv(0.8 * float(timescale_index) / float(s - 1), 0.7, 0.9)
+		var key = timescale_keys[timescale_index]
+		var color = Color.from_hsv(0.8 * float(timescale_index) / float(s - 1), 0.7, 0.9)
+		timescale_colors[key] = color
+		# Use the description ("desc") as the legend display name, fall back to the key
+		var display_name = key
+		var attrs = fuseki_data.timescales[key]
+		if attrs is Dictionary and "desc" in attrs and not attrs["desc"].is_empty() and attrs["desc"][0] != "":
+			display_name = attrs["desc"][0]
+		legend_colors[display_name] = color
 	
 	for legend in legends:
-		legend.timescales = timescale_colors
+		legend.timescales = legend_colors
 
 func _process(_delta):
 	already_drawn_x.clear()

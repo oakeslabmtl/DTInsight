@@ -84,7 +84,7 @@ const QUERY_METADATA = [
 	{ id = "characteristic_acting_component", alias = "c2", type = "DTDFvocab:ActingComponent" },
 	{ id = "characteristic_data_transmitted", alias = "c4", type = "DTDFvocab:DataTransmitted" },
 	{ id = "characteristic_virtual_to_physical", alias = "c5", type = "DTDFvocab:VirtualToPhysical" },
-	{ id = "characteristic_time_scale", alias = "c7", type = "DTDFvocab:TimeScale" },
+	{ id = "characteristic_time_scale", alias = "c7", type = "DTDFvocab:TimeScaleDescription" },
 	{ id = "characteristic_multiplicity", alias = "c8", type = "DTDFvocab:Multiplicity" },
 	{ id = "characteristic_life_cycle_stage", alias = "c9", type = "DTDFvocab:LifeCycleStage" },
 	{ id = "characteristic_constellation", alias = "c12", type = "DTDFvocab:Constellation" },
