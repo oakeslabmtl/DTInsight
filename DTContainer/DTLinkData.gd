@@ -128,10 +128,13 @@ func _build_link_dict(links: Dictionary, fuseki_link_data, get_node: Callable) -
 	for link in fuseki_link_data:
 		var source_node = get_node.call(link.source)
 		if source_node == null:
-			return
+			continue
+		var destination_node = get_node.call(link.destination)
+		if destination_node == null:
+			continue
 		if not links.has(source_node):
 			links[source_node] = []
-		links[source_node].append(get_node.call(link.destination))
+		links[source_node].append(destination_node)
 
 
 func _delete_fuseki_link(source: GenericDisplay, dest: GenericDisplay,
