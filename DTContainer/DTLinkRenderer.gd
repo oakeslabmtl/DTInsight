@@ -118,6 +118,8 @@ func get_link_under_mouse(mouse_pos: Vector2, highlighted_element) -> Dictionary
 			return link
 		# Vertical source branch
 		var src_node = link["source"]
+		if not src_node:
+			return {}
 		var src_y_start = _bottom(src_node).y if src_node.global_position.y < link["lane_y"] else _top(src_node).y
 		if _point_on_segment(mouse_pos, Vector2(link["source_x"], src_y_start),
 				Vector2(link["source_x"], link["lane_y"]), TOLERANCE):
