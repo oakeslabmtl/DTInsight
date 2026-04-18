@@ -11,10 +11,10 @@
 [ext_resource type="PackedScene" uid="uid://px6a2dg8cawb" path="res://addons/modular-settings-menu/scenes/settings.tscn" id="8_ixws2"]
 [ext_resource type="PackedScene" uid="uid://cowug1mbtod0e" path="res://Fuseki/Caller/FusekiCallerBtton.tscn" id="8_ped26"]
 [ext_resource type="Script" uid="uid://cfkgtkfhl06v5" path="res://RabbitMQ/Control/RabbitButton.gd" id="9_qda1k"]
-[ext_resource type="PackedScene" uid="uid://3rf0dti147xm" path="res://ScriptRunnerPanel.tscn" id="10_xqnle"]
 [ext_resource type="Texture2D" uid="uid://doyxcp824t4vw" path="res://gear.png" id="12_77ryg"]
 [ext_resource type="PackedScene" uid="uid://cf7nrorpbpbjb" path="res://Legends/Legends.tscn" id="12_80vrr"]
 [ext_resource type="Script" uid="uid://cdswvlml33tfq" path="res://MainScene/python_runner.gd" id="13_gmiik"]
+[ext_resource type="Script" uid="uid://d1h3p24nh6ahy" path="res://script_runner_panel.gd" id="14_xqnle"]
 [ext_resource type="Script" uid="uid://0b3cap3tphwi" path="res://MainScene/CICDServer.gd" id="15_gmiik"]
 
 [sub_resource type="GDScript" id="GDScript_xqnle"]
@@ -327,24 +327,90 @@ Once the graph is generated, hover on the nodes (clickable) to highlight connect
 layout_mode = 2
 text = "Link Deletion"
 
-[node name="PythonButton" type="Button" parent="ControlLayer/ButtonsContainer/VBoxContainer"]
+[node name="ScriptRunnerButton" type="Button" parent="ControlLayer/ButtonsContainer/VBoxContainer"]
 layout_mode = 2
 text = "Call a script"
 script = ExtResource("13_gmiik")
 metadata/_custom_type_script = "uid://clu02vc02js06"
 
-[node name="ScriptRunnerBackground" type="ColorRect" parent="ControlLayer"]
+[node name="ScriptRunnerPopup" type="Window" parent="ControlLayer/ButtonsContainer/VBoxContainer/ScriptRunnerButton"]
+oversampling_override = 1.0
+title = "Run a Python Script"
+initial_position = 1
+size = Vector2i(500, 600)
 visible = false
+script = ExtResource("14_xqnle")
+
+[node name="ProjectDirDialog" type="FileDialog" parent="ControlLayer/ButtonsContainer/VBoxContainer/ScriptRunnerButton/ScriptRunnerPopup"]
+oversampling_override = 1.0
+title = "Open a Directory"
+initial_position = 1
+size = Vector2i(935, 550)
+file_mode = 2
+access = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ControlLayer/ButtonsContainer/VBoxContainer/ScriptRunnerButton/ScriptRunnerPopup"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -8.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0.639216)
 
-[node name="ScriptRunnerPanel" parent="ControlLayer/ScriptRunnerBackground" instance=ExtResource("10_xqnle")]
-unique_name_in_owner = true
-layout_mode = 1
+[node name="ProjectDirContainer" type="HBoxContainer" parent="ControlLayer/ButtonsContainer/VBoxContainer/ScriptRunnerButton/ScriptRunnerPopup/VBoxContainer"]
+layout_mode = 2
+
+[node name="ProjectDirLineEdit" type="LineEdit" parent="ControlLayer/ButtonsContainer/VBoxContainer/ScriptRunnerButton/ScriptRunnerPopup/VBoxContainer/ProjectDirContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Project folder (contains .venv)"
+editable = false
+
+[node name="ProjectDirPickButton" type="Button" parent="ControlLayer/ButtonsContainer/VBoxContainer/ScriptRunnerButton/ScriptRunnerPopup/VBoxContainer/ProjectDirContainer"]
+layout_mode = 2
+text = "Pick folder"
+
+[node name="ScriptContainer" type="HBoxContainer" parent="ControlLayer/ButtonsContainer/VBoxContainer/ScriptRunnerButton/ScriptRunnerPopup/VBoxContainer"]
+layout_mode = 2
+
+[node name="ScriptLabel" type="Label" parent="ControlLayer/ButtonsContainer/VBoxContainer/ScriptRunnerButton/ScriptRunnerPopup/VBoxContainer/ScriptContainer"]
+layout_mode = 2
+text = "Script:"
+
+[node name="ScriptLineEdit" type="LineEdit" parent="ControlLayer/ButtonsContainer/VBoxContainer/ScriptRunnerButton/ScriptRunnerPopup/VBoxContainer/ScriptContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "e.g. src\\main.py"
+
+[node name="ParamsScrollContainer" type="ScrollContainer" parent="ControlLayer/ButtonsContainer/VBoxContainer/ScriptRunnerButton/ScriptRunnerPopup/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="DynamicParamsContainer" type="VBoxContainer" parent="ControlLayer/ButtonsContainer/VBoxContainer/ScriptRunnerButton/ScriptRunnerPopup/VBoxContainer/ParamsScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 5
+
+[node name="ActionButtons" type="HBoxContainer" parent="ControlLayer/ButtonsContainer/VBoxContainer/ScriptRunnerButton/ScriptRunnerPopup/VBoxContainer"]
+layout_mode = 2
+
+[node name="RunButton" type="Button" parent="ControlLayer/ButtonsContainer/VBoxContainer/ScriptRunnerButton/ScriptRunnerPopup/VBoxContainer/ActionButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Apply"
+
+[node name="BackButton" type="Button" parent="ControlLayer/ButtonsContainer/VBoxContainer/ScriptRunnerButton/ScriptRunnerPopup/VBoxContainer/ActionButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Back"
+
+[node name="StatusLabel" type="Label" parent="ControlLayer/ButtonsContainer/VBoxContainer/ScriptRunnerButton/ScriptRunnerPopup/VBoxContainer"]
+layout_mode = 2
+text = "Status: Not Running"
+horizontal_alignment = 1
 
 [node name="FusekiData" parent="." instance=ExtResource("5_4e51a")]
 
@@ -362,4 +428,8 @@ to_hide = [NodePath("../ControlLayer")]
 [connection signal="pressed" from="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid/SettingsButton" to="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid/SettingsButton" method="_on_pressed"]
 [connection signal="toggled" from="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid/VisualEditingButton" to="DTContainer" method="_on_visual_editing_button_toggled"]
 [connection signal="pressed" from="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid/HelpButton" to="ControlLayer/ButtonsContainer/VBoxContainer/ButtonGrid/HelpButton" method="_on_help_button_pressed"]
-[connection signal="pressed" from="ControlLayer/ButtonsContainer/VBoxContainer/PythonButton" to="ControlLayer/ButtonsContainer/VBoxContainer/PythonButton" method="_on_pressed"]
+[connection signal="pressed" from="ControlLayer/ButtonsContainer/VBoxContainer/ScriptRunnerButton" to="ControlLayer/ButtonsContainer/VBoxContainer/ScriptRunnerButton" method="_on_pressed"]
+[connection signal="dir_selected" from="ControlLayer/ButtonsContainer/VBoxContainer/ScriptRunnerButton/ScriptRunnerPopup/ProjectDirDialog" to="ControlLayer/ButtonsContainer/VBoxContainer/ScriptRunnerButton/ScriptRunnerPopup" method="_on_project_dir_dialog_dir_selected"]
+[connection signal="pressed" from="ControlLayer/ButtonsContainer/VBoxContainer/ScriptRunnerButton/ScriptRunnerPopup/VBoxContainer/ProjectDirContainer/ProjectDirPickButton" to="ControlLayer/ButtonsContainer/VBoxContainer/ScriptRunnerButton/ScriptRunnerPopup" method="_on_project_dir_pick_button_pressed"]
+[connection signal="pressed" from="ControlLayer/ButtonsContainer/VBoxContainer/ScriptRunnerButton/ScriptRunnerPopup/VBoxContainer/ActionButtons/RunButton" to="ControlLayer/ButtonsContainer/VBoxContainer/ScriptRunnerButton/ScriptRunnerPopup" method="_on_run_button_pressed"]
+[connection signal="pressed" from="ControlLayer/ButtonsContainer/VBoxContainer/ScriptRunnerButton/ScriptRunnerPopup/VBoxContainer/ActionButtons/BackButton" to="ControlLayer/ButtonsContainer/VBoxContainer/ScriptRunnerButton/ScriptRunnerPopup" method="_on_back_button_pressed"]
