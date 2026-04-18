@@ -142,7 +142,11 @@ func set_fuseki_data(_fuseki_data: FusekiData) -> void:
 func feed_fuseki_data(feed):
 	fuseki_data = feed
 	for node in displayed_node_list:
-		node.get_parent().remove_child(node)
+		if is_instance_valid(node):
+			var parent = node.get_parent()
+			if parent != null:
+				parent.remove_child(node)
+			node.queue_free()
 	displayed_node_list.clear()
 	on_fuseki_data_updated()
 	await get_tree().create_timer(0.2).timeout
