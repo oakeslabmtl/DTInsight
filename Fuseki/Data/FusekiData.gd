@@ -193,3 +193,240 @@ func empty() -> void:
 ## [FusekiDataDumper]. Pass [param to_console] = true to print instead.
 func dump(dump_path: String, to_console: bool = false) -> void:
 	FusekiDataDumper.dump_architecture(self, dump_path, to_console)
+
+
+# ── Write-back support ────────────────────────────────────────────────────────
+
+## Reference to the FusekiWriter node, injected by MainSceneController.
+var fuseki_writer: Node
+
+## Reference to the FusekiCallerButton, injected by MainSceneController.
+## Used for auto-refresh after successful writes.
+var fuseki_caller_button: Node
+
+## Known namespace prefixes used to reconstruct full prefixed names from
+## short fragment-only names stored in FusekiData dictionaries.
+## Only contains static vocabulary namespaces; graph-derived prefixes are
+## handled dynamically via FusekiConfig.GRAPH_PREFIXES.
+const _NAMESPACE_MAP := {
+	"DTDFvocab": "https://bentleyjoakes.github.io/DTDF/vocab/DTDFVocab#",
+	"rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+	"base": "https://bentleyjoakes.github.io/DTDF/vocab/base#",
+	"rabbit": "https://bentleyjoakes.github.io/DTaaS/RabbitMQVocab#",
+}
+
+
+## Resolves a short fragment name (e.g. "Service") back to a prefixed SPARQL
+## name (e.g. "DTDFvocab:Service") by checking if any known namespace contains
+## that fragment.  If [param short_name] already contains a prefix separator
+## (':') or looks like a full URI, it is returned as-is.
+##
+## [param preferred_prefix] can be supplied when the caller knows which
+## namespace the name belongs to (avoids ambiguity).
+func _resolve_uri(short_name: String, preferred_prefix: String = "") -> String:
+	# Special case: SPARQL shorthand for rdf:type
+	if short_name == "a":
+		return "a"
+
+	# Already prefixed or a full URI — nothing to do.
+	if ":" in short_name or short_name.begins_with("<"):
+		return short_name
+
+	# If a preferred prefix is given, use it directly.
+	if preferred_prefix != "":
+		return "%s:%s" % [preferred_prefix, short_name]
+
+	# Default to the auto-detected fallback write graph prefix for instance entities.
+	var default_prefix := FusekiConfig.DEFAULT_WRITE_GRAPH_PREFIX
+	if default_prefix == "":
+		printerr("FusekiData._resolve_uri: No default write graph detected yet, cannot resolve '%s'" % short_name)
+		return short_name
+	return "%s:%s" % [default_prefix, short_name]
+
+
+## Triggers the existing "Call Fuseki" read cycle to refresh all local data
+## after a write operation.
+func _auto_refresh() -> void:
+	if fuseki_caller_button != null and fuseki_caller_button.has_method("_on_pressed"):
+		await fuseki_caller_button._on_pressed()
+
+
+## Queries Fuseki dynamically to find out which graph an entity natively belongs to.
+func _query_graph_for_subject(subject: String) -> String:
+	var normalized = FusekiUpdateQuery._normalize_term(subject)
+	var query = "SELECT ?g WHERE { GRAPH ?g { %s ?p ?o } } LIMIT 1" % normalized
+	var url = FusekiConfig.URL + FusekiConfig.DATASET + FusekiConfig.ENDPOINT + query.uri_encode()
+	
+	var http_request = HTTPRequest.new()
+	add_child(http_request)
+	http_request.request(url)
+	
+	var response = await http_request.request_completed
+	var response_code = response[1]
+	var body = response[3]
+	
+	http_request.queue_free()
+	
+	if response_code != 200:
+		return ""
+		
+	var json = JSON.parse_string(body.get_string_from_utf8())
+	if json == null:
+		return ""
+		
+	var bindings = json.get("results", {}).get("bindings", [])
+	if bindings.size() > 0 and bindings[0].has("g"):
+		var graph_uri = bindings[0]["g"]["value"]
+		return FusekiConfig._prefix_from_uri(graph_uri)
+		
+	return ""
+
+
+## Resolves the correct graph prefix for a write operation dynamically.
+func _resolve_graph_prefix(explicit_prefix: String, subject: String) -> String:
+	if explicit_prefix != "":
+		return explicit_prefix
+	
+	var live_prefix = await _query_graph_for_subject(subject)
+	if live_prefix != "":
+		return live_prefix
+	
+	# Fallback
+	if FusekiConfig.DEFAULT_WRITE_GRAPH_PREFIX != "":
+		return FusekiConfig.DEFAULT_WRITE_GRAPH_PREFIX
+		
+	printerr("FusekiData: No graph prefix found for subject '", subject, "', writing to an empty prefix which may fail.")
+	return ""
+
+
+## Adds a triple to Fuseki.
+##
+## [param subject]   Short name or prefixed name of the subject entity.
+## [param predicate]  Short name or prefixed name of the predicate.
+## [param object]     The object value.
+## [param is_literal] If true, [param object] is treated as a literal string.
+##                    If false, [param object] is treated as a prefixed name/URI
+##                    and will be auto-prefixed if it's a bare name.
+## [param subject_prefix]   Optional namespace prefix for the subject.
+## [param predicate_prefix] Optional namespace prefix for the predicate.
+## [param object_prefix]    Optional namespace prefix for the object (only used when is_literal is false).
+##
+## Returns [code]true[/code] on success.
+func add_triple(
+	subject: String,
+	predicate: String,
+	object: String,
+	is_literal: bool = true,
+	target_graph_prefix: String = "",
+	subject_prefix: String = "",
+	predicate_prefix: String = "",
+	object_prefix: String = ""
+) -> bool:
+	if fuseki_writer == null:
+		printerr("FusekiData: fuseki_writer not set — cannot write.")
+		return false
+
+	var resolved_predicate = _resolve_uri(predicate, predicate_prefix)
+	var resolved_object := object if is_literal else _resolve_uri(object, object_prefix)
+	
+	var graph_prefix = await _resolve_graph_prefix(target_graph_prefix, subject)
+
+	var sparql := FusekiUpdateQuery.build_insert(
+		graph_prefix,
+		_resolve_uri(subject, subject_prefix),
+		resolved_predicate,
+		resolved_object,
+		is_literal
+	)
+	var success: bool = await fuseki_writer.execute_update(sparql)
+	if success:
+		await _auto_refresh()
+	return success
+
+
+## Removes a specific triple from Fuseki.
+func remove_triple(
+	subject: String,
+	predicate: String,
+	object: String,
+	is_literal: bool = true,
+	target_graph_prefix: String = "",
+	subject_prefix: String = "",
+	predicate_prefix: String = "",
+	object_prefix: String = ""
+) -> bool:
+	if fuseki_writer == null:
+		printerr("FusekiData: fuseki_writer not set — cannot write.")
+		return false
+
+	var resolved_object := object if is_literal else _resolve_uri(object, object_prefix)
+	var graph_prefix = await _resolve_graph_prefix(target_graph_prefix, subject)
+	
+	var sparql := FusekiUpdateQuery.build_delete(
+		graph_prefix,
+		_resolve_uri(subject, subject_prefix),
+		_resolve_uri(predicate, predicate_prefix),
+		resolved_object,
+		is_literal
+	)
+	var success: bool = await fuseki_writer.execute_update(sparql)
+	if success:
+		await _auto_refresh()
+	return success
+
+
+## Atomically replaces [param old_value] with [param new_value] for a given
+## subject + predicate.
+func update_triple(
+	subject: String,
+	predicate: String,
+	old_value: String,
+	new_value: String,
+	is_literal: bool = true,
+	target_graph_prefix: String = "",
+	subject_prefix: String = "",
+	predicate_prefix: String = "",
+	object_prefix: String = ""
+) -> bool:
+	if fuseki_writer == null:
+		printerr("FusekiData: fuseki_writer not set — cannot write.")
+		return false
+
+	var resolved_old := old_value if is_literal else _resolve_uri(old_value, object_prefix)
+	var resolved_new := new_value if is_literal else _resolve_uri(new_value, object_prefix)
+	var graph_prefix = await _resolve_graph_prefix(target_graph_prefix, subject)
+
+	var sparql := FusekiUpdateQuery.build_update(
+		graph_prefix,
+		_resolve_uri(subject, subject_prefix),
+		_resolve_uri(predicate, predicate_prefix),
+		resolved_old,
+		resolved_new,
+		is_literal
+	)
+	var success: bool = await fuseki_writer.execute_update(sparql)
+	if success:
+		await _auto_refresh()
+	return success
+
+
+## Removes all triples for a given subject entity.
+func delete_entity(
+	subject: String,
+	target_graph_prefix: String = "",
+	subject_prefix: String = ""
+) -> bool:
+	if fuseki_writer == null:
+		printerr("FusekiData: fuseki_writer not set — cannot write.")
+		return false
+
+	var graph_prefix = await _resolve_graph_prefix(target_graph_prefix, subject)
+
+	var sparql := FusekiUpdateQuery.build_delete_entity(
+		graph_prefix,
+		_resolve_uri(subject, subject_prefix)
+	)
+	var success: bool = await fuseki_writer.execute_update(sparql)
+	if success:
+		await _auto_refresh()
+	return success

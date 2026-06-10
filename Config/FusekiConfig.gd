@@ -4,6 +4,41 @@ extends Node
 var URL = "http://127.0.0.1:3030" #Fuseki server, localhost if started from openCAESAR on this machine
 var DATASET = "/DTDF" #FUseki endpoint defined in fuseki.ttl in the project
 var ENDPOINT = "/sparql?query=" #sparql endpoint
+var UPDATE_ENDPOINT = "/update" #sparql update endpoint (POST only)
+## Fallback prefix used when writing a completely new entity type that
+## wasn't found in CLASS_TO_GRAPH_PREFIX.
+var DEFAULT_WRITE_GRAPH_PREFIX := ""
+
+## Dynamic graph-derived prefix map: { "prefix_name": "<full_uri#>" }
+## Populated at startup by querying all named graphs in Fuseki.
+var GRAPH_PREFIXES: Dictionary = {}
+
+## SPARQL query to discover all named graphs.
+const GRAPH_DETECT_QUERY = """SELECT DISTINCT ?g WHERE {
+  GRAPH ?g { ?s ?p ?o }
+}"""
+
+
+
+## Derives a short prefix name from a graph URI.
+## e.g. "https://bentleyjoakes.github.io/incubator/incubator_dt" → "incubator_dt"
+## e.g. "https://bentleyjoakes.github.io/DTDF/desc/baseDesc"    → "baseDesc"
+static func _prefix_from_uri(uri: String) -> String:
+	# Strip trailing / or #
+	var clean := uri.rstrip("/#")
+	var last_slash := clean.rfind("/")
+	var prefix := clean
+	if last_slash >= 0:
+		prefix = clean.substr(last_slash + 1)
+	
+	# Sanitize for SPARQL: replace invalid characters
+	prefix = prefix.replace(".", "_").replace("-", "_")
+	
+	# SPARQL prefixes must start with a letter
+	if prefix.length() > 0 and "0123456789".find(prefix[0]) >= 0:
+		prefix = "ns_" + prefix
+		
+	return prefix
 
 #JSON match
 class JsonHead:
