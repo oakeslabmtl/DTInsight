@@ -35,20 +35,31 @@ func clear() -> void:
 ## Draw all links from a single link dictionary (source -> [destinations]).
 func draw_links(links_dict: Dictionary, side: ContainerSide,
 		link_type: String, highlighting: DTHighlighting) -> void:
+	
+	# Pre-filter valid sources so we can count them for even hue spacing
+	var valid_sources = []
 	for source_node in links_dict:
-		if source_node == null:
-			continue
-		var destinations = links_dict[source_node].filter(func(e): return e != null)
-		if destinations.is_empty():
-			continue
+		if source_node != null and not links_dict[source_node].filter(func(e): return e != null).is_empty():
+			valid_sources.append(source_node)
+			
+	var total_sources = valid_sources.size()
+	# Add a base offset per lane type so different groups don't all start at exactly Red (0.0)
+	var group_hue_offset = float(abs(link_type.hash()) % 1000) / 1000.0
 
+	for i in range(total_sources):
+		var source_node = valid_sources[i]
+		var destinations = links_dict[source_node].filter(func(e): return e != null)
+		
 		var lane_y := _get_lane_y(side, source_node, destinations)
 		var x_all: Array[int] = []
 		var x_highlight: Array[int] = []
+		
+		# Maximally space the hues across the color wheel for this specific group of arrows
+		var hue = fmod(group_hue_offset + (float(i) / float(total_sources)), 1.0) if total_sources > 0 else 0.0
 
 		# Draw source stem
 		var src_in_path := highlighting.in_critical_path(source_node, destinations)
-		var src_color := highlighting.get_link_color(src_in_path)
+		var src_color := highlighting.get_link_color(src_in_path, hue)
 		var src_x := _draw_stem(source_node, lane_y, src_color, false)
 		x_all.append(src_x)
 		if src_in_path:
@@ -57,7 +68,7 @@ func draw_links(links_dict: Dictionary, side: ContainerSide,
 		# Draw destination stems (with arrow)
 		for dest_node in destinations:
 			var dest_in_path := highlighting.in_critical_path(source_node, [dest_node])
-			var dest_color := highlighting.get_link_color(dest_in_path)
+			var dest_color := highlighting.get_link_color(dest_in_path, hue)
 			var dest_x := _draw_stem(dest_node, lane_y, dest_color, true)
 			x_all.append(dest_x)
 			if dest_in_path:
@@ -69,7 +80,7 @@ func draw_links(links_dict: Dictionary, side: ContainerSide,
 			})
 
 		# Draw horizontal lane connecting all stems
-		_draw_lane(x_all, x_highlight, lane_y, highlighting)
+		_draw_lane(x_all, x_highlight, lane_y, highlighting, hue)
 
 
 ## Execute all deferred draw commands on the given CanvasItem.
@@ -162,16 +173,16 @@ func _draw_stem(node, lane_y: int, color: Color, is_destination: bool) -> int:
 
 
 func _draw_lane(x_all: Array[int], x_highlight: Array[int], lane_y: int,
-		highlighting: DTHighlighting) -> void:
+		highlighting: DTHighlighting, hue: float = -1.0) -> void:
 	var half_w = round(StyleConfig.Link.WIDTH / 2.0)
 	var left: int = x_all.min() - half_w
 	var right: int = x_all.max() + half_w
-	var base_color = StyleConfig.Link.HIGHLIGHT_COLOR if highlighting.highlighted_element == null else StyleConfig.Link.DIMMED_COLOR
+	var base_color = highlighting.get_link_color(highlighting.highlighted_element == null, hue)
 	_queue_line(Vector2(left, lane_y), Vector2(right, lane_y), base_color)
 	if not x_highlight.is_empty():
 		var hl: int = x_highlight.min() - half_w
 		var hr: int = x_highlight.max() + half_w
-		_queue_line(Vector2(hl, lane_y), Vector2(hr, lane_y), StyleConfig.Link.HIGHLIGHT_COLOR)
+		_queue_line(Vector2(hl, lane_y), Vector2(hr, lane_y), highlighting.get_link_color(true, hue))
 
 
 func _queue_line(start: Vector2, end: Vector2, color: Color) -> void:

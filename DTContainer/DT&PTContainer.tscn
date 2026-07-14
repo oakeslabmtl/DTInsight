@@ -23,7 +23,7 @@ corner_radius_bottom_left = 20
 content_margin_left = 20.0
 content_margin_top = 20.0
 content_margin_right = 20.0
-content_margin_bottom = 10.0
+content_margin_bottom = 20.0
 bg_color = Color(0.847474, 0.847474, 0.847474, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qb31t"]
@@ -41,6 +41,13 @@ content_margin_right = 20.0
 content_margin_bottom = 10.0
 bg_color = Color(0.933333, 0.733333, 1, 1)
 corner_radius_bottom_right = 20
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_panlg"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 4.0
+content_margin_bottom = 0.0
+thickness = 0
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_panlg"]
 
@@ -70,7 +77,7 @@ corner_radius_bottom_left = 20
 content_margin_left = 20.0
 content_margin_top = 20.0
 content_margin_right = 20.0
-content_margin_bottom = 10.0
+content_margin_bottom = 20.0
 bg_color = Color(1, 0.8, 0.6, 1)
 corner_radius_top_left = 20
 corner_radius_top_right = 20
@@ -170,7 +177,7 @@ uppercase = true
 layout_mode = 2
 
 [node name="EnvContainer" type="HBoxContainer" parent="PTContainer/Operator&EnvContainer/ExperimentContainer/EnvPanel/EnvOrganizer" unique_id=629597637]
-custom_minimum_size = Vector2(200, 358)
+custom_minimum_size = Vector2(200, 372)
 layout_mode = 2
 size_flags_horizontal = 6
 
@@ -200,7 +207,7 @@ uppercase = true
 layout_mode = 2
 
 [node name="SystemContainer" type="HBoxContainer" parent="PTContainer/Operator&EnvContainer/ExperimentContainer/SystemPanel/SystemOrganizer" unique_id=1099107310]
-custom_minimum_size = Vector2(200, 358)
+custom_minimum_size = Vector2(200, 372)
 layout_mode = 2
 size_flags_horizontal = 6
 
@@ -261,7 +268,7 @@ text = "Sensors"
 uppercase = true
 
 [node name="SensorsOrganizer" type="HBoxContainer" parent="PTContainer/DataTravelContainer/DataOutPanel/DataOutContainer" unique_id=95159007]
-custom_minimum_size = Vector2(0, 150)
+custom_minimum_size = Vector2(0, 140)
 layout_mode = 2
 size_flags_vertical = 3
 
@@ -269,6 +276,11 @@ size_flags_vertical = 3
 layout_mode = 2
 size_flags_horizontal = 6
 size_flags_vertical = 3
+
+[node name="HSeparator" type="HSeparator" parent="PTContainer/DataTravelContainer/DataOutPanel/DataOutContainer" unique_id=1902466502]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+theme_override_styles/separator = SubResource("StyleBoxLine_panlg")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="PTContainer/DataTravelContainer/DataOutPanel/DataOutContainer" unique_id=1999152635]
 layout_mode = 2
@@ -292,7 +304,7 @@ size_flags_horizontal = 3
 layout_mode = 2
 
 [node name="DataTransmittedOrganizer" type="HBoxContainer" parent="PTContainer/DataTravelContainer/DataOutPanel/DataOutContainer" unique_id=223100660]
-custom_minimum_size = Vector2(0, 150)
+custom_minimum_size = Vector2(0, 140)
 layout_mode = 2
 size_flags_vertical = 3
 
