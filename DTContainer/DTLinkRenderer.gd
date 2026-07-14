@@ -214,18 +214,38 @@ func _unique_x(potential: int) -> int:
 func _get_lane_y(side: ContainerSide, key_node: Node, destinations: Array) -> int:
 	match side:
 		ContainerSide.ANY:
-			var mid_y = (key_node.global_position.y + key_node.size.y + destinations[0].global_position.y) / 2
+			var source_parent = key_node.get_parent()
+			var dest_parent = destinations[0].get_parent()
+			var source_face: float
+			var dest_face: float
+			
+			if source_parent.global_position.y > dest_parent.global_position.y:
+				source_face = source_parent.global_position.y
+				dest_face = dest_parent.global_position.y + dest_parent.size.y
+			else:
+				source_face = source_parent.global_position.y + source_parent.size.y
+				dest_face = dest_parent.global_position.y
+				
+			var mid_y = source_face + (dest_face - source_face) * StyleConfig.Link.DIRECT_LINK_LANE_RATIO
 			return _find_viable(mid_y, _used_y, 1)
+			
 		ContainerSide.TOP:
-			return _find_viable(_top(key_node).y - StyleConfig.Link.MEAN_OUTER_LINK_DISTANCE, _used_y, 1)
+			var min_top = key_node.get_parent().global_position.y
+			for dest in destinations:
+				min_top = min(min_top, dest.get_parent().global_position.y)
+			return _find_viable(min_top - StyleConfig.Link.MEAN_OUTER_LINK_DISTANCE, _used_y, 1)
+			
 		ContainerSide.BOTTOM:
-			return _find_viable(_bottom(key_node).y + StyleConfig.Link.MEAN_OUTER_LINK_DISTANCE, _used_y, 1)
+			var max_bottom = key_node.get_parent().global_position.y + key_node.get_parent().size.y
+			for dest in destinations:
+				max_bottom = max(max_bottom, dest.get_parent().global_position.y + dest.get_parent().size.y)
+			return _find_viable(max_bottom + StyleConfig.Link.MEAN_OUTER_LINK_DISTANCE, _used_y, 1)
 	return 0
 
 
 func _find_viable(potential: int, used: Array[int], iteration: int) -> int:
 	if potential in used:
-		var offset = 2 * StyleConfig.Link.WIDTH * iteration
+		var offset = StyleConfig.Link.SPACING * iteration
 		if iteration % 2 == 0:
 			return _find_viable(potential - offset, used, iteration + 1)
 		else:

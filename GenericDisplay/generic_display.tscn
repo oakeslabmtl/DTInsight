@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://tvcjlrt40n0q"]
+[gd_scene format=3 uid="uid://tvcjlrt40n0q"]
 
 [ext_resource type="Script" uid="uid://ost4ju4q0ybe" path="res://GenericDisplay/GenericDisplay.gd" id="1_5lixw"]
 [ext_resource type="Script" uid="uid://jeh5r2brp2mt" path="res://GenericDisplay/PopUpChart/PopUpChartControl.gd" id="2_5nhr6"]
@@ -74,7 +74,7 @@ corner_detail = 5
 [sub_resource type="ViewportTexture" id="ViewportTexture_ipcor"]
 viewport_path = NodePath("GenericDisplay/VisualizationContainer/HBoxContainer/VizPopUpButton/PopupPanel/TextureRect/SubViewport")
 
-[node name="GenericDisplayContainer" type="PanelContainer"]
+[node name="GenericDisplayContainer" type="PanelContainer" unique_id=1265705603]
 offset_right = 123.0
 offset_bottom = 43.0
 size_flags_vertical = 4
@@ -83,12 +83,12 @@ theme = SubResource("Theme_5nhr6")
 theme_override_styles/panel = SubResource("StyleBoxFlat_2niug")
 script = ExtResource("1_5lixw")
 
-[node name="GenericDisplay" type="VBoxContainer" parent="."]
+[node name="GenericDisplay" type="VBoxContainer" parent="." unique_id=168850086]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
 
-[node name="FilePicker" type="FileDialog" parent="GenericDisplay"]
+[node name="FilePicker" type="FileDialog" parent="GenericDisplay" unique_id=1697420435]
 oversampling_override = 1.0
 title = "Open a File"
 file_mode = 0
@@ -96,23 +96,27 @@ access = 2
 filters = PackedStringArray("*.pck")
 use_native_dialog = true
 
-[node name="PresentationBox" type="HBoxContainer" parent="GenericDisplay"]
+[node name="PresentationBox" type="HBoxContainer" parent="GenericDisplay" unique_id=813818304]
 layout_mode = 2
 
-[node name="GenericElementName" type="Label" parent="GenericDisplay/PresentationBox"]
+[node name="GenericElementName" type="Label" parent="GenericDisplay/PresentationBox" unique_id=1231489129]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.129558, 0.129558, 0.129558, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0)
+theme_override_constants/outline_size = 0
+theme_override_font_sizes/font_size = 20
 text = "Default"
 horizontal_alignment = 1
 vertical_alignment = 3
+paragraph_separator = "_"
 
-[node name="ScriptButton" type="Button" parent="GenericDisplay/PresentationBox"]
+[node name="ScriptButton" type="Button" parent="GenericDisplay/PresentationBox" unique_id=1676171503]
 visible = false
 layout_mode = 2
 text = "Script"
 
-[node name="EditButton" type="Button" parent="GenericDisplay"]
+[node name="EditButton" type="Button" parent="GenericDisplay" unique_id=666638941]
 custom_minimum_size = Vector2(60, 25)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -126,37 +130,37 @@ text = "Edit"
 icon_alignment = 1
 expand_icon = true
 
-[node name="RealTimeContainer" type="VBoxContainer" parent="GenericDisplay"]
+[node name="RealTimeContainer" type="VBoxContainer" parent="GenericDisplay" unique_id=1637070955]
 visible = false
 layout_mode = 2
 
-[node name="GenericElementAttributes" type="Label" parent="GenericDisplay/RealTimeContainer"]
+[node name="GenericElementAttributes" type="Label" parent="GenericDisplay/RealTimeContainer" unique_id=899901965]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.12941177, 0.12941177, 0.12941177, 1)
 text = "test information"
 horizontal_alignment = 1
 vertical_alignment = 3
 
-[node name="PopUpButton" type="Button" parent="GenericDisplay/RealTimeContainer"]
+[node name="PopUpButton" type="Button" parent="GenericDisplay/RealTimeContainer" unique_id=1733199384]
 layout_mode = 2
 text = "Show Realtime Graph"
 
-[node name="VisualizationContainer" type="VBoxContainer" parent="GenericDisplay"]
+[node name="VisualizationContainer" type="VBoxContainer" parent="GenericDisplay" unique_id=446944392]
 visible = false
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="GenericDisplay/VisualizationContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="GenericDisplay/VisualizationContainer" unique_id=370405512]
 layout_mode = 2
 
-[node name="VizPickerButton" type="Button" parent="GenericDisplay/VisualizationContainer/HBoxContainer"]
+[node name="VizPickerButton" type="Button" parent="GenericDisplay/VisualizationContainer/HBoxContainer" unique_id=617009856]
 layout_mode = 2
 text = "Pick file"
 
-[node name="VizPopUpButton" type="Button" parent="GenericDisplay/VisualizationContainer/HBoxContainer"]
+[node name="VizPopUpButton" type="Button" parent="GenericDisplay/VisualizationContainer/HBoxContainer" unique_id=169536741]
 layout_mode = 2
 text = "Open Visualization"
 
-[node name="PopupPanel" type="PopupPanel" parent="GenericDisplay/VisualizationContainer/HBoxContainer/VizPopUpButton"]
+[node name="PopupPanel" type="PopupPanel" parent="GenericDisplay/VisualizationContainer/HBoxContainer/VizPopUpButton" unique_id=777601690]
 transparent_bg = false
 oversampling_override = 1.0
 title = "Visualization"
@@ -166,20 +170,20 @@ borderless = false
 always_on_top = true
 transparent = false
 
-[node name="TextureRect" type="TextureRect" parent="GenericDisplay/VisualizationContainer/HBoxContainer/VizPopUpButton/PopupPanel"]
+[node name="TextureRect" type="TextureRect" parent="GenericDisplay/VisualizationContainer/HBoxContainer/VizPopUpButton/PopupPanel" unique_id=332463332]
 offset_left = 4.0
 offset_top = 4.0
 offset_right = 404.0
 offset_bottom = 404.0
 texture = SubResource("ViewportTexture_ipcor")
 
-[node name="SubViewport" type="SubViewport" parent="GenericDisplay/VisualizationContainer/HBoxContainer/VizPopUpButton/PopupPanel/TextureRect"]
+[node name="SubViewport" type="SubViewport" parent="GenericDisplay/VisualizationContainer/HBoxContainer/VizPopUpButton/PopupPanel/TextureRect" unique_id=1872243069]
 size = Vector2i(400, 400)
 
-[node name="popup_root" type="Node3D" parent="GenericDisplay/VisualizationContainer/HBoxContainer/VizPopUpButton/PopupPanel/TextureRect/SubViewport"]
+[node name="popup_root" type="Node3D" parent="GenericDisplay/VisualizationContainer/HBoxContainer/VizPopUpButton/PopupPanel/TextureRect/SubViewport" unique_id=1601548382]
 unique_name_in_owner = true
 
-[node name="PopupChart" type="PopupPanel" parent="."]
+[node name="PopupChart" type="PopupPanel" parent="." unique_id=1659724685]
 disable_3d = true
 oversampling_override = 1.0
 title = "Realtime Monitoring"
@@ -189,21 +193,21 @@ unresizable = false
 borderless = false
 always_on_top = true
 
-[node name="ChartControl" type="Control" parent="PopupChart"]
+[node name="ChartControl" type="Control" parent="PopupChart" unique_id=1301444289]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 4.0
 offset_top = 4.0
-offset_right = -4.0
-offset_bottom = -4.0
+offset_right = 516.0
+offset_bottom = 516.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("2_5nhr6")
 metadata/_custom_type_script = "uid://jeh5r2brp2mt"
 
-[node name="VBoxContainer" type="VBoxContainer" parent="PopupChart/ChartControl"]
+[node name="VBoxContainer" type="VBoxContainer" parent="PopupChart/ChartControl" unique_id=1432917650]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -211,15 +215,15 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="ChartContainer" type="VBoxContainer" parent="PopupChart/ChartControl/VBoxContainer"]
+[node name="ChartContainer" type="VBoxContainer" parent="PopupChart/ChartControl/VBoxContainer" unique_id=808600558]
 layout_mode = 2
 size_flags_vertical = 3
 alignment = 1
 
-[node name="Chart" parent="PopupChart/ChartControl/VBoxContainer/ChartContainer" instance=ExtResource("3_0c6qw")]
+[node name="Chart" parent="PopupChart/ChartControl/VBoxContainer/ChartContainer" unique_id=1415336296 instance=ExtResource("3_0c6qw")]
 layout_mode = 2
 
-[node name="PopupDescription" type="PopupPanel" parent="."]
+[node name="PopupDescription" type="PopupPanel" parent="." unique_id=1584000645]
 disable_3d = true
 oversampling_override = 1.0
 title = "Component Information"
@@ -229,19 +233,19 @@ unresizable = false
 borderless = false
 always_on_top = true
 
-[node name="DescriptionControl" type="Control" parent="PopupDescription"]
+[node name="DescriptionControl" type="Control" parent="PopupDescription" unique_id=1784277978]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 4.0
 offset_top = 4.0
-offset_right = -4.0
-offset_bottom = -4.0
+offset_right = 396.0
+offset_bottom = 221.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="DescriptionContainer" type="VBoxContainer" parent="PopupDescription/DescriptionControl"]
+[node name="DescriptionContainer" type="VBoxContainer" parent="PopupDescription/DescriptionControl" unique_id=1348947524]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -249,39 +253,39 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="ComponentNameContainer" type="HBoxContainer" parent="PopupDescription/DescriptionControl/DescriptionContainer"]
+[node name="ComponentNameContainer" type="HBoxContainer" parent="PopupDescription/DescriptionControl/DescriptionContainer" unique_id=1850039064]
 custom_minimum_size = Vector2(0, 35)
 layout_mode = 2
 
-[node name="ComponentNameLabel" type="Label" parent="PopupDescription/DescriptionControl/DescriptionContainer/ComponentNameContainer"]
+[node name="ComponentNameLabel" type="Label" parent="PopupDescription/DescriptionControl/DescriptionContainer/ComponentNameContainer" unique_id=1118203020]
 layout_mode = 2
 text = "Name:"
 
-[node name="ComponentNameEdit" type="TextEdit" parent="PopupDescription/DescriptionControl/DescriptionContainer/ComponentNameContainer"]
+[node name="ComponentNameEdit" type="TextEdit" parent="PopupDescription/DescriptionControl/DescriptionContainer/ComponentNameContainer" unique_id=809946136]
 layout_mode = 2
 size_flags_horizontal = 3
 focus_next = NodePath("../../Description")
 placeholder_text = "Placeholder component name"
 context_menu_enabled = false
 
-[node name="HSeparator" type="HSeparator" parent="PopupDescription/DescriptionControl/DescriptionContainer"]
+[node name="HSeparator" type="HSeparator" parent="PopupDescription/DescriptionControl/DescriptionContainer" unique_id=559951170]
 layout_mode = 2
 
-[node name="DescriptionLabel" type="Label" parent="PopupDescription/DescriptionControl/DescriptionContainer"]
+[node name="DescriptionLabel" type="Label" parent="PopupDescription/DescriptionControl/DescriptionContainer" unique_id=251644047]
 layout_mode = 2
 text = "Description:"
 
-[node name="Description" type="TextEdit" parent="PopupDescription/DescriptionControl/DescriptionContainer"]
+[node name="Description" type="TextEdit" parent="PopupDescription/DescriptionControl/DescriptionContainer" unique_id=561080645]
 layout_mode = 2
 size_flags_vertical = 3
 placeholder_text = "No description"
 context_menu_enabled = false
 wrap_mode = 1
 
-[node name="HSeparator2" type="HSeparator" parent="PopupDescription/DescriptionControl/DescriptionContainer"]
+[node name="HSeparator2" type="HSeparator" parent="PopupDescription/DescriptionControl/DescriptionContainer" unique_id=496651167]
 layout_mode = 2
 
-[node name="DeleteButton" type="Button" parent="PopupDescription/DescriptionControl/DescriptionContainer"]
+[node name="DeleteButton" type="Button" parent="PopupDescription/DescriptionControl/DescriptionContainer" unique_id=1376460470]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.87, 0.25230002, 0.25230002, 1)
 theme_override_colors/font_focus_color = Color(0.87058824, 0.2509804, 0.2509804, 1)
@@ -290,7 +294,7 @@ theme_override_colors/font_hover_color = Color(0.87058824, 0.2509804, 0.2509804,
 theme_override_colors/font_hover_pressed_color = Color(0.87058824, 0.2509804, 0.2509804, 1)
 text = "Delete"
 
-[node name="PopupScript" type="PopupPanel" parent="."]
+[node name="PopupScript" type="PopupPanel" parent="." unique_id=1630563824]
 disable_3d = true
 oversampling_override = 1.0
 title = "Script Information"
@@ -300,20 +304,20 @@ unresizable = false
 borderless = false
 always_on_top = true
 
-[node name="ScriptControl" type="Control" parent="PopupScript"]
+[node name="ScriptControl" type="Control" parent="PopupScript" unique_id=598863505]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 4.0
 offset_top = 4.0
-offset_right = -4.0
-offset_bottom = -4.0
+offset_right = 516.0
+offset_bottom = 516.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("3_ipcor")
 
-[node name="ScriptContainer" type="VBoxContainer" parent="PopupScript/ScriptControl"]
+[node name="ScriptContainer" type="VBoxContainer" parent="PopupScript/ScriptControl" unique_id=1876110627]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -321,7 +325,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Script" type="RichTextLabel" parent="PopupScript/ScriptControl/ScriptContainer"]
+[node name="Script" type="RichTextLabel" parent="PopupScript/ScriptControl/ScriptContainer" unique_id=2068999593]
 layout_mode = 2
 size_flags_vertical = 3
 text = "Select the DT script folder in the settings first"
@@ -329,8 +333,8 @@ text = "Select the DT script folder in the settings first"
 [connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
 [connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]
 [connection signal="file_selected" from="GenericDisplay/FilePicker" to="." method="_on_file_selected"]
-[connection signal="pressed" from="GenericDisplay/EditButton" to="." method="_on_edit_button_pressed"]
 [connection signal="pressed" from="GenericDisplay/PresentationBox/ScriptButton" to="." method="_on_script_button_pressed"]
+[connection signal="pressed" from="GenericDisplay/EditButton" to="." method="_on_edit_button_pressed"]
 [connection signal="pressed" from="GenericDisplay/RealTimeContainer/PopUpButton" to="." method="_on_pop_up_button_pressed"]
 [connection signal="pressed" from="GenericDisplay/VisualizationContainer/HBoxContainer/VizPickerButton" to="." method="_on_viz_picker_button_pressed"]
 [connection signal="pressed" from="GenericDisplay/VisualizationContainer/HBoxContainer/VizPopUpButton" to="." method="_on_viz_pop_up_button_pressed"]
