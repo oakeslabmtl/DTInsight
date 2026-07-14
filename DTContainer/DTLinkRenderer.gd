@@ -19,6 +19,7 @@ var _used_y: Array[int] = []
 
 # ── Drawn link registry (for hit-testing) ─────────────────────────────────────
 var drawn_links: Array[Dictionary] = []
+var _draw_call_counter: int = 0
 
 
 ## Clear all deferred draws and position caches. Call once per frame.
@@ -30,6 +31,7 @@ func clear() -> void:
 	_dimmed_triangles.clear()
 	_highlighted_triangles.clear()
 	drawn_links.clear()
+	_draw_call_counter = 0
 
 
 ## Draw all links from a single link dictionary (source -> [destinations]).
@@ -43,8 +45,10 @@ func draw_links(links_dict: Dictionary, side: ContainerSide,
 			valid_sources.append(source_node)
 			
 	var total_sources = valid_sources.size()
-	# Add a base offset per lane type so different groups don't all start at exactly Red (0.0)
-	var group_hue_offset = float(abs(link_type.hash()) % 1000) / 1000.0
+	
+	# Use a golden ratio offset based on the number of draw calls so every group gets a unique starting color
+	var group_hue_offset = float(_draw_call_counter) * 0.6180339887
+	_draw_call_counter += 1
 
 	for i in range(total_sources):
 		var source_node = valid_sources[i]
