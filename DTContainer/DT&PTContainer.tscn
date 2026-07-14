@@ -96,6 +96,8 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_kfiye"]
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panlg"]
 content_margin_left = 0.0
 content_margin_top = 0.0
@@ -390,13 +392,8 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_ox2pm")
 
 [node name="ModelsDataContainer" type="HBoxContainer" parent="DTContainer/ModelsDataPanel" unique_id=691633951]
 layout_mode = 2
-theme_override_constants/separation = 50
 
-[node name="ModelsPanelContainer" type="PanelContainer" parent="DTContainer/ModelsDataPanel/ModelsDataContainer" unique_id=141576101]
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_qb3t8")
-
-[node name="ModelsLabel" type="Label" parent="DTContainer/ModelsDataPanel/ModelsDataContainer/ModelsPanelContainer" unique_id=486638902]
+[node name="ModelsLabel" type="Label" parent="DTContainer/ModelsDataPanel/ModelsDataContainer" unique_id=486638902]
 z_index = 1
 layout_mode = 2
 size_flags_horizontal = 0
@@ -408,6 +405,10 @@ text = "Models
 "
 uppercase = true
 
+[node name="ModelsPanelContainer" type="PanelContainer" parent="DTContainer/ModelsDataPanel/ModelsDataContainer" unique_id=141576101]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_qb3t8")
+
 [node name="ModelsContainer" type="HBoxContainer" parent="DTContainer/ModelsDataPanel/ModelsDataContainer/ModelsPanelContainer" unique_id=1000874031]
 custom_minimum_size = Vector2(200, 125)
 layout_mode = 2
@@ -417,11 +418,12 @@ size_flags_vertical = 3
 [node name="AddComponentButton" parent="DTContainer/ModelsDataPanel/ModelsDataContainer/ModelsPanelContainer" unique_id=250195497 instance=ExtResource("2_panlg")]
 layout_mode = 2
 
-[node name="DataPanelContainer" type="PanelContainer" parent="DTContainer/ModelsDataPanel/ModelsDataContainer" unique_id=269900558]
+[node name="VSeparator" type="VSeparator" parent="DTContainer/ModelsDataPanel/ModelsDataContainer" unique_id=538096190]
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_panlg")
+theme_override_constants/separation = 20
+theme_override_styles/separator = SubResource("StyleBoxEmpty_kfiye")
 
-[node name="DataLabel" type="Label" parent="DTContainer/ModelsDataPanel/ModelsDataContainer/DataPanelContainer" unique_id=58304311]
+[node name="DataLabel" type="Label" parent="DTContainer/ModelsDataPanel/ModelsDataContainer" unique_id=58304311]
 z_index = 1
 layout_mode = 2
 size_flags_horizontal = 0
@@ -431,6 +433,10 @@ theme_override_constants/outline_size = 1
 theme_override_font_sizes/font_size = 20
 text = "Data"
 uppercase = true
+
+[node name="DataPanelContainer" type="PanelContainer" parent="DTContainer/ModelsDataPanel/ModelsDataContainer" unique_id=269900558]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panlg")
 
 [node name="DataContainer" type="HBoxContainer" parent="DTContainer/ModelsDataPanel/ModelsDataContainer/DataPanelContainer" unique_id=477069515]
 custom_minimum_size = Vector2(200, 125)
