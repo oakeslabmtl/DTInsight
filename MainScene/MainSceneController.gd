@@ -13,12 +13,24 @@ extends Node
 @onready var fuseki_data: FusekiData = $FusekiData
 @onready var dt_container: BoxContainer = $DTContainer
 
+# ── Preloaded scenes ──────────────────────────────────────────────────────────
+var _fuseki_writer_scene := preload("res://Fuseki/Caller/FusekiWriter.tscn")
+var _fuseki_writer: Node
+
 
 func _ready() -> void:
 	# Inject the shared FusekiData manager into every subsystem that needs it.
 	fuseki_caller.set_fuseki_data_manager(fuseki_data)
 	fuseki_dumper.set_fuseki_data_manager(fuseki_data)
 	dt_container.set_fuseki_data(fuseki_data)
+
+	# Instantiate the FusekiWriter and add it to the scene tree.
+	_fuseki_writer = _fuseki_writer_scene.instantiate()
+	add_child(_fuseki_writer)
+
+	# Inject the writer and caller references into FusekiData for write-back.
+	fuseki_data.fuseki_writer = _fuseki_writer
+	fuseki_data.fuseki_caller_button = fuseki_caller
 
 	# React to Fuseki data updates to refresh the visualisation.
 	FusekiSignals.fuseki_data_updated.connect(_update_fuseki_data)

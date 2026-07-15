@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://px6a2dg8cawb"]
+[gd_scene format=3 uid="uid://px6a2dg8cawb"]
 
 [ext_resource type="Script" uid="uid://cj71y2lip0wby" path="res://addons/modular-settings-menu/scripts/settings_menu.gd" id="1_crapp"]
 [ext_resource type="Script" uid="uid://b2uskv7m4kmgm" path="res://addons/modular-settings-menu/scripts/settings_section.gd" id="2_4tyfx"]
@@ -21,7 +21,7 @@ bg_color = Color(0.298039, 0.298039, 0.298039, 1)
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_qp71p"]
 
-[node name="Settings" type="Control"]
+[node name="Settings" type="Control" unique_id=1498230756]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -31,7 +31,7 @@ grow_vertical = 2
 mouse_filter = 1
 script = ExtResource("1_crapp")
 
-[node name="SettingsPanel" type="VBoxContainer" parent="."]
+[node name="SettingsPanel" type="VBoxContainer" parent="." unique_id=2076583499]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -45,20 +45,20 @@ offset_bottom = 270.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="SettingsTabs" type="TabContainer" parent="SettingsPanel"]
+[node name="SettingsTabs" type="TabContainer" parent="SettingsPanel" unique_id=224754822]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_lj62q")
 theme_override_styles/tab_focus = SubResource("StyleBoxEmpty_kwbsm")
 current_tab = 0
 
-[node name="General" type="Control" parent="SettingsPanel/SettingsTabs"]
+[node name="General" type="Control" parent="SettingsPanel/SettingsTabs" unique_id=774188433]
 layout_mode = 2
 script = ExtResource("2_4tyfx")
 metadata/_custom_type_script = "uid://b2uskv7m4kmgm"
 metadata/_tab_index = 0
 
-[node name="MarginContainer" type="MarginContainer" parent="SettingsPanel/SettingsTabs/General"]
+[node name="MarginContainer" type="MarginContainer" parent="SettingsPanel/SettingsTabs/General" unique_id=1711414120]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -70,11 +70,11 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="ScrollContainer" type="ScrollContainer" parent="SettingsPanel/SettingsTabs/General/MarginContainer"]
+[node name="ScrollContainer" type="ScrollContainer" parent="SettingsPanel/SettingsTabs/General/MarginContainer" unique_id=688406439]
 layout_mode = 2
 horizontal_scroll_mode = 0
 
-[node name="MarginContainer" type="MarginContainer" parent="SettingsPanel/SettingsTabs/General/MarginContainer/ScrollContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="SettingsPanel/SettingsTabs/General/MarginContainer/ScrollContainer" unique_id=1759543239]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -83,59 +83,59 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="ElementList" type="VBoxContainer" parent="SettingsPanel/SettingsTabs/General/MarginContainer/ScrollContainer/MarginContainer"]
+[node name="ElementList" type="VBoxContainer" parent="SettingsPanel/SettingsTabs/General/MarginContainer/ScrollContainer/MarginContainer" unique_id=745874528]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 24
 
-[node name="BasicSettings" type="VBoxContainer" parent="SettingsPanel/SettingsTabs/General/MarginContainer/ScrollContainer/MarginContainer/ElementList"]
+[node name="BasicSettings" type="VBoxContainer" parent="SettingsPanel/SettingsTabs/General/MarginContainer/ScrollContainer/MarginContainer/ElementList" unique_id=579699737]
 layout_mode = 2
 
-[node name="SubSectionName" type="Label" parent="SettingsPanel/SettingsTabs/General/MarginContainer/ScrollContainer/MarginContainer/ElementList/BasicSettings"]
+[node name="SubSectionName" type="Label" parent="SettingsPanel/SettingsTabs/General/MarginContainer/ScrollContainer/MarginContainer/ElementList/BasicSettings" unique_id=1841063228]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Basic Settings"
 
-[node name="HSeparator" type="HSeparator" parent="SettingsPanel/SettingsTabs/General/MarginContainer/ScrollContainer/MarginContainer/ElementList/BasicSettings"]
+[node name="HSeparator" type="HSeparator" parent="SettingsPanel/SettingsTabs/General/MarginContainer/ScrollContainer/MarginContainer/ElementList/BasicSettings" unique_id=1665039779]
 layout_mode = 2
 
-[node name="ScriptFileSelector" parent="SettingsPanel/SettingsTabs/General/MarginContainer/ScrollContainer/MarginContainer/ElementList/BasicSettings" instance=ExtResource("3_0qu0k")]
+[node name="ScriptFileSelector" parent="SettingsPanel/SettingsTabs/General/MarginContainer/ScrollContainer/MarginContainer/ElementList/BasicSettings" unique_id=424185379 instance=ExtResource("3_0qu0k")]
 layout_mode = 2
 
-[node name="FusekiDumperController" type="HBoxContainer" parent="SettingsPanel/SettingsTabs/General/MarginContainer/ScrollContainer/MarginContainer/ElementList/BasicSettings"]
+[node name="FusekiDumperController" type="HBoxContainer" parent="SettingsPanel/SettingsTabs/General/MarginContainer/ScrollContainer/MarginContainer/ElementList/BasicSettings" unique_id=1234035038]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
 script = ExtResource("4_rlirv")
 
-[node name="DumpPathEdit" type="TextEdit" parent="SettingsPanel/SettingsTabs/General/MarginContainer/ScrollContainer/MarginContainer/ElementList/BasicSettings/FusekiDumperController"]
+[node name="DumpPathEdit" type="TextEdit" parent="SettingsPanel/SettingsTabs/General/MarginContainer/ScrollContainer/MarginContainer/ElementList/BasicSettings/FusekiDumperController" unique_id=950135603]
 layout_mode = 2
 size_flags_horizontal = 3
 theme = ExtResource("5_lwpvd")
 placeholder_text = "Dump file path..."
 
-[node name="PickButton" type="Button" parent="SettingsPanel/SettingsTabs/General/MarginContainer/ScrollContainer/MarginContainer/ElementList/BasicSettings/FusekiDumperController"]
+[node name="PickButton" type="Button" parent="SettingsPanel/SettingsTabs/General/MarginContainer/ScrollContainer/MarginContainer/ElementList/BasicSettings/FusekiDumperController" unique_id=1799776236]
 layout_mode = 2
 text = "Pick file"
 
-[node name="ButtonsContainer" type="VBoxContainer" parent="SettingsPanel/SettingsTabs/General/MarginContainer/ScrollContainer/MarginContainer/ElementList/BasicSettings/FusekiDumperController"]
+[node name="ButtonsContainer" type="VBoxContainer" parent="SettingsPanel/SettingsTabs/General/MarginContainer/ScrollContainer/MarginContainer/ElementList/BasicSettings/FusekiDumperController" unique_id=156378097]
 layout_mode = 2
 
-[node name="DumpButton" type="Button" parent="SettingsPanel/SettingsTabs/General/MarginContainer/ScrollContainer/MarginContainer/ElementList/BasicSettings/FusekiDumperController/ButtonsContainer"]
+[node name="DumpButton" type="Button" parent="SettingsPanel/SettingsTabs/General/MarginContainer/ScrollContainer/MarginContainer/ElementList/BasicSettings/FusekiDumperController/ButtonsContainer" unique_id=670452954]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 text = "Dump"
 
-[node name="LoadButton" type="Button" parent="SettingsPanel/SettingsTabs/General/MarginContainer/ScrollContainer/MarginContainer/ElementList/BasicSettings/FusekiDumperController/ButtonsContainer"]
+[node name="LoadButton" type="Button" parent="SettingsPanel/SettingsTabs/General/MarginContainer/ScrollContainer/MarginContainer/ElementList/BasicSettings/FusekiDumperController/ButtonsContainer" unique_id=1181643876]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 text = "Load
 "
 
-[node name="FileDialog" type="FileDialog" parent="SettingsPanel/SettingsTabs/General/MarginContainer/ScrollContainer/MarginContainer/ElementList/BasicSettings/FusekiDumperController"]
+[node name="FileDialog" type="FileDialog" parent="SettingsPanel/SettingsTabs/General/MarginContainer/ScrollContainer/MarginContainer/ElementList/BasicSettings/FusekiDumperController" unique_id=718633068]
 auto_translate_mode = 1
 title = "Open a File"
 initial_position = 1
@@ -149,26 +149,26 @@ file_mode = 0
 access = 2
 use_native_dialog = true
 
-[node name="RabbitMQ" parent="SettingsPanel/SettingsTabs" instance=ExtResource("2_qpphr")]
+[node name="RabbitMQ" parent="SettingsPanel/SettingsTabs" unique_id=689397301 instance=ExtResource("2_qpphr")]
 visible = false
 layout_mode = 2
 theme_override_styles/tab_focus = SubResource("StyleBoxEmpty_v0fou")
 metadata/_tab_index = 1
 
-[node name="Fuseki" parent="SettingsPanel/SettingsTabs" instance=ExtResource("3_i2jv1")]
+[node name="Fuseki" parent="SettingsPanel/SettingsTabs" unique_id=881089734 instance=ExtResource("3_i2jv1")]
 visible = false
 layout_mode = 2
 metadata/_tab_index = 2
 
-[node name="Graphics" parent="SettingsPanel/SettingsTabs" instance=ExtResource("3_8fcn6")]
+[node name="Graphics" parent="SettingsPanel/SettingsTabs" unique_id=1115598554 instance=ExtResource("3_8fcn6")]
 visible = false
 layout_mode = 2
 metadata/_tab_index = 3
 
-[node name="HBoxContainer" type="HBoxContainer" parent="SettingsPanel"]
+[node name="HBoxContainer" type="HBoxContainer" parent="SettingsPanel" unique_id=89291231]
 layout_mode = 2
 
-[node name="ApplyButton" type="Button" parent="SettingsPanel/HBoxContainer"]
+[node name="ApplyButton" type="Button" parent="SettingsPanel/HBoxContainer" unique_id=1339155389]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -176,13 +176,13 @@ theme_override_styles/focus = SubResource("StyleBoxEmpty_ntlmy")
 disabled = true
 text = "Apply"
 
-[node name="BackButton" type="Button" parent="SettingsPanel/HBoxContainer"]
+[node name="BackButton" type="Button" parent="SettingsPanel/HBoxContainer" unique_id=1101376233]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/focus = SubResource("StyleBoxEmpty_qp71p")
 text = "Back"
 
-[node name="ElementPanels" type="Control" parent="."]
+[node name="ElementPanels" type="Control" parent="." unique_id=1054795077]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -191,7 +191,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="DiscardChangesPopup" parent="." instance=ExtResource("4_yfemx")]
+[node name="DiscardChangesPopup" parent="." unique_id=1496688922 instance=ExtResource("4_yfemx")]
 visible = false
 layout_mode = 1
 

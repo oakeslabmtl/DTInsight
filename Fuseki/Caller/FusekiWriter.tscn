@@ -1,0 +1,9 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Fuseki/Caller/FusekiWriter.gd" id="1_writer"]
+
+[node name="FusekiWriter" type="Node"]
+script = ExtResource("1_writer")
+
+[node name="UpdateHTTPRequest" type="HTTPRequest" parent="."]
+use_threads = true

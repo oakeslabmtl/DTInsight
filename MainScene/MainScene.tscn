@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://cxj8tr6re2b4t"]
+[gd_scene load_steps=21 format=3 uid="uid://cxj8tr6re2b4t"]
 
 [ext_resource type="PackedScene" uid="uid://nqgolpvgp7yg" path="res://DTContainer/DT&PTContainer.tscn" id="1_lklxr"]
 [ext_resource type="Script" uid="uid://dfun6prbhxg7c" path="res://MainScene/MainSceneController.gd" id="1_r7thu"]
@@ -33,6 +33,15 @@ corner_radius_bottom_right = 20
 corner_radius_bottom_left = 20
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_80vrr"]
+
+[sub_resource type="GDScript" id="GDScript_77ryg"]
+script/source = "extends Button
+
+func _on_pressed() -> void:
+	var fuseki_data = $\"../../FusekiData\"
+	await fuseki_data.add_triple(\"Testfsesefseff\", \"a\", \"DTDFVocab:ProvidedThing\", false)
+	#await fuseki_data.add_triple(\"MyService2\", \"DTDFVocab:provides\", \"controller_control\", false)
+"
 
 [node name="MainScene" type="Node"]
 script = ExtResource("1_r7thu")
@@ -412,6 +421,13 @@ layout_mode = 2
 text = "Status: Not Running"
 horizontal_alignment = 1
 
+[node name="TestFusekiWriteButton" type="Button" parent="ControlLayer"]
+visible = false
+offset_right = 8.0
+offset_bottom = 8.0
+text = "test"
+script = SubResource("GDScript_77ryg")
+
 [node name="FusekiData" parent="." instance=ExtResource("5_4e51a")]
 
 [node name="CICDServer" type="Node" parent="." node_paths=PackedStringArray("container", "to_hide")]
@@ -433,3 +449,4 @@ to_hide = [NodePath("../ControlLayer")]
 [connection signal="pressed" from="ControlLayer/ButtonsContainer/VBoxContainer/ScriptRunnerButton/ScriptRunnerPopup/VBoxContainer/ProjectDirContainer/ProjectDirPickButton" to="ControlLayer/ButtonsContainer/VBoxContainer/ScriptRunnerButton/ScriptRunnerPopup" method="_on_project_dir_pick_button_pressed"]
 [connection signal="pressed" from="ControlLayer/ButtonsContainer/VBoxContainer/ScriptRunnerButton/ScriptRunnerPopup/VBoxContainer/ActionButtons/RunButton" to="ControlLayer/ButtonsContainer/VBoxContainer/ScriptRunnerButton/ScriptRunnerPopup" method="_on_run_button_pressed"]
 [connection signal="pressed" from="ControlLayer/ButtonsContainer/VBoxContainer/ScriptRunnerButton/ScriptRunnerPopup/VBoxContainer/ActionButtons/BackButton" to="ControlLayer/ButtonsContainer/VBoxContainer/ScriptRunnerButton/ScriptRunnerPopup" method="_on_back_button_pressed"]
+[connection signal="pressed" from="ControlLayer/TestFusekiWriteButton" to="ControlLayer/TestFusekiWriteButton" method="_on_pressed"]

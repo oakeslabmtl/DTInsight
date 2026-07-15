@@ -22,11 +22,21 @@ func in_critical_path(source, destinations: Array) -> bool:
 		or highlighted_element in destinations)
 
 
-## Returns the appropriate link color based on highlight state.
-func get_link_color(is_in_critical_path: bool) -> Color:
+## Returns the appropriate link color based on highlight state and hue.
+func get_link_color(is_in_critical_path: bool, hue: float = -1.0) -> Color:
+	var base_color: Color
+	if hue >= 0.0:
+		base_color = Color.from_hsv(hue, 0.65, 0.8)
+	else:
+		base_color = StyleConfig.Link.HIGHLIGHT_COLOR
+
+	if highlighted_element == null:
+		return base_color
+	
 	if is_in_critical_path:
-		return StyleConfig.Link.HIGHLIGHT_COLOR
-	return StyleConfig.Link.DIMMED_COLOR
+		return base_color
+	else:
+		return StyleConfig.Link.DIMMED_COLOR
 
 
 # ── Private ───────────────────────────────────────────────────────────────────
