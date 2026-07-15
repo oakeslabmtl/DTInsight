@@ -330,6 +330,9 @@ func add_triple(
 	var resolved_object := object if is_literal else _resolve_uri(object, object_prefix)
 	
 	var graph_prefix = await _resolve_graph_prefix(target_graph_prefix, subject)
+	if graph_prefix == "":
+		printerr("FusekiData.add_triple: No graph prefix resolved for subject '%s'; aborting write." % subject)
+		return false
 
 	var sparql := FusekiUpdateQuery.build_insert(
 		graph_prefix,
