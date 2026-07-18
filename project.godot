@@ -15,7 +15,7 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 [application]
 
 config/name="DTInsight"
-config/version="1.3.0"
+config/version="1.3.1"
 run/main_scene="res://MainScene/MainScene.tscn"
 config/features=PackedStringArray("4.7", "C#", "Forward Plus")
 run/low_processor_mode=true

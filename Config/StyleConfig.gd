@@ -28,18 +28,19 @@ class Implementation:
 class DTElement:
 	const BORDER_WIDTH: int = 5
 	const BORDER_COLOR: Color = Color("454545")
-	const DIMMED_COLOR: Color = Color.GRAY
+	const DIMMED_COLOR: Color = Color("d7d7d7")
 	const HIGHLIGHT_COLOR: Color = Color.DIM_GRAY
 	const TEXT_HIGHLIGHT_COLOR: Color = Color.WHITE_SMOKE
 	const PLANNED_COLOR: Color = Color(Color.WHITE, 0.6)
 
 #Visual link style
 class Link:
+	static var COLORED_LINKS: bool = false
 	const WIDTH: int = 5
 	const SPACING: int = 2 * WIDTH
 	const MEAN_OUTER_LINK_DISTANCE: int = 15 * WIDTH
 	const DIRECT_LINK_LANE_RATIO: float = 0.6
-	const DIMMED_COLOR: Color = Color.GRAY
+	const DIMMED_COLOR: Color = Color("d7d7d7")
 	const HIGHLIGHT_COLOR: Color = Color.DIM_GRAY
 
 #Legends style

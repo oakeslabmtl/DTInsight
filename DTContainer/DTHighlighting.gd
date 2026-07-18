@@ -25,7 +25,7 @@ func in_critical_path(source, destinations: Array) -> bool:
 ## Returns the appropriate link color based on highlight state and hue.
 func get_link_color(is_in_critical_path: bool, hue: float = -1.0) -> Color:
 	var base_color: Color
-	if hue >= 0.0:
+	if hue >= 0.0 and StyleConfig.Link.COLORED_LINKS:
 		base_color = Color.from_hsv(hue, 0.65, 0.8)
 	else:
 		base_color = StyleConfig.Link.HIGHLIGHT_COLOR
